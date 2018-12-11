@@ -1,31 +1,85 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+	<div id="app">
+
+		<keep-alive>
+			<router-view v-if="$route.meta.keepAlive&& $route.matched.length==1"></router-view>
+		</keep-alive>
+		<router-view v-if="!$route.meta.keepAlive|| $route.matched.length>1"></router-view>
+	</div>
 </template>
 
+<script>
+	export default {
+		name: 'app',
+		data(){
+			return {
+				transitionName: 'slide-left',
+				alive: false
+			}
+		},
+
+
+		created() {
+			// console.log(this.getUrlParam('state'))
+			// console.log(encodeURIComponent(window.location.href))
+			if(this.isWeixn()){
+
+				let state= this.getUrlParam('state')
+				let URL = encodeURIComponent(window.location.href)
+				if( !state){
+					// let URL = encodeURIComponent('http://192.168.169.109:8888')
+					let appId = window.location.origin === 'https://weixin.shanghaiqixiu.org' ? this.consts.onlineAppId : this.consts.testAppId
+					window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${URL}&response_type=code&scope=snsapi_userinfo&state=snsapi_base#wechat_redirect`
+				}
+				if(state=='snsapi_base'){
+					this.axios({
+						url: '/user/useraccount/access/openid',
+						method: 'post',
+						headers: {'Content-type': 'application/json'},
+						data: JSON.stringify({
+							code: this.getUrlParam('code'),
+							platform: 'WX',
+							workOn: window.location.origin === 'https://weixin.shanghaiqixiu.org' ? 'pPro' : 'pDev',
+							systemToken: localStorage.getItem('SYSTEMTOKEN'),
+							// redirectUri: URL
+						})
+					}).then(res=>{
+						if(res.data.code==='000000') {
+							// this.UnionID = res.data.openId.openId
+							localStorage.setItem("UNIONID",res.data.openId.openId);
+							localStorage.setItem("QXWOPENID",res.data.openId.openIdReal);
+							history.replaceState(null, null, window.location.origin + window.location.hash)
+						}
+					})
+				}
+
+				let shareLink= this.getUrlParam('share')
+				if(shareLink){
+					// alert(decodeURIComponent(shareLink))
+					window.location.href=window.location.origin + decodeURIComponent(shareLink)
+				}
+			}
+		},
+		methods:{
+			isWeixn(){
+				let ua = navigator.userAgent.toLowerCase();
+				if(ua.match(/MicroMessenger/i)=="micromessenger") {
+					return true;
+				} else {
+					return false;
+				}
+			},
+			getUrlParam(name) {
+				let reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+				let r = window.location.search.substr(1).match(reg);
+				// if(r!=null)return  unescape(r[2]); return null;
+				if(r!=null)return r[2];
+				return null;
+			}
+		}
+	}
+</script>
+
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-}
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>

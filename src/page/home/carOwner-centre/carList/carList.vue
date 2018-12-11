@@ -1,0 +1,370 @@
+<template>
+  <div id="carList">
+    <div class='search'>
+      <form action="javascript:return true;">
+        <input type="search" placeholder="搜索车牌号码" class="mui-input-clear" v-model='vehicleplatenumber' @keydown="key($event)" style="padding-left: 35px; text-indent: 0;">
+      </form>
+    </div>
+      <div class="carList">
+        <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
+          <ul>
+            <li @click="goRecordList(item.vin, item.status, item.vehicleplatenumber)" class="block mui-table-view-cell mui-transitioning" v-for='(item, index) in carList' :key='index'>
+              <div class="mui-slider-right mui-disabled">
+                <a class="mui-btn mui-btn-red" style="transform: translate(0px, 0px);" v-if="item.binds&&item.binds.length" @click.stop.prevent="removeAuthorize(item.binds)">解除授权</a>
+                <a class="mui-btn mui-btn-yellow" style="transform: translate(0px, 0px);" @click.stop="deleteVehicle(item.vehicleId)">解绑车辆</a>
+              </div>
+              <div class="mui-slider-handle" style="transform: translate(0px, 0px);">
+                <div class="title">
+                  <img style="width: 15px; height: 15px;" src="../../../../assets/img/record/list.png"/>
+                  <span>{{ item.vehicleplatenumber }}</span>
+                  <img class="arrow" src="../../../../assets/img/my/right-arrow.png" width="7px" height="14px">
+                </div>
+                <div class="info">
+                  <p>
+                    <!--<mt-button size="small" @click.stop="deleteVehicle(item.vehicleId)" type="danger" style="height: 24px; right: 0; top: 3px; font-size: 10px; position: absolute; width: 50px;">解绑</mt-button>-->
+                    <span class="text-one-cut" style="display: block; margin-right: 60px;">车架号(VIN)：{{ item.vin }}</span>
+                  </p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </mt-loadmore>
+      </div>
+
+
+    <mt-button @click="sheetVisible=!sheetVisible" type="primary" class="add_car" size="large">新增绑定车辆</mt-button>
+    <mt-actionsheet
+      :actions="actions"
+      v-model="sheetVisible">
+    </mt-actionsheet>
+    <mt-popup
+      v-model="popupVisible">
+      <div style="width: 80vw; border-radius: 3px; max-height: calc(80vh - 40px);">
+        <mt-radio
+          style="margin-bottom: 8px;"
+          v-model="checkedWho"
+          align="right"
+          :options="authorizers">
+        </mt-radio>
+        <div style="height: 40px; border-top: 1px solid #ccc;">
+          <div class="mint-msgbox-btns">
+            <button class="mint-msgbox-btn mint-msgbox-cancel" @click="cancel">取消</button>
+            <button class="mint-msgbox-btn mint-msgbox-confirm" @click="confirm">确定</button></div>
+        </div>
+      </div>
+    </mt-popup>
+  </div>
+</template>
+
+<script>
+import { Toast, Loadmore, Button, MessageBox, Actionsheet, Popup, Radio } from 'mint-ui'
+export default {
+  name: 'carList',
+  mounted() {
+    this.getData()
+  },
+  data() {
+    let _this = this
+    return {
+      carList: [],
+      lastPage: false,
+      pageNo: 1,
+      vehicleplatenumber: '',
+      loadMoreBtn: false,
+      userRoleId: null,
+      allLoaded: false,
+      sheetVisible: false,
+      actions: [{
+        name: '绑定本人车辆',
+        method(){
+          _this.$router.push('/carOwner-centre/bind-car/bindCar')
+        }
+      }, {
+        name: '绑定他人车辆',
+        method(){
+          _this.$router.push('/carOwner-centre/bind-car/bind-other-car')
+        }
+      }],
+      popupVisible: false,
+      checkedWho: '',
+      authorizers: [],
+      authorizers1: []
+    }
+  },
+
+  methods: {
+    goRecordList(id, status, vehicleplatenumber) {
+      if(status == '1'){
+        MessageBox.alert('绑定车辆信息正在审核中, 请审核通过后再查看').then(action => {
+          return
+        })
+        return
+      }
+      if(id) {
+        this.$router.push({
+          path: '/recordList',
+          query: {id:id, vehicleplatenumber: vehicleplatenumber}
+        })
+      } else {
+        Toast('该车暂无维修记录')
+      }
+
+    },
+
+    getData(){
+      let data = {
+        accessToken: localStorage.getItem("ACCESSTOKEN"),
+        vehicleplatenumber: this.vehicleplatenumber,
+        pageSize: 10,
+        pageNo: this.pageNo
+      }
+      if(!arguments.length){
+      }
+      this.axios({
+        method: 'post',
+        url: '/vehicle/owner/queryVehicelist',
+        headers: {'Content-type': 'application/json'},
+        data: JSON.stringify(data)
+      })
+      .then(res=>{
+        this.allLoaded=true
+        if(arguments.length==2){
+          this.carList=[...this.carList, ...res.data.data]
+          this.$refs.loadmore.onBottomLoaded();
+        }else {
+          this.carList = res.data.data
+        }
+        if (this.carList == null || this.carList.length == 0) {
+          Toast('您还未绑定车辆')
+        }
+        if(arguments.length==1){
+          this.$refs.loadmore.onTopLoaded()
+        }
+      })
+    },
+
+    // 上拉加载更多
+    loadBottom() {
+      this.pageNo+=1
+      this.getData(1,2)
+    },
+
+    // 下拉刷新
+    loadTop(){
+      this.getData(1)
+    },
+
+    // 输入车牌号进行搜索
+    key(e) {
+      this.pageNo=1
+      if (e.keyCode == '13') {
+        e.target.blur()
+        if (this.vehicleplatenumber.trim() == '') {
+          Toast('请输入车牌号')
+          return
+        }
+        let data = {
+          accessToken: localStorage.getItem("ACCESSTOKEN"),
+          vehicleplatenumber: this.vehicleplatenumber,
+          pageSize: 10,
+          pageNo: this.pageNo
+        }
+        this.axios({
+          method: 'post',
+          url: '/vehicle/owner/queryVehicelist',
+          headers: { 'Content-type': 'application/json' },
+          data: JSON.stringify(data)
+        }).then(res => {
+            console.log("search---res", res);
+          if (res.data.data == null || res.data.data.length < 1){
+            Toast('未找到匹配车辆')
+            return
+          }
+          this.carList = res.data.data
+          this.allLoaded = true
+          console.log(this.carList)
+        })
+      }
+    },
+
+    deleteVehicle(id) {
+      MessageBox.confirm('确定执行此操作?').then(action => {
+        let param = {
+          accessToken: localStorage.getItem('ACCESSTOKEN'),
+          vehicleId: id
+        }
+        this.axios({
+          method: 'post',
+          url: '/vehicle/carfile/remove-bind',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          data: JSON.stringify(param)
+        })
+          .then(res => {
+            if(res.data.code === '000000') {
+              Toast('解绑成功!');
+              this.plate=''
+              this.frame=''
+              window.location.reload()
+            } else {
+              Toast(res.data.status);
+            }
+          })
+      })
+    },
+
+    removeAuthorize(data){
+      this.popupVisible = true
+      this.authorizers1=data
+      this.authorizers=[]
+      data.map(item=>{
+        this.authorizers.push("解除授权账号:"+item.mobile)
+      })
+    },
+
+    cancel(){
+      this.popupVisible=!this.popupVisible
+    },
+
+    confirm(){
+      let _this = this
+      this.popupVisible=!this.popupVisible
+      function getBinduserid(){
+        for(let i = 0; i < _this.authorizers1.length; i++){
+          if(_this.authorizers1[i].mobile == _this.checkedWho.split(':')[1]){
+            return _this.authorizers1[i].binduserid
+          }
+        }
+      }
+      this.axios({
+        method: 'post',
+        url: '/scan/relieve',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        data: JSON.stringify({
+          accessToken: localStorage.getItem('ACCESSTOKEN'),
+          binduserid: getBinduserid(),
+          vehicleNumber: document.querySelector('.mui-table-view-cell.mui-selected span').innerHTML
+        })
+      }).then(res=>{
+        if(res.data.code==='000000'){
+          Toast('取消授权成功')
+          window.location.reload()
+        }else {
+          Toast(res.data.status)
+        }
+      })
+    }
+  }
+}
+</script>
+
+<style scoped lang='less'>
+  #carList {
+  background-color: #f8f8f8;
+  overflow: auto;
+  position: relative;
+    .add_car{
+      position: fixed; left: 0;bottom: 0; border-radius: 0; border: none; width: 100%;
+    }
+    .carList{
+      height: 100vh;
+      padding: 50px 0 40px 0;
+      overflow: auto;
+    }
+  .search {
+    padding: 8px 12px;
+    position: fixed;
+    width: 100%;
+    background: #fff;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    form {
+      input {
+        background: url(../../../../assets/img/record/search.png) no-repeat 10px 10px;
+        font-size: 14px;
+        background-color: #eee;
+        background-size: 18px 18px;
+        text-indent: 20px;
+        border-radius: 5px;
+        outline: none;
+        border: none;
+        width: 100%;
+        height: 35px;
+        position: relative;
+        text-align: left;
+        margin-bottom: 0;
+      }
+      span {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        height: 35px;
+        width: 50px;
+        line-height: 35px;
+        text-align: center;
+      }
+    }
+  }
+  .block {
+    width: 100%;
+    padding: 0 10px;
+    border-top: 10px solid #f8f8f8;
+    background-color: #fff;
+    .title {
+      width: 100%;
+      border-bottom: 1px solid #f8f8f8;
+      height: 30px;
+      overflow: hidden;
+      img {
+        margin-top: 7px;
+      }
+      .arrow {
+        float: right;
+        margin-right: 10px;
+      }
+      span {
+        font-size: 16px;
+        display: inline-block;
+        height: 30px;
+        line-height: 30px;
+        margin-left: 5px;
+      }
+    }
+    .info {
+      padding: 10px 20px;
+      color: #676767;
+      margin: 0;
+      p {
+        height: 30px;
+        line-height: 30px;
+        font-size: 14px;
+        margin-bottom: 0;
+        .right {
+          float: right;
+        }
+      }
+      form {
+         &:after, &:before {
+            height: 0;
+          }
+        font-size: 14px;
+        .mui-input-row {
+          label {
+            padding: 11px 0;
+            width: 60px;
+          }
+          input {
+            float: left;
+            font-size: 14px;
+            padding-left: 10px;
+          }
+        }
+      }
+    }
+  }
+}
+</style>
