@@ -116,7 +116,7 @@
           .then(res => {
             let _this=this
             console.log('res',res)
-            if(res.data.code === '000000'){
+            if(res.data.code === '0'){
 
               this.isanonymous = false
               this.text=''
@@ -174,7 +174,7 @@
         // };  //添加请求头
         // this.axios.post('/image/add/' + localStorage.getItem('ACCESSTOKEN'),param,config)
         //   .then(response=>{
-        //     if(response.data.code === '000000') {
+        //     if(response.data.code === '0') {
         //       this.picURL.push(response.data.data.picPath);
         //     }
         //   })
@@ -230,7 +230,7 @@
           },
           data: formdata
         }).then(res => {
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             console.log(res.data)
             // self.img= res.data.data.picPath
             self.picURL.push(res.data.data.picPath);

@@ -171,9 +171,9 @@ export const formatMoney =(val, decimals, dec_point, thousands_sep)=> {
  */
 export const formatDate= (value, format) => {
 	if (value) {
-		console.log('转化之前',value);
+		// console.log('转化之前',value);
 		value = new Date(value);
-		console.log('转化hi后',value);
+		// console.log('转化hi后',value);
 		let o = {
 			"M+": value.getMonth() + 1, //month
 			"d+": value.getDate(),    //day

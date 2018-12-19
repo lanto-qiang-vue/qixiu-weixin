@@ -13,7 +13,7 @@
     <div class='content'>
       <mt-swipe :auto="0">
         <mt-swipe-item v-for="(item, index) in bannerList" :key="index">
-          <router-link :to="item.link_url" tag="a"><img :src="item.image_url"></router-link>
+          <router-link :to="item.linkUrl" tag="a"><img :src="item.imageUrl"></router-link>
         </mt-swipe-item>
       </mt-swipe>
     </div>
@@ -112,15 +112,15 @@
       <div style="height: 171px;overflow: hidden;" class="cdf1">
       <ul>
         <router-link v-for="(item, index) in questionList" :key="index" tag="li"
-            :to="{ path: '/questionDetail', query: {questionId: item.quesId}}">
+            :to="{ path: '/questionDetail', query: {questionId: item.id}}">
           <div class="top">
-            <div class="head"><img :src="item.questionerPhoto || '/static/img/home/user.png'"/></div>
-            <p>{{item.userName ? item.userName : '匿名'}}</p><p>{{item.createTime | FormatDate}}</p>
+            <div class="head"><img :src="item.headPhoto || '/static/img/home/user.png'"/></div>
+            <p>{{item.nickName || '匿名'}}</p><p>{{item.createTime | FormatDate}}</p>
           </div>
-          <p class="ask"><label>问题：</label><span>{{item.quesContent}}</span></p>
-          <p class="answer" v-if="item.answer">
-            <label>{{item.answer.answerUserName ? item.answer.answerUserName + '：' : '匿名：'}}</label>
-            <span>{{item.answer.answerContent ? item.answer.answerContent : ''}}</span></p>
+          <p class="ask"><label>问题：</label><span>{{item.content}}</span></p>
+          <p class="answer" v-if="item.answerContent">
+            <label>{{item.answerName || '匿名'}}：</label>
+            <span>{{item.answerContent || ''}}</span></p>
           <p class="answer" style="margin-top: 25px" v-else><label></label><span style="color: #c1c1c1;height: 20px">暂无回答</span></p>
         </router-link>
       </ul>
@@ -161,7 +161,7 @@
 
   <div class="allnews">
     <img class="head" src="../../assets/img/home/news-title.png"/>
-    <router-link tag="div" class="lastnews" :to="{ path: '/infoDetail', query: {infoId: lastnews.infoId}}">
+    <router-link tag="div" class="lastnews" :to="{ path: '/infoDetail', query: {infoId: lastnews.id}}">
       <div class="title">{{lastnews.title}}</div>
       <span v-if="lastnews.publishTime">{{lastnews.publishTime | FormatDate}}</span>
       <img :src="lastnews.photo||'/static/img/home/news_big.png'"/>
@@ -169,7 +169,7 @@
     <div class="news1" style="height: 200px;overflow: hidden;">
       <ul>
         <router-link v-for="(item, index) in news1" :key="index" tag="li"
-          :to="{ path: '/infoDetail', query: {infoId: item.infoId}}">
+          :to="{ path: '/infoDetail', query: {infoId: item.id}}">
           <img :src="item.photo||'/static/img/home/news_small.png'"/>
           <div class="right">
             <div class="title">{{item.title}} <span v-if="item.publishTime">{{item.publishTime | FormatDate}}</span></div>
@@ -315,19 +315,9 @@ export default {
     // window.clearInterval(this.snews2.timer)
     // window.clearInterval(this.snews3.timer)
 
-    this.axios({
-      method: 'post',
-      url: '/app/banner/list',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      data: JSON.stringify({
-        place: 0,
-        terminal: 'W'
-      })
-    }).then(res=>{
-      if(res.data.code==='000000'){
-        this.bannerList=res.data.data
+    this.axios.post('/banner/query',{terminal: 'W'}).then(res=>{
+      if(res.data.code==='0'){
+        this.bannerList=res.data.items
       }else {
         // Toast(res.data.status)
       }
@@ -335,19 +325,17 @@ export default {
 
     this.axios({
       method: 'post',
-      url: '/center/questionList',
-      headers: {'Content-type': 'application/json'},
-      data: JSON.stringify({
-        systemToken: SYSTEMTOKEN,
-        limit: 10,
-        page: 1
-      })
+      url: '/question/nostate/list',
+      data: {
+	      "pageNo": 1,
+	      "pageSize": 10,
+      }
     }).then(res => {
-      if(res.data.code=='000000'){
-        self.questionList= res.data.data.dataList
+      if(res.data.code=='0'){
+        self.questionList= res.data.items
 
         // console.log(res.data.data.dataList.length)
-        self.autoroll('cdf1', res.data.data.dataList.length, 'questionList', 3000)
+        self.autoroll('cdf1',res.data.items.length, 'questionList', 3000)
 
 
       } else{
@@ -429,9 +417,8 @@ export default {
     });
 
     this.axios({
-      method: 'get',
-      url: '/wechat/material?type=news&offset=0&count=20',
-      headers: {'Content-type': 'application/json'},
+		method: 'get',
+		url: '/weixin/qixiu/material/query?type=news&offset=0&count=20',
     }).then(res => {
       if(res.data.item){
         let list= res.data.item
@@ -500,22 +487,14 @@ export default {
     },
     getNews(category, callback){
       let data = {
-        systemToken: localStorage.getItem("SYSTEMTOKEN"),
-        category: category,
-        page: 1,
-        size: 10
+	      infoType: category,
+	      pageNo: 1,
+	      pageSize: 10
       }
-      this.axios({
-        method: 'post',
-        url: '/infopublic/list',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        data: JSON.stringify(data)
-      }).then(res => {
+      this.axios.post('/infopublic/home/all', data).then(res => {
           // this.infoPublicList = res.data.data.dataList;
-        if(res.data.code=='000000') {
-          callback(res.data.data.dataList)
+        if(res.data.code=='0') {
+          callback(res.data.items)
         }else{
           // Toast(res.data.status);
         }

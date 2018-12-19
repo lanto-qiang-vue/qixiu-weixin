@@ -66,7 +66,7 @@
       //       systemToken: localStorage.getItem('SYSTEMTOKEN')
       //     })
       //   }).then(res=>{
-      //     if(res.data.code==='000000'){
+      //     if(res.data.code==='0'){
       //       this.UnionID = res.data.openId.openId
       //       this.axios({
       //         url: '/user/useraccount/register/login',
@@ -79,7 +79,7 @@
       //         })
       //       }).then(res=>{
       //         console.log(res.data.code)
-      //         if(res.data.code === "000000"){
+      //         if(res.data.code === "0"){
       //           Toast("授权登录成功")
       //           localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
       //           localStorage.setItem("USERINFO",JSON.stringify(res.data.data));
@@ -143,7 +143,7 @@
     //         systemToken: localStorage.getItem("SYSTEMTOKEN")
     //       })
     //     }).then(res=>{
-    //       if(res.data.code === "000000"){
+    //       if(res.data.code === "0"){
     //         Toast('验证码发送成功,请查收!')
     //         this.flag = false
     //         this.timer = setInterval(()=>{
@@ -174,7 +174,7 @@
     //         systemToken: localStorage.getItem("SYSTEMTOKEN")
     //       })
     //     }).then(res=>{
-    //       if(res.data.code==='000000'){
+    //       if(res.data.code==='0'){
     //         Toast('绑定手机号并登录成功')
     //         localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
     //         localStorage.setItem("USERINFO",JSON.stringify(res.data.data));

@@ -29,7 +29,7 @@
         method: 'get',
         headers: {'Content-type': 'application/json'}
       }).then(res=>{
-        if(res.data.code==='000000'){
+        if(res.data.code==='0'){
           console.log(res.data.data);
           this.bindUsers = res.data.data.bindUsers
           this.bindVehicles = res.data.data.bindVehicles

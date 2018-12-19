@@ -119,7 +119,7 @@
         })
           .then(res => {
               console.log("维修服务res", res);
-            if (res.data.code == '000000') {
+            if (res.data.code == '0') {
 
               that.username = ''
               that.address = ''

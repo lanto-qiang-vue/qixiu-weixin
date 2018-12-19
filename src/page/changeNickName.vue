@@ -45,7 +45,7 @@ export default {
           "nickName": this.nickName.trim()
         }
       }).then(res=>{
-        if(res.data.code==="000000"){
+        if(res.data.code==="0"){
           Toast("修改成功")
           let userInfo = JSON.parse(localStorage.getItem("USERINFO"));
           userInfo.nickname = this.nickName

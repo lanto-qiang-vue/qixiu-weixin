@@ -262,7 +262,7 @@
             property: 3
           })
         }).then(res => {
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             this.companyName = res.data.data.corpName
             this.name = res.data.data.legalPerson
             this.businessId = res.data.data.businessId
@@ -285,7 +285,7 @@
             image: baseImg.split(',')[1],
           })
         }).then(res=>{
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             this.vehiclePlateNumber = res.data.data.vehiclePlateNumber
             this.ownerName = res.data.data.ownerName
             this.vin = res.data.data.vin
@@ -315,7 +315,7 @@
             licenseId: this.licenseId
           })
         }).then(res=>{
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             MessageBox.confirm('绑定成功,是否立即查看车辆?').then(action => {
               _this.$router.push('/carOwner-centre/carList')
             }, action => {
@@ -378,7 +378,7 @@
           headers: {'Content-type': 'application/json'},
           data: JSON.stringify(data)
         }).then(res=>{
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             Toast('修改成功')
             this.popupVisible1=false
             this.popupVisible2=false

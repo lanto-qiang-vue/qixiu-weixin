@@ -43,7 +43,7 @@ export default {
         }).then(function (response) {
           console.log('response',response)
 
-          if(response.data.code == '000000'){
+          if(response.data.code == '0'){
             Toast('发送成功，请查收！');
           }else {
             Toast(response.data.status);
@@ -72,7 +72,7 @@ export default {
         .then(res => {
         console.log('response111111',res)
 
-        if(res.data.code == '000000'){
+        if(res.data.code == '0'){
           this.$router.push({
             path: '/bindPhone'
           })

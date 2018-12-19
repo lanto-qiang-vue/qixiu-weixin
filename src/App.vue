@@ -44,7 +44,7 @@
 							// redirectUri: URL
 						})
 					}).then(res=>{
-						if(res.data.code==='000000') {
+						if(res.data.code==='0') {
 							// this.UnionID = res.data.openId.openId
 							localStorage.setItem("UNIONID",res.data.openId.openId);
 							localStorage.setItem("QXWOPENID",res.data.openId.openIdReal);

@@ -65,7 +65,7 @@ export default {
         data: JSON.stringify(param)
       })
       .then(res => {
-        if(res.data.code==='000000'){
+        if(res.data.code==='0'){
           Toast('提交成功,待审核通过')
           that.$router.go(-1)
         }else{

@@ -211,7 +211,7 @@
         //   };  //添加请求头
         //   this.axios.post('/image/add/' + localStorage.getItem('ACCESSTOKEN'), param, config)
         //     .then(response => {
-        //       if (response.data.code === '000000') {
+        //       if (response.data.code === '0') {
         //         this.picURL = response.data.data.picPath;
         //         this.changeAvatar(this.picURL);
         //       }
@@ -267,7 +267,7 @@
           },
           data: formdata
         }).then(res => {
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             self.picURL = res.data.data.picPath;
             self.changeAvatar(this.picURL);
           } else {
@@ -290,7 +290,7 @@
           };
           this.axios.post('/center/photo', param)
             .then(response => {
-              if (response.data.code === '000000') {
+              if (response.data.code === '0') {
                 Toast("头像更换成功");
                 let userinfo = JSON.parse(localStorage.getItem("USERINFO"))
                 userinfo.photo = avatarpath;

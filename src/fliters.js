@@ -2,7 +2,7 @@ import Vue from "vue"
 import { formatDate} from "./util"
 
 //格式化日期
-Vue.filter("FormatDate", function (value, format = 'YYYY-MM-DD') {
+Vue.filter("FormatDate", function (value, format) {
   return value?formatDate(value, format) :''
 })
 

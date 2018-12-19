@@ -74,7 +74,7 @@
         })
           .then(res=>{
             this.$refs.loadmore.onTopLoaded();
-            if(res.data.code==='000000'){
+            if(res.data.code==='0'){
               this.jobList=[...this.jobList, ...res.data.data]
               console.log(res);
             }else{

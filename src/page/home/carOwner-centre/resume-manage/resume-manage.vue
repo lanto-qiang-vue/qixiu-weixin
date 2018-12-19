@@ -103,7 +103,7 @@
         method: 'get'
       })
       .then(res=>{
-        if(res.data.code==="000000") {
+        if(res.data.code==="0") {
           this.resumeList=res.data.data
         } else {
           Toast(res.data.status)
@@ -115,7 +115,7 @@
         method: 'get'
       })
       .then(res=>{
-        if(res.data.code==="000000") {
+        if(res.data.code==="0") {
           this.requestList=res.data.data
         } else {
           Toast(res.data.status)
@@ -128,7 +128,7 @@
       })
         .then(res=>{
           console.log(res);
-          if(res.data.code==="000000") {
+          if(res.data.code==="0") {
             this.whoSeeList=res.data.data
           } else {
             Toast("暂无数据")

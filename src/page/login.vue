@@ -244,7 +244,7 @@
               systemToken: localStorage.getItem("SYSTEMTOKEN")
             })
           }).then(res=>{
-            if(res.data.code === '000000'){
+            if(res.data.code === '0'){
               Toast('验证码发送成功,请及时查收!')
               let [_this, time] = [this, null]
               this.flag = false
@@ -313,7 +313,7 @@
           },
           data: JSON.stringify(data)
         }).then(res => {
-          if(res.data.code=='000000'){
+          if(res.data.code=='0'){
             localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
             localStorage.setItem("USERINFO",JSON.stringify(res.data.data));
             self.loginUserInfo= res.data.data
@@ -353,7 +353,7 @@
                 method: 'get',
                 headers: {'Content-type': 'application/json'},
               }).then(res=>{
-                if(res.data.code=='000000'){
+                if(res.data.code=='0'){
                   localStorage.setItem("USERINFO",JSON.stringify(res.data.loginUserBO.data))
                   Toast("绑定成功")
                 }else{
@@ -389,7 +389,7 @@
           })
         }).then(res=>{
           console.log(res.data.code)
-          if(res.data.code === "000000"){
+          if(res.data.code === "0"){
             Toast("授权登录成功")
             localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
             localStorage.setItem("USERINFO",JSON.stringify(res.data.data));
@@ -425,7 +425,7 @@
             systemToken: localStorage.getItem("SYSTEMTOKEN")
           })
         }).then(res=>{
-          if(res.data.code === "000000"){
+          if(res.data.code === "0"){
             Toast('验证码发送成功,请查收!')
             this.flag2 = false
             this.timer2 = setInterval(()=>{
@@ -457,7 +457,7 @@
             systemToken: localStorage.getItem("SYSTEMTOKEN")
           })
         }).then(res=>{
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             Toast('绑定手机号并登录成功')
             localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
             localStorage.setItem("USERINFO",JSON.stringify(res.data.data));

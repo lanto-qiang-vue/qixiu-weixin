@@ -202,7 +202,7 @@
         url: '/scan/getCard/' + localStorage.getItem("ACCESSTOKEN"),
         method: 'get'
       }).then(res=>{
-        if(res.data.code==='000000'){
+        if(res.data.code==='0'){
           if(!res.data.data.userId){
             return
           }
@@ -286,7 +286,7 @@
             property: 1
           })
         }).then(res => {
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             this.IDCardID = res.data.data.creditId
             this.name = res.data.data.ownerName
             this.IDCardNum = res.data.data.idCardNo
@@ -309,7 +309,7 @@
             image: baseImg.split(',')[1],
           })
         }).then(res=>{
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             this.showDriveLicenseInfo = true
             this.vehiclePlateNumber = res.data.data.vehiclePlateNumber
             this.ownerName = res.data.data.ownerName
@@ -339,7 +339,7 @@
             licenseId: this.licenseId
           })
         }).then(res=>{
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             MessageBox.confirm('绑定成功,是否立即查看车辆?').then(action => {
               _this.$router.push('/carOwner-centre/carList')
             }, action => {
@@ -411,7 +411,7 @@
           headers: {'Content-type': 'application/json'},
           data: JSON.stringify(data)
         }).then(res=>{
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             Toast('修改成功')
             this.popupVisible1 = false
             this.popupVisible2 = false

@@ -135,7 +135,7 @@
             data: JSON.stringify(param)
           })
             .then(res => {
-                if(res.data.code === '000000') {
+                if(res.data.code === '0') {
                   Toast('删除成功!');
 
                   this.OrderList = [];

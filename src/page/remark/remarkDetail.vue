@@ -64,7 +64,7 @@
         url: '/comment/id?commentId='+ this.$route.query.id,
         headers: {'Content-type': 'application/json'},
       }).then(res => {
-        if(res.data.code=='000000'){
+        if(res.data.code=='0'){
           self.info= res.data;
           self.starnum= parseInt(res.data.companyAverage)
           self.title= self.getTitle(parseFloat(res.data.companyAverage))

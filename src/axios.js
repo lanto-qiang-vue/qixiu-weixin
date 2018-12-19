@@ -82,7 +82,7 @@ function weixinLogin() {
       })
     }).then(res=>{
       console.log(res.data.code)
-      if(res.data.code === "000000"){
+      if(res.data.code === "0"){
         // Toast("授权登录成功")
         localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
         localStorage.setItem("USERINFO",JSON.stringify(res.data.data));

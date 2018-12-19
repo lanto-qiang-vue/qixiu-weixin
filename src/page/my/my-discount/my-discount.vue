@@ -45,7 +45,7 @@
       })
         .then(res=>{
           console.log(res);
-          if(res.data.code==="000000"){
+          if(res.data.code==="0"){
             this.ticketList=res.data.data
           } else if (res.data.code==="131303"){
             this.$router.go(-1)

@@ -108,7 +108,7 @@
             pageSize: 10,
           })
         }).then(res => {
-          if(res.data.code=='000000'){
+          if(res.data.code=='0'){
             console.log(res.data)
             if(res.data.comments&&res.data.comments.length){
               self.list=self.list.concat(res.data.comments)
@@ -140,7 +140,7 @@
             pageSize: 10,
           })
         }).then(res => {
-          if(res.data.code=='000000'){
+          if(res.data.code=='0'){
             // console.log(res.data)
             if(res.data.comments&&res.data.comments.length){
               self.list2=self.list2.concat(res.data.comments)

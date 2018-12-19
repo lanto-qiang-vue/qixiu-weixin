@@ -87,7 +87,7 @@
             pageSize: 10,
           })
         }).then(res => {
-          if(res.data.code=='000000'&& res.data.comments){
+          if(res.data.code=='0'&& res.data.comments){
             console.log(res.data)
 
             for (let i in res.data.comments){

@@ -101,7 +101,7 @@
         })
           .then(response => {
 
-            if (response.data.code === '000000') {
+            if (response.data.code === '0') {
               this.text = ''
 
               setTimeout(function () {

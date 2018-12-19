@@ -70,7 +70,7 @@
       })
         .then(res=>{
           console.log(res);
-          if(res.data.code==="000000") {
+          if(res.data.code==="0") {
             this.resumeInfo=res.data.data
           } else {
             Toast(res.data.status)

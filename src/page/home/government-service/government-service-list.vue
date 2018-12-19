@@ -90,7 +90,7 @@
           .then(res => {
             // this.infoPublicList = res.data.data.dataList;
 
-            if(res.data.code=='000000'){
+            if(res.data.code=='0'){
               // console.log(res.data)
               self.infoPublicList =self.infoPublicList.concat(res.data.data.dataList)
               // self.list=self.list.concat(res.data.comments)

@@ -112,7 +112,7 @@ export default {
             if(res.data.code=='130410'){
               Toast('登录过期,请重新登录')
               this.$router.push('/login')
-            }else if(res.data.code=='000000'){
+            }else if(res.data.code=='0'){
               Toast('提交成功')
               setTimeout(function(){
                 _this.$router.push("/myOrder")

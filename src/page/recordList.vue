@@ -73,7 +73,7 @@
           })
         }).then(res=>{
           // console.log(res);
-          if(res.data.code==="000000"){
+          if(res.data.code==="0"){
             if(res.data.comments&&res.data.comments.length){
               this.info2[index].gray= true
               this.info2[index].commentId= res.data.comments[0].id

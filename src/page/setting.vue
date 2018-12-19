@@ -46,7 +46,7 @@ export default {
                 method: 'get',
                 url: '/user/useraccount/logout/'+ localStorage.getItem("ACCESSTOKEN")
             }).then(function (response) {
-                if(response.data.code!='000000'){
+                if(response.data.code!='0'){
                   MessageBox('提示', response.data.status);
                 }else{
                   localStorage.removeItem("ACCESSTOKEN")

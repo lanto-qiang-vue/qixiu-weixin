@@ -146,7 +146,7 @@
           },
           data: formdata
         }).then(res => {
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             console.log(res.data)
             self.img= res.data.data.picPath
           } else {
@@ -202,7 +202,7 @@
           },
           data: JSON.stringify(param)
         }).then(res => {
-          if(res.data.code==='000000'){
+          if(res.data.code==='0'){
             console.log(res.data)
             if(jump) {
               Toast('提交成功')

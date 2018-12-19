@@ -85,7 +85,7 @@
             "systemToken": localStorage.getItem('SYSTEMTOKEN')
           }
         }).then(response => {
-          if(response.data.code==='000000'){
+          if(response.data.code==='0'){
             Toast('发送成功，请查收！')
             this.flag=false
               //计时器
@@ -146,7 +146,7 @@
           data: JSON.stringify(data)
         }).then(function (response) {
           console.log(response)
-          if(response.data.code==='000000'){
+          if(response.data.code==='0'){
             MessageBox.alert('注册成功').then(action => {
               self.$router.push({
                 path:'/login'

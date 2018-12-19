@@ -57,7 +57,7 @@
           })
         })
           .then(res=>{
-            if(res.data.code==='000000'){
+            if(res.data.code==='0'){
               if(!res.data.data || res.data.data.length=='0'){
                 Toast('暂无预约订单')
                 this.$router.go(-1)
@@ -86,7 +86,7 @@
                 })
               }).then(res=>{
                 console.log('res', res);
-                if(res.data.code==='000000'){
+                if(res.data.code==='0'){
 
                   e.target.parentNode.nextElementSibling.children[1].innerHTML='已拒绝'
                   e.target.parentNode.nextElementSibling.children[1].style.background='red'
@@ -119,7 +119,7 @@
                 onSiteOrderId: id
               })
             }).then(res=>{
-              if(res.data.code==='000000'){
+              if(res.data.code==='0'){
 
                 e.target.parentNode.nextElementSibling.children[1].innerHTML='已接受'
                 e.target.parentNode.nextElementSibling.children[1].style.background='#4CD964'
@@ -150,7 +150,7 @@
               id
             })
           }).then(res=>{
-            if(res.data.code==='000000'){
+            if(res.data.code==='0'){
               Toast("删除成功")
               this.getOrderList()
             }else {

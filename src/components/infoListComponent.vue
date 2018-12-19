@@ -51,7 +51,7 @@
           'Content-type': 'application/json'
         }
       }).then(res => {
-        if (res.data.code === '000000') {
+        if (res.data.code === '0') {
           let category = res.data.data;
           for (let j in category[0].children) {
             if (category[0].children[j].isfile === false) {

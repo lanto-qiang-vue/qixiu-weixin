@@ -151,7 +151,7 @@ export default {
       data: JSON.stringify(data)
     }).then(res=>{
         // console.log(res);
-        if(res.data.code==="000000"){
+        if(res.data.code==="0"){
           this.repairInfo = res.data.data.repairBasicinfo
           this.weixiuxiangmu=res.data.data.repairprojectlist
           this.weixiupeijian=res.data.data.vehiclepartslist
@@ -173,7 +173,7 @@ export default {
       })
     }).then(res=>{
       // console.log(res);
-      if(res.data.code==="000000"){
+      if(res.data.code==="0"){
         if(res.data.comments&&res.data.comments.length){
           self.comment = res.data.comments[0]
           self.showComment=false
@@ -203,7 +203,7 @@ export default {
       })
     }).then(res=>{
       // console.log(res);
-      if(res.data.code==="000000"){
+      if(res.data.code==="0"){
         if(res.data.content.length){
           self.complaint = res.data.content[0]
           self.showComplaint=false

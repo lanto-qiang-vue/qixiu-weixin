@@ -62,7 +62,7 @@
         method: "get"
       })
         .then(res=>{
-          if(res.data.code==="000000"){
+          if(res.data.code==="0"){
             this.tabList=res.data.data[1].children
             console.log(this.tabList);
           }else {

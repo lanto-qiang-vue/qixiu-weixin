@@ -51,7 +51,7 @@ export default {
           data:''
         }).then(res => {
           // this.list = res.data.complaintInfoBOList
-          if(res.data.code=='000000'){
+          if(res.data.code=='0'){
             self.list=self.list.concat(res.data.complaintInfoBOList)
             // self.list=res.data.comments
             if(self.list.length>=res.data.total){

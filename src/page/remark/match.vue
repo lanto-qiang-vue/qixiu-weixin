@@ -183,7 +183,7 @@
             systemToken: localStorage.getItem("SYSTEMTOKEN")
           })
         }).then(res=>{
-            if(res.data.code === '000000'){
+            if(res.data.code === '0'){
               Toast('验证码发送成功,请及时查收!')
             }else {
               Toast(res.data.status)
@@ -253,7 +253,7 @@
         //     headers: {'Content-type': 'application/json'},
         //     data: JSON.stringify(data)
         //   }).then(res => {
-        //     if(res.data.code=='000000'){
+        //     if(res.data.code=='0'){
         //       localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
         //       localStorage.setItem("USERINFO",JSON.stringify(res.data.data));
         //       // Toast("登录成功")
@@ -392,7 +392,7 @@
           headers: {'Content-type': 'application/json'},
           data: JSON.stringify(param)
         }).then(res => {
-          if(res.data.code=='000000'){
+          if(res.data.code=='0'){
 
             Toast('点评成功')
             // setTimeout(function () {

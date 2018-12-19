@@ -58,7 +58,7 @@
           }
         }).then(response => {
           console.log(response);
-          if (response.data.code === "000000") {
+          if (response.data.code === "0") {
             Toast('发送成功，请查收！');
             this.flag=false
             //计时器
@@ -103,7 +103,7 @@
         })
           .then(res => {
             console.log(res);
-            if(res.data.code == '000000'){
+            if(res.data.code == '0'){
               this.$router.push({
                 path: '/resetPassword',
                 query: {

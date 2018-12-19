@@ -202,7 +202,7 @@ export default {
           data: JSON.stringify(param)
         })
           .then(res => {
-            if(res.data.code === '000000') {
+            if(res.data.code === '0') {
               Toast('解绑成功!');
               this.plate=''
               this.frame=''
@@ -249,7 +249,7 @@ export default {
           vehicleNumber: document.querySelector('.mui-table-view-cell.mui-selected span').innerHTML
         })
       }).then(res=>{
-        if(res.data.code==='000000'){
+        if(res.data.code==='0'){
           Toast('取消授权成功')
           window.location.reload()
         }else {

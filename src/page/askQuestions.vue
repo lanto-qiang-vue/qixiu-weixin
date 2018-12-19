@@ -86,7 +86,7 @@
           data: JSON.stringify(param)
         })
           .then(res => {
-            if(res.data.code==='000000'){
+            if(res.data.code==='0'){
               console.log('res',res)
               this.list = res.data.data.dataList;
               this.listLength = res.data.data.total;
