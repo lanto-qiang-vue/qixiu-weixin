@@ -4,7 +4,7 @@
       <span id="phone_login" class="my_active" @click="phoneLogin($event)">验证码登录</span>
       <span id="account_login" @click="accountLogin($event)">密码登录</span>
     </div>
-    <div style="position: absolute; width: 100%; left: 0; bottom: 30px; z-index: 10;" @click="weChatLogin">
+    <div style="position: absolute; width: 100%; left: 0; bottom: 30px; z-index: 10;" @click="login('weixin')">
       <mt-button type="primary" size="large" style="width: 90%; margin: 0 auto;">
         <span class="mui-icon mui-icon-weixin" style="color: #fff;"></span>
         微信授权一键登录
@@ -20,7 +20,7 @@
                 </mt-field>
               </div>
               <div class="mui-input-row" v-show="false">
-                <pic_verification></pic_verification>
+                <!--<pic_verification></pic_verification>-->
               </div>
               <div class="mui-input-row second_input">
                 <mt-field placeholder="输入验证码" :attr="{ maxlength: 6 }" type="tel" v-model="code">
@@ -63,15 +63,15 @@
       <div class="ipt" style="width: 100vw; height: 100vh; position: relative;">
         <div style="height: 45px; line-height: 45px; text-indent: 10px; background-color: #f8f8f8; font-size: 16px;">请绑定您的手机号</div>
         <div>
-          <mt-field label="手机号" placeholder="请输入手机号" :attr="{ maxlength: 11 }" type="tel" v-model.trim="phone"></mt-field>
+          <mt-field label="手机号" placeholder="请输入手机号" :attr="{ maxlength: 11 }" type="tel" v-model.trim="tel"></mt-field>
           <div v-show="false">
-            <pic_verification></pic_verification>
+            <!--<pic_verification></pic_verification>-->
           </div>
-          <mt-field label="验证码" type="tel" v-model.trim="captcha" :attr="{ maxlength: 6 }" placeholder="短信验证码">
-            <div id="captcha" style="width: 120px; height: 45px; line-height: 45px; text-align: center; color: #42b5f4;" @click="flag2 && getCaptcha()">获取验证码</div>
+          <mt-field label="验证码" type="tel" v-model.trim="code" :attr="{ maxlength: 6 }" placeholder="短信验证码">
+            <div id="captcha" style="width: 120px; height: 45px; line-height: 45px; text-align: center; color: #42b5f4;" @click="flag && getCaptcha()">获取验证码</div>
           </mt-field>
         </div>
-        <mt-button type="primary" style="position: absolute; left: 0; bottom: 0; width: 100vw; border-radius: 0;" @click='submit'>提交</mt-button>
+        <mt-button type="primary" style="position: absolute; left: 0; bottom: 0; width: 100vw; border-radius: 0;" @click="login('code')">提交</mt-button>
       </div>
     </mt-popup>
   </div>
@@ -79,7 +79,7 @@
 
 <script>
   import { Toast, Field, TabContainer, Button, TabContainerItem, MessageBox } from 'mint-ui'
-  import pic_verification from '../components/picVerification.vue'
+  // import pic_verification from '../components/picVerification.vue'
   export default {
     name: 'login',
     data () {
@@ -110,32 +110,6 @@
     },
 
     created() {
-      let data = {
-        device: uuid(),
-        password: "EpPrCgbF",
-        username: "wechatqixiu"
-      };
-      this.axios({
-        method: 'post',
-        url: '/system/terminalsystem/login',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        data: JSON.stringify(data)
-      }).then(function (response) {
-        localStorage.setItem("SYSTEMTOKEN", response.data.data.systemToken)
-      })
-      function  uuid() {
-        var s = [];
-        var hexDigits = "0123456789abcdef";
-        for (var i = 0; i < 32; i++) {
-          s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-        }
-        s[14] = "4";
-        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
-        var uuid = s.join("");
-        return uuid;
-      }
 
       if(this.$route.query.bind=='needbind') this.popupVisible = true
 
@@ -150,11 +124,11 @@
       }
     },
     mounted(){
-      mui('.mui-input-row input').input();
+      // mui('.mui-input-row input').input();
     },
 
     components: {
-      pic_verification
+      // pic_verification
     },
 
     watch: {
@@ -233,15 +207,9 @@
           this.axios({
             method: 'post',
             url: '/message/sms/sendsmscaptcha',
-            headers: {
-              'Content-type': 'application/json'
-            },
             data: JSON.stringify({
               businessType: "10",
-              cid: this.$store.state.picVerification.imageToken,
-              code: this.$store.state.picVerification.YZM,
-              mobile: this.tel,
-              systemToken: localStorage.getItem("SYSTEMTOKEN")
+	            mobileNo: this.tel,
             })
           }).then(res=>{
             if(res.data.code === '0'){
@@ -275,51 +243,63 @@
 
       login(type){
         let self = this;
-        let data = null
+        let data = {}
+	      let UNIONID=localStorage.getItem('UNIONID')
 
-        if(type === 'code'){
-          if(this.state1 != 'success'){
-            return Toast("手机号输入有误")
-          } else if(this.code.trim() === '') {
-            return Toast('验证码不能为空')
-          } else if(this.code.trim().length < 6) {
-            return Toast('验证码为6位数字')
-          }
+	      switch (type){
+		      case 'code':{
+			      if(this.state1 != 'success'){
+				      return Toast("手机号输入有误")
+			      } else if(this.code.trim() === '') {
+				      return Toast('验证码不能为空')
+			      } else if(this.code.trim().length < 6) {
+				      return Toast('验证码为6位数字')
+			      }
 
-          data = {
-            captcha: this.code,   // 验证码
-            loginMethod: type,
-            systemToken: localStorage.getItem('SYSTEMTOKEN'),
-            usertel: this.tel
-          }
-        }else {
-          if(this.state2 != 'success'){
-            return Toast("手机号输入有误")
-          } else if(this.passWord.trim() === '') {
-            return Toast('密码不能为空')
-          }
-          data = {
-            systemToken: localStorage.getItem('SYSTEMTOKEN'),
-            loginaccount : this.userName,
-            userpassword : this.passWord
-          }
+			      data = {
+				      "loginMethod":'手机',
+				      "captureCode": this.code,
+				      "mobile": this.tel,
+			      }
+			      break
+		      }
+		      case 'passwd':{
+			      if(this.state2 != 'success'){
+				      return Toast("手机号输入有误")
+			      } else if(this.passWord.trim() === '') {
+				      return Toast('密码不能为空')
+			      }
+			      data = {
+				      "loginMethod":'密码',
+				      "loginaccount": this.userName,
+				      "userpassword": this.passWord,
+			      }
+			      break
+		      }
+		      case 'weixin':{
+			      data.loginMethod= "微信"
+		      }
+	      }
+
+        if(UNIONID){
+	        data.openid= localStorage.getItem('UNIONID')+','+localStorage.getItem('QXWOPENID')
         }
+	      data.system= "wechatqixiu"
 
         this.axios({
           method: 'post',
-          url: type === 'code' ? '/user/useraccount/register/login': '/user/useraccount/login',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(data)
+          url: '/user/useraccount/login',
+          data: data
         }).then(res => {
           if(res.data.code=='0'){
-            localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
-            localStorage.setItem("USERINFO",JSON.stringify(res.data.data));
-            self.loginUserInfo= res.data.data
-            // self.goBackUrl()
+            localStorage.setItem("ACCESSTOKEN", res.data.item.accessToken);
+            localStorage.setItem("USERINFO", JSON.stringify(res.data.item));
+            self.loginUserInfo= res.data.item
+            self.goBackUrl()
             Toast("登录成功")
-            self.toBindweixin(res.data.data.openid)
+            // self.toBindweixin(res.data.item.openid)
+          }else if(res.data.code==='141010'){
+	          this.popupVisible = true
           } else{
             Toast(res.data.status);
           }
@@ -337,38 +317,37 @@
           })
         }
       },
-      toBindweixin(id){
-        let UNIONID=localStorage.getItem('UNIONID')
-        let self= this
-        if(UNIONID!=id){
-          MessageBox({
-            title: '与微信号绑定',
-            message: '您的账号未与此微信绑定，是否一键绑定？',
-            showCancelButton: true
-          }).then(action => {
-            if(action=='confirm'){
-              this.axios({
-                url: '/user/useraccount/bind/weixin?accessTOken='+localStorage.getItem("ACCESSTOKEN")+
-                '&mobile='+self.loginUserInfo.telphone+'&unionid='+ UNIONID+'&openid='+ localStorage.getItem('QXWOPENID'),
-                method: 'get',
-                headers: {'Content-type': 'application/json'},
-              }).then(res=>{
-                if(res.data.code=='0'){
-                  localStorage.setItem("USERINFO",JSON.stringify(res.data.loginUserBO.data))
-                  Toast("绑定成功")
-                }else{
-                  Toast("绑定失败")
-                }
-                self.goBackUrl()
-              })
-            }else{
-              self.goBackUrl()
-            }
-          })
-        }else{
-          self.goBackUrl()
-        }
-      },
+      // toBindweixin(id){
+      //   let UNIONID=localStorage.getItem('UNIONID')
+      //   let self= this
+      //   if(UNIONID!=id){
+      //     MessageBox({
+      //       title: '与微信号绑定',
+      //       message: '您的账号未与此微信绑定，是否一键绑定？',
+      //       showCancelButton: true
+      //     }).then(action => {
+      //       if(action=='confirm'){
+      //         this.axios({
+      //           url: '/user/useraccount/bind/weixin?accessTOken='+localStorage.getItem("ACCESSTOKEN")+
+      //           '&mobile='+self.loginUserInfo.mobileNo+'&unionid='+ UNIONID+'&openid='+ localStorage.getItem('QXWOPENID'),
+      //           method: 'get',
+      //         }).then(res=>{
+      //           if(res.data.code=='0'){
+      //             localStorage.setItem("USERINFO",JSON.stringify(res.data.loginUserBO.data))
+      //             Toast("绑定成功")
+      //           }else{
+      //             Toast("绑定失败")
+      //           }
+      //           self.goBackUrl()
+      //         })
+      //       }else{
+      //         self.goBackUrl()
+      //       }
+      //     })
+      //   }else{
+      //     self.goBackUrl()
+      //   }
+      // },
       // weChatLogin(){
       //   let URL = encodeURIComponent(window.location.origin + '/#/index')
       //   let appId = window.location.origin === 'https://weixin.shanghaiqixiu.org' ? this.consts.onlineAppId : this.consts.testAppId
@@ -379,14 +358,12 @@
       weChatLogin(){
         let self= this
         this.axios({
-          url: '/user/useraccount/register/login',
+          url: '/user/useraccount/login',
           method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            account: localStorage.getItem('UNIONID')+','+localStorage.getItem('QXWOPENID'),
-            loginMethod: 'wx',
-            systemToken: localStorage.getItem('SYSTEMTOKEN')
-          })
+          data: {
+	          "loginMethod": "微信",
+	          "openid": localStorage.getItem('UNIONID'),
+          }
         }).then(res=>{
           console.log(res.data.code)
           if(res.data.code === "0"){
@@ -414,16 +391,10 @@
         this.axios({
           method: 'post',
           url: '/message/sms/sendsmscaptcha',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify({
-            businessType: "10",
-            cid: this.$store.state.picVerification.imageToken,
-            code: this.$store.state.picVerification.YZM,
-            mobile: this.phone,
-            systemToken: localStorage.getItem("SYSTEMTOKEN")
-          })
+          data: {
+	          businessType: "10",
+	          mobileNo: this.phone,
+          }
         }).then(res=>{
           if(res.data.code === "0"){
             Toast('验证码发送成功,请查收!')
@@ -446,16 +417,13 @@
         this.axios({
           method: 'post',
           url: '/user/useraccount/register/login',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify({
-            account: localStorage.getItem('UNIONID'),
-            captcha: this.captcha,
-            usertel: this.phone,
-            loginMethod: 'wx',
-            systemToken: localStorage.getItem("SYSTEMTOKEN")
-          })
+          data: {
+	          "system": "wechatqixiu",
+	          "loginMethod":'手机',
+	          "captureCode": this.captcha,
+	          "mobile": this.phone,
+	          loginaccount: localStorage.getItem('UNIONID')
+          }
         }).then(res=>{
           if(res.data.code==='0'){
             Toast('绑定手机号并登录成功')

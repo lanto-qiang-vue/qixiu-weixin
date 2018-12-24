@@ -9,6 +9,7 @@
 </template>
 
 <script>
+	import config from '~/config.js'
 	export default {
 		name: 'app',
 		data(){
@@ -20,6 +21,7 @@
 
 
 		created() {
+			// console.log('process.env.NODE_ENV',process.env.NODE_ENV, process)
 			// console.log(this.getUrlParam('state'))
 			// console.log(encodeURIComponent(window.location.href))
 			if(this.isWeixn()){
@@ -28,21 +30,19 @@
 				let URL = encodeURIComponent(window.location.href)
 				if( !state){
 					// let URL = encodeURIComponent('http://192.168.169.109:8888')
-					let appId = window.location.origin === 'https://weixin.shanghaiqixiu.org' ? this.consts.onlineAppId : this.consts.testAppId
+					// let appId = window.location.origin === 'https://weixin.shanghaiqixiu.org' ? config : this.consts.testAppId
+					let appId = config.appid
 					window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${URL}&response_type=code&scope=snsapi_userinfo&state=snsapi_base#wechat_redirect`
 				}
 				if(state=='snsapi_base'){
 					this.axios({
 						url: '/user/useraccount/access/openid',
 						method: 'post',
-						headers: {'Content-type': 'application/json'},
-						data: JSON.stringify({
+						data: {
 							code: this.getUrlParam('code'),
 							platform: 'WX',
 							workOn: window.location.origin === 'https://weixin.shanghaiqixiu.org' ? 'pPro' : 'pDev',
-							systemToken: localStorage.getItem('SYSTEMTOKEN'),
-							// redirectUri: URL
-						})
+						}
 					}).then(res=>{
 						if(res.data.code==='0') {
 							// this.UnionID = res.data.openId.openId

@@ -52,7 +52,7 @@ export default {
 
 <style lang='less'>
     body {
-        background-color: #f8f8f8;
+        /*background-color: #f8f8f8;*/
         >input {
           height: 0;
         }
@@ -101,7 +101,7 @@ export default {
             }
         }
         .version {
-            background-color: #f8f8f8;
+            /*background-color: #f8f8f8;*/
             color: #b2b2b2;
             position: absolute;
             width: 100%;

@@ -12,22 +12,22 @@
                      ref="loadmore">
           <ul class="page-loadmore-questionList">
             <li v-for="(item, index) in questionList" class="page-loadmore-questionListitem" :key="index">
-              <div class="block" :data-questionId="item.questionId" @click='goQuestionDetail(item.quesId)'>
+              <div class="block" :data-questionId="item.id" @click='goQuestionDetail(item.id)'>
                 <div class="user">
                   <div class="user_imgWrap">
-                    <img :src="item.questionerPhoto || '/static/img/home/user.png'"/>
+                    <img :src="item.headPhoto || '/static/img/home/user.png'"/>
                   </div>
-                  <div class="userright"><p>{{item.userName ? item.userName : '匿名'}}</p>
+                  <div class="userright"><p>{{item.nickName || '匿名'}}</p>
                     <span>{{item.createTime | FormatDate}}</span></div>
                 </div>
-                <p class="question" v-html="item.quesContent"></p>
+                <p class="question" v-html="item.content"></p>
                 <div class="answer">
-                  <span class="violet" v-if="item.answer">已处理</span>
+                  <span class="violet" v-if="item.answerContent">已处理</span>
                   <span class="blue" v-else>未处理</span>
-                  <p v-if="item.answer"
-                     v-html="(item.answer.answerUserName ? item.answer.answerUserName + '：' : '匿名：') + (item.answer.answerContent ? item.answer.answerContent : '')"></p>
+                  <p v-if="item.answerContent"
+                     v-html="(item.answerName || '匿名')+'：' + (item.answerContent || '')"></p>
                 </div>
-                <div class="foot">{{item.viewNumber}}浏览 {{item.answerCounts}}回答</div>
+                <div class="foot">{{item.viewNumber}}浏览 {{item.answerCount}}回答</div>
               </div>
             </li>
           </ul>
@@ -111,31 +111,27 @@
 
       doQuery(num) {
         let param = {
-          systemToken: localStorage.getItem("SYSTEMTOKEN"),
-          limit: 10,
-          page: this.page
+	        "pageNo":  this.page,
+	        "pageSize": 10
         }
         this.axios({
           method: 'post',
-          url: '/center/questionList',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(param)
+          url: '/question/nostate/list',
+          data: param
         })
         .then(res => {
           console.log(res.data.data)
           if(num===1){
-            this.questionList=res.data.data.dataList
+            this.questionList=res.data.items
           } else if(num===2){
-            this.questionList=res.data.data.dataList
+            this.questionList=res.data.items
             this.$refs.loadmore.onTopLoaded()
           }
           else{
-            this.questionList = [...this.questionList,...res.data.data.dataList];
+            this.questionList = [...this.questionList,...res.data.items];
             this.$refs.loadmore.onBottomLoaded()
           }
-          if(this.questionList.length==res.data.data.total){
+          if(this.questionList.length==res.data.total){
             this.allLoaded=true
           }
         })

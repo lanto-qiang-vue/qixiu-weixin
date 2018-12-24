@@ -87,10 +87,10 @@ export default {
 
 <style lang='less'>
     body {
-        background-color: #f8f8f8;
+        /*background-color: #f8f8f8;*/
     }
     .wrap {
-        background-color: #f8f8f8;
+        /*background-color: #f8f8f8;*/
         ul {
             margin-top: 8px;
             li{

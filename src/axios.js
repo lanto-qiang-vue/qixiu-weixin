@@ -15,7 +15,8 @@ axios.defaults.baseURL = '/proxy/';
 // Add a request interceptor  请求拦截器
 axios.interceptors.request.use(config => {
 	// console.log(store)
-	let token= store.state.user.token
+	// let token= store.state.user.token
+	let token= localStorage.getItem("ACCESSTOKEN")
 	if(token) {
 		config.headers.token= token
 	}
@@ -55,13 +56,28 @@ axios.interceptors.response.use(
     return response;
   },
   error => {
+  	// for(let key in error){
+  	// 	console.log(key)
+    // }
+	 //  console.log('error.response', error.response.data.error)
+	  Indicator.close()
+	  // Toast({
+		//   message: error.response.data.error,
+		//   position: 'bottom',
+		//   duration: 2000
+	  // });
     if(error.message == 'timeout of 10000ms exceeded'){
-      Indicator.close()
       Toast({
         message: '请求超时',
         position: 'bottom',
         duration: 2000
       });
+    }else{
+	    Toast({
+		    message: '系统异常',
+		    position: 'bottom',
+		    duration: 2000
+	    });
     }
     return Promise.reject(error)
   });

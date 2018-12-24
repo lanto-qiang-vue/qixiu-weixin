@@ -3,42 +3,32 @@
     <div class="block">
       <div class="user">
         <div class="img_wrap">
-          <img :src="questionDetail.questionerPhoto || '/static/img/home/user.png'"/>
+          <img :src="questionDetail.photo || '/static/img/home/user.png'"/>
         </div>
-        <div class="userright"><p>{{questionDetail.userName ? questionDetail.userName : '匿名'}}</p>
+        <div class="userright"><p>{{questionDetail.userName || '匿名'}}</p>
           <span>{{questionDetail.createTime | FormatDate}}</span></div>
       </div>
-      <p class="question" v-html="questionDetail.quesContent"></p>
+      <p class="question" v-html="questionDetail.content"></p>
 
       <div class="imgsWrap mui-content-padded">
         <img v-for="(item, index) in questionDetail.images" :key="index" :src="item" data-preview-src=""
              data-preview-group="1"/>
       </div>
 
-      <div class="answer">
-        <span class="violet">{{questionDetail.categoryCode}}</span>
-      </div>
-      <div class="foot">{{questionDetail.viewNumber + 1}}浏览 · {{ questionDetail.answerCount }}回答</div>
+      <!--<div class="answer">-->
+        <!--<span class="violet">{{questionDetail.questionPhoto}}</span>-->
+      <!--</div>-->
+      <div class="foot">{{questionDetail.viewNumber}}浏览 · {{ questionDetail.answerCount }}回答</div>
     </div>
     <div class="answers">
       <ul>
-        <li v-for="item in questionDetail.answer" v-if="item.answerIsadopt === true">
-          <span class="used">已采纳</span>
+        <li v-for="item in questionDetail.answerDetailDtos" >
+          <span class="used" v-if="item.adopt === true">已采纳</span>
           <div class="zhuanjia">
            <div class="img_wrap">
-             <img :src="item.answerPhoto || '/static/img/home/user.png'"/>
+             <img :src="item.answerHeadPhoto || '/static/img/home/user.png'"/>
            </div>
-            <div class="userright"><p>{{item.answerUserName}}</p>
-              <span>{{item.answerTime | FormatDate}}</span></div>
-          </div>
-          <div class="answer_text" v-html="item.answerContent"></div>
-        </li>
-        <li v-for="item in questionDetail.answer" v-if="item.answerIsadopt === false">
-          <div class="zhuanjia">
-            <div class="img_wrap">
-              <img :src="item.answerPhoto || '/static/img/home/user.png'"/>
-            </div>
-            <div class="userright"><p>{{item.answerUserName}}</p>
+            <div class="userright"><p>{{item.answerName}}</p>
               <span>{{item.answerTime | FormatDate}}</span></div>
           </div>
           <div class="answer_text" v-html="item.answerContent"></div>
@@ -72,21 +62,17 @@
     created(){
       this.axios({
         method: "get",
-        url: "/QxwCdf/article/detail/" + localStorage.getItem("SYSTEMTOKEN") + "/" + this.$route.query.questionId,
-        heardes: {
-          "Content-type": "application/json"
-        }
-      })
-        .then(res => {
-          this.questionDetail = res.data.data;
-          this.questionDetail.answerCount = this.questionDetail.answer.length;
+        url: "/question/detail/"  + this.$route.query.questionId,
+      }).then(res => {
+          this.questionDetail = res.data.item;
+          // this.questionDetail.answerCount = res.data.item.answerCount;
         })
     },
     methods: {
       goMyAnswer(){
         if(localStorage.getItem('USERINFO')){
-          let userRoleId= JSON.parse(localStorage.getItem('USERINFO')).userRoleId
-          if(userRoleId===5){
+          let userRoleId= JSON.stringify(JSON.parse(localStorage.getItem('USERINFO')).roles)
+          if(userRoleId.indexOf('zhuanjia')>=0){
             this.$router.push({
               path: "/myAnswer",
               query: {

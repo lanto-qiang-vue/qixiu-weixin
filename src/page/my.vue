@@ -66,9 +66,9 @@
     <div class="list" @click='goSetting(tel)' style="border-top: 10px solid #f8f8f8;box-sizing: content-box;">
       <img src="../assets/img/my/set.png" alt=""><span>设置</span> <i></i>
     </div>
-    <div class="list" @click='goBind' v-if="notbind">
-      <img src="../assets/img/my/set.png" alt=""><span>绑定此微信号</span> <i></i>
-    </div>
+    <!--<div class="list" @click='goBind' v-if="notbind">-->
+      <!--<img src="../assets/img/my/set.png" alt=""><span>绑定此微信号</span> <i></i>-->
+    <!--</div>-->
     <div class="list" @click='goSuggestion'>
       <img src="../assets/img/my/feedback.png" alt=""><span>意见建议</span> <i></i>
     </div>
