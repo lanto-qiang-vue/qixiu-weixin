@@ -24,25 +24,27 @@
       <ul>
         <li v-for="item in questionDetail.answerDetailDtos" >
           <span class="used" v-if="item.adopt === true">已采纳</span>
+	        <mt-button type="primary" size="small" class="toAdopt" v-if="questionDetail.login &&!isAdopt"
+	                   @click="toAdopt(item.id)">采纳</mt-button>
           <div class="zhuanjia">
            <div class="img_wrap">
              <img :src="item.answerHeadPhoto || '/static/img/home/user.png'"/>
            </div>
-            <div class="userright"><p>{{item.answerName}}</p>
+            <div class="userright"><p>{{item.answerName || '匿名'}}</p>
               <span>{{item.answerTime | FormatDate}}</span></div>
           </div>
           <div class="answer_text" v-html="item.answerContent"></div>
         </li>
       </ul>
     </div>
-    <div class="iAnswer">
+    <div class="iAnswer" v-if="canAnswer">
       <button @click="goMyAnswer">我要回答</button>
     </div>
   </div>
 </template>
 
 <script>
-  import { Toast } from "mint-ui"
+  import { Toast, MessageBox} from "mint-ui"
   import defaultImage from '@/assets/img/my/photo.png'
   import avatar from '@/assets/img/my/photo.png'
   export default {
@@ -55,37 +57,60 @@
           "http://mpic.tiankong.com/6d2/a9a/6d2a9af50ae64f13c226110e17792d9b/640.jpg"
         ],
         defaultImage: defaultImage,
-        avatar: avatar
+        avatar: avatar,
+	      isAdopt: false
       }
     },
 
     created(){
-      this.axios({
-        method: "get",
-        url: "/question/detail/"  + this.$route.query.questionId,
-      }).then(res => {
-          this.questionDetail = res.data.item;
-          // this.questionDetail.answerCount = res.data.item.answerCount;
-        })
+     this.getData()
     },
+	  computed:{
+    	canAnswer(){
+    		let can= false
+		    if(localStorage.getItem('USERINFO')){
+			    let userRoleId= JSON.stringify(JSON.parse(localStorage.getItem('USERINFO')).roles)
+			    if(userRoleId.indexOf('zhuanjia')>=0){
+				    can= true
+			    }
+		    }
+		    return can
+	    }
+	  },
     methods: {
+	    getData(){
+		    this.axios({
+			    method: "get",
+			    url: "/question/detail/"  + this.$route.query.questionId,
+		    }).then(res => {
+			    let list= res.data.item.answerDetailDtos, isAdopt= false
+			    for(let i in list){
+				    if(list[i].adopt) isAdopt= true
+			    }
+			    this.questionDetail = res.data.item;
+			    this.isAdopt= isAdopt
+		    })
+	    },
+	    toAdopt(id){
+		    MessageBox.confirm('确定采纳此回答吗?').then(action => {
+		        // console.log('action',action)
+			    this.axios.post('/question/cnanswer/'+id,{}).then((res) => {
+				    if (res.code == '0') {
+					    Toast('采纳成功')
+					    this.getData()
+				    }
+			    })
+		    },err => {
+			    // console.log('err',err)
+		    });
+	    },
       goMyAnswer(){
-        if(localStorage.getItem('USERINFO')){
-          let userRoleId= JSON.stringify(JSON.parse(localStorage.getItem('USERINFO')).roles)
-          if(userRoleId.indexOf('zhuanjia')>=0){
-            this.$router.push({
-              path: "/myAnswer",
-              query: {
-                questionId: this.$route.query.questionId
-              }
-            })
-          }else {
-            Toast("仅限协会专家回答问题")
-          }
-        }else{
-          Toast('请登录')
-          this.$router.push('/login')
-        }
+	        this.$router.push({
+	          path: "/myAnswer",
+	          query: {
+	            questionId: this.$route.query.questionId
+	          }
+	        })
       },
     }
   }
@@ -112,6 +137,7 @@
           margin-right: 10px;
           img {
             width: 50px;
+	          height: 50px;
           }
         }
         .userright {
@@ -190,6 +216,11 @@
           right: 0;
           font-size: 12px;
         }
+	      .toAdopt{
+		      position: absolute;
+		      top: 10px;
+		      right: 0;
+	      }
         .zhuanjia {
           overflow: hidden;
           .img_wrap {

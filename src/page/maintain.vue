@@ -67,7 +67,7 @@
 </template>
 
 <script>
-  import { Toast, Popup, Header, MessageBox, Navbar, TabItem, IndexList, IndexSection, Radio, Actionsheet } from 'mint-ui'
+  import { Toast,  Actionsheet, Indicator } from 'mint-ui'
   import comp_detail from './maintainDetail.vue'
   import SlideBar from './components/SlideBar'
   import maintainList from './maintainList'
@@ -243,7 +243,6 @@
 
     mounted(){
 		this.init()
-	    this.bodyNoScoll()
 
 
       // let that = this
@@ -336,6 +335,10 @@
     },
     methods: {
     	init(){
+		    Indicator.open({
+			    text: '请稍候...',
+			    spinnerType: 'snake'
+		    });
 		    this.map= new AMap.Map('container',{
 			    center: new AMap.LngLat(this.search.lng, this.search.lat),
 			    zoom: 10,
@@ -434,7 +437,7 @@
 		    else this.page++
 		    let query= this.calcQuery()
 		    this.axios({
-			    baseURL: '/repair',
+			    baseURL: '/repairproxy',
 			    url: '/micro/search/company'+ query,
 			    method: 'get',
 		    }).then( (res) => {

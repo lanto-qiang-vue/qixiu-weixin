@@ -15,8 +15,8 @@
           <li v-for='(item, index) in myQuestionList' :key='index' @click="goToMyQuestionDetail(item.id)">
             <p>{{ item.content }}</p>
             <p class="foot clearfix">
-              <span class="date">{{ item.createtime | FormatDate}}</span>
-              <span class="view">{{ item.viewnumber }}浏览</span>
+              <span class="date">{{ item.createDate | FormatDate}}</span>
+              <!--<span class="view">{{ item.viewnumber }}浏览</span>-->
             </p>
           </li>
           <div v-if="allLoaded" style="text-align: center; line-height: 30px; background-color: #f8f8f8; font-size: 14px; color: #999;">暂无更多数据...</div>
@@ -54,38 +54,27 @@
       },
 
       getQuestionList(num) {
-        let userInfo = JSON.parse(localStorage.getItem('USERINFO'));
-        let data = {
-          accessToken: localStorage.getItem("ACCESSTOKEN"),
-          loginUserId: userInfo.userId,
-          pageNo: this.pageNo,
-          pageSize: 10
-        };
         this.axios({
           method: 'post',
-          url: '/cdf/myQuestion',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(data)
-        })
-        .then(res => {
-          console.log('res: ', res.data.data);
-            if (this.pageNo === 1 && (res.data.data == null || res.data.data.length === 0)) {
-              this.$router.go(-1);
+          url: '/question/myquestion',
+          data:{
+	          pageNo: this.pageNo,
+	          pageSize: 10
+          }
+        }).then(res => {
+            if (this.pageNo === 1 && (res.data.items == null || res.data.items.length === 0)) {
               Toast('暂无数据')
-
             }else {
               if(num === 1){
-                this.myQuestionList=res.data.data
+                this.myQuestionList=res.data.items
               } else if(num === 2){
-                this.myQuestionList=res.data.data
+                this.myQuestionList=res.data.items
                 this.$refs.loadmore.onTopLoaded()
               } else {
-                this.myQuestionList = [...this.myQuestionList, ...res.data.data];
+                this.myQuestionList = [...this.myQuestionList, ...res.data.items];
                 this.$refs.loadmore.onBottomLoaded()
               }
-              if(this.myQuestionList.length === res.data.totalCount){
+              if(this.myQuestionList.length >= res.data.total){
                 this.allLoaded = true
               }
             }
@@ -94,7 +83,7 @@
 
       goToMyQuestionDetail(questionId) {
         this.$router.push({
-          path: '/myQuestionDetail',
+          path: '/questionDetail',
           query: {
             questionId: questionId
           }

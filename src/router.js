@@ -78,7 +78,7 @@ export default new Router({
 
 
 
-		{path: '/carOwner-centre/carList', name: 'carList', component: resolve => require(['@/page/home/carOwner-centre/carList/carList'], resolve), meta: {requiresAuth: true, keepAlive: true}},
+		{path: '/carOwner-centre/carList', name: 'carList', component: resolve => require(['@/page/home/carOwner-centre/carList/carList'], resolve), meta: {requiresAuth: true}},
 		// {path: '/carOwner-centre/newCarList', name: 'newCarList', component: resolve => require(['@/page/home/carOwner-centre/carList/newCarList'], resolve), meta: {requiresAuth: true, keepAlive: true}},//新版维修记录
 		{path: '/carOwner-centre/carList-manager', name: 'carListManager', component: resolve => require(['@/page/home/carOwner-centre/carList/carList-manager'], resolve), meta: {requiresAuth: true}},
 		{path: '/government-service/government-service-list', name: 'governmentServiceList', component: resolve => require(['@/page/home/government-service/government-service-list'], resolve)},

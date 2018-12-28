@@ -15,17 +15,17 @@
               <div class="block" :data-questionId="item.id">
                 <div class="user">
                   <div class="userright">
-                    <p style="display: inline-block">{{item.ownername ? item.ownername : '匿名'}}</p>
-                    <span style="float: right">{{item.onServiceTime | FormatDate("YYYY-MM-DD HH:mm") }}</span>
+                    <p style="display: inline-block">用户名：{{item.ownerName || '匿名'}}</p>
+                    <span style="float: right">{{item.arrivalTime | FormatDate }}</span>
                   </div>
                 </div>
-                <p class="question"><span style="color: #9a9a9a;">预约企业: </span>{{item.companyName}}</p>
-                <p class="question"><span style="color: #9a9a9a;">服务内容: </span>{{item.servicecontent}}</p>
-                <p class="question"><span style="color: #9a9a9a;">联系方式: </span>{{item.contactmobile}}</p>
+                <p class="question"><span style="color: #9a9a9a;">预约企业: </span>{{item.company.name}}</p>
+                <p class="question"><span style="color: #9a9a9a;">服务内容: </span>{{item.serviceContent}}</p>
+                <p class="question"><span style="color: #9a9a9a;">联系方式: </span>{{item.contactMobile}}</p>
                 <div class="answer">
-                  <span style="background-color: skyblue; border-radius: 3px;" v-if="item.handleStatus == '待处理'">待处理</span>
-                  <span style="background-color: #4CD964; border-radius: 3px;" v-if="item.handleStatus == '已接受'">预约成功</span>
-                  <span style="background-color: #f00; border-radius: 3px;" v-if="item.handleStatus == '拒绝'">预约被拒绝</span>
+                  <span style="background-color: skyblue; border-radius: 3px;" v-if="item.handleStatus.name == '待处理'">待处理</span>
+                  <span style="background-color: #4CD964; border-radius: 3px;" v-if="item.handleStatus.name == '已接受'">预约成功</span>
+                  <span style="background-color: #f00; border-radius: 3px;" v-if="item.handleStatus.name == '拒绝'">预约被拒绝</span>
                 </div>
                 <div class="foot"><mt-button size="small" @click.stop="deleteAppointment(item.id)" type="danger" style="height: 23px; font-size: 12px; width: 48px;">删除</mt-button></div>
               </div>
@@ -75,35 +75,29 @@
     },
     methods: {
       doQuery(num) {
-        let param = {
-          accessToken: localStorage.getItem("ACCESSTOKEN"),
-          pageSize: 10,
-          pageNo: this.page
-        }
         this.axios({
           method: 'post',
-          url: '/maintain/getMyOnsiteOrderlist',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(param)
-        })
-        .then(res => {
-          if(this.page===1 && (!this.list|| res.data.data.length=='0')){
+          url: '/service/order/list',
+          data: {
+	          "pageNo": this.page,
+	          "pageSize": 10,
+          }
+        }).then(res => {
+          if(this.page===1 && (!this.list|| res.data.items.length=='0')){
             MessageBox.alert('暂无数据').then(action => {
-              return this.$router.go(-1)
+
             })
           }else {
             if(num===1){
-              this.OrderList=res.data.data
+              this.OrderList=res.data.items
             }else if(num===2) {
               this.$refs.loadmore.onTopLoaded()
-              this.OrderList=res.data.data
+              this.OrderList=res.data.items
             }else {
-              this.OrderList=[...this.OrderList, ...res.data.data]
+              this.OrderList=[...this.OrderList, ...res.data.items]
               this.$refs.loadmore.onBottomLoaded()
             }
-            if(this.OrderList.length==res.data.count){
+            if(this.OrderList.length>=res.data.total){
               this.allLoaded=true
             }
           }
@@ -122,19 +116,11 @@
 
       deleteAppointment(id) {
         MessageBox.confirm('确定执行此操作?').then(action => {
-          let param = {
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
-            id: id,
-          }
           this.axios({
             method: 'post',
-            url: '/maintain/deleteOnsiteOrder',
-            headers: {
-              'Content-type': 'application/json'
-            },
-            data: JSON.stringify(param)
-          })
-            .then(res => {
+            url: '/service/order/delete/'+ id,
+            data: {}
+          }).then(res => {
                 if(res.data.code === '0') {
                   Toast('删除成功!');
 

@@ -16,10 +16,10 @@ module.exports = {
 	devServer: {
 		port: 8888,
 		proxy: {
-			'/repair': {
+			'/repairproxy': {
 				target: 'http://192.168.169.230:7210/',
 				// target: 'http://118.25.35.172:7210/',
-				pathRewrite: {'^/repair': ''},
+				pathRewrite: {'^/repairproxy': ''},
 				secure: false
 			},
 			'/proxy': {

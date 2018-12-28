@@ -22,10 +22,11 @@
                 <div class="info">
                   <p>
                     <!--<mt-button size="small" @click.stop="deleteVehicle(item.vehicleId)" type="danger" style="height: 24px; right: 0; top: 3px; font-size: 10px; position: absolute; width: 50px;">解绑</mt-button>-->
-                    <span class="text-one-cut" style="display: block; margin-right: 60px;">车架号(VIN)：{{ item.vin }}</span>
+                    <span class="text-one-cut" style="display: block; margin-right: 30px;">车架号(VIN)：{{ item.vin }}</span>
                   </p>
                 </div>
               </div>
+	            <mt-button type="danger" size="small" class="remove" @click="deleteVehicle(item.vehicleId)">解绑</mt-button>
             </li>
           </ul>
         </mt-loadmore>
@@ -112,35 +113,26 @@ export default {
     },
 
     getData(){
-      let data = {
-        accessToken: localStorage.getItem("ACCESSTOKEN"),
-        vehicleplatenumber: this.vehicleplatenumber,
-        pageSize: 10,
-        pageNo: this.pageNo
-      }
-      if(!arguments.length){
-      }
-      this.axios({
-        method: 'post',
-        url: '/vehicle/owner/queryVehicelist',
-        headers: {'Content-type': 'application/json'},
-        data: JSON.stringify(data)
-      })
-      .then(res=>{
-        this.allLoaded=true
-        if(arguments.length==2){
-          this.carList=[...this.carList, ...res.data.data]
-          this.$refs.loadmore.onBottomLoaded();
-        }else {
-          this.carList = res.data.data
-        }
-        if (this.carList == null || this.carList.length == 0) {
-          Toast('您还未绑定车辆')
-        }
-        if(arguments.length==1){
-          this.$refs.loadmore.onTopLoaded()
-        }
-      })
+	    this.axios.post('/vehicle/owner/queryVehicelist', {
+		    "cartype": "",
+		    "pageNo": this.pageNo,
+		    "pageSize": 10,
+		    "vehiclePlateNumber": this.vehicleplatenumber,
+	    }).then( (res) => {
+		    this.allLoaded=true
+		    if(arguments.length==2){
+			    this.carList=[...this.carList, ...res.data.items]
+			    this.$refs.loadmore.onBottomLoaded();
+		    }else {
+			    this.carList = res.data.items
+		    }
+		    if (this.carList == null || this.carList.length == 0) {
+			    Toast('您还未绑定车辆')
+		    }
+		    if(arguments.length==1){
+			    this.$refs.loadmore.onTopLoaded()
+		    }
+	    })
     },
 
     // 上拉加载更多
@@ -365,6 +357,12 @@ export default {
         }
       }
     }
+	  .remove{
+		  font-size: 12px;
+		  position: absolute;
+		  right: 10px;
+		  bottom: 10px;
+	  }
   }
 }
 </style>

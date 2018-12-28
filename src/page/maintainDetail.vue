@@ -150,7 +150,7 @@ export default {
 
 	    this.axios({
 		    method: 'get',
-		    baseURL: '/repair',
+		    baseURL: '/repairproxy',
 		    url: '/micro/search/company/repair/'+this.maintainDetail.sid ,
 	    }).then(res => {
 		    this.all=res.data

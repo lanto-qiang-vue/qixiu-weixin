@@ -17,20 +17,20 @@
                   <div class="lf fl"></div>
                   <!--<div @click.stop="deleteAppointment(item.id)" class="rht" style="float: right; color: #f00; padding: 2px 5px; border: 1px solid #f00; background: rgba(200,10,10,.1); border-radius: 3px;">删除</div>-->
                   <div class="ce">
-                    <h4>{{ item.companyName }}</h4>
-                    <p style="color: #999;">{{ item.modifytime | FormatDate("YYYY-MM-DD HH:mm:ss") }}</p>
+                    <h4>{{ item.company.name }}</h4>
+                    <p style="color: #999;">{{ item.modifyTime | FormatDate }}</p>
                   </div>
                 </div>
                 <div class="content">
-                  <p>服务内容：{{ item.servicetype | FormatService(serviceContent, item.servicetype) }}</p>
-                  <p>联系方式：{{ item.ownername }}&nbsp;&nbsp;{{ item.contactmobile }}</p>
-                  <p>联系地址：{{item.contactaddress}}</p>
+                  <p>服务内容：{{ item.serviceType  }}</p>
+                  <p>联系方式：{{ item.ownerName }}&nbsp;&nbsp;{{ item.contactMobile }}</p>
+                  <p>联系地址：{{item.contactAddress}}</p>
                 </div>
                 <div class="footer_btn clearfix">
                   <div class="answer" style="float: left;">
-                    <span class="violet" v-if="item.status == '1'">新增</span>
-                    <span class="blue" v-if="item.status == '2'">已指派企业</span>
-                    <span class="blue" v-if="item.status == '3'">已回复</span>
+                    <span class="violet" v-if="item.status == '新增'">新增</span>
+                    <span class="blue" v-if="item.status == '已指派企业'">已指派企业</span>
+                    <span class="blue" v-if="item.status == '已回复'">已回复</span>
                   </div>
                   <!--<div class="evaluate">评价</div>-->
                   <!--<div class="come_again">再次上门</div>-->
@@ -73,35 +73,30 @@
     },
     methods: {
       doQuery(num) {
-        let param = {
-          accessToken: localStorage.getItem("ACCESSTOKEN"),
-          pageSize: 10,
-          pageNo: this.page
-        }
         this.axios({
           method: 'post',
-          url: '/maintain/getMyOnsiteServicelist',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(param)
+          url: '/service/list',
+          data: {
+	          pageNo: this.page,
+	          pageSize: 10
+          }
         })
         .then(res => {
-          if(this.page===1 && (!res.data.data || res.data.data.length=='0')){
+          if(this.page===1 && (!res.data.items || res.data.items.length=='0')){
             MessageBox.alert('暂无数据').then(action => {
-              return this.$router.go(-1)
+              // return this.$router.go(-1)
             })
           } else {
             if(num===1){
-              this.appointmentList=res.data.data
+              this.appointmentList=res.data.items
             }else if(num===2) {
               this.$refs.loadmore.onTopLoaded()
-              this.appointmentList=res.data.data
+              this.appointmentList=res.data.items
             }else {
-              this.appointmentList=[...this.appointmentList, ...res.data.data]
+              this.appointmentList=[...this.appointmentList, ...res.data.items]
               this.$refs.loadmore.onBottomLoaded()
             }
-            if(this.appointmentList.length==res.data.count){
+            if(this.appointmentList.length>=res.data.total){
               this.allLoaded=true
             }
           }
@@ -120,19 +115,11 @@
 
       deleteAppointment(id) {
         MessageBox.confirm('确定执行此操作?').then(action => {
-          let param = {
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
-            id: id,
-          }
           this.axios({
             method: 'post',
-            url: '/maintain/delete',
-            headers: {
-              'Content-type': 'application/json'
-            },
-            data: JSON.stringify(param)
-          })
-          .then(res => {
+            url: '/service/delete/'+ id,
+            data: {}
+          }).then(res => {
             if(res.data.code === '0') {
               Toast('删除成功!');
               this.appointmentList = [];

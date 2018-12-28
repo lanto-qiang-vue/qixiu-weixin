@@ -7,11 +7,11 @@
       <div class="basinfo">
         <div class="title"><img src="../assets/img/record/repairinfo.png"/><span>维修信息</span></div>
         <ul class="info thick" v-for='(item, index) in info' :key='index'>
-          <li><span>维修企业</span><p>{{ item.companyname }}</p></li>
-          <li><span>送修日期</span><p>{{ item.repairdate }}</p></li>
-          <li><span>送修里程</span><p>{{ item.repairmileage }}公里</p></li>
-          <div class="more" @click="goVehicleDetail(item.repairbasicinfoId, item.companyId, item.vehicleplatenumber)"><span>详情</span><i></i></div>
-          <span v-show="!item.gray" @click="goRemark(item.repairbasicinfoId, item.companyId, item.vehicleplatenumber)">我要评价</span>
+          <li><span>维修企业</span><p>{{ item.companyName }}</p></li>
+          <li><span>送修日期</span><p>{{ item.repairDate }}</p></li>
+          <li><span>送修里程</span><p>{{ item.repairMileage }}公里</p></li>
+          <div class="more" @click="goVehicleDetail(item.id, item.companyId, item.plateNumber)"><span>详情</span><i></i></div>
+          <span v-show="!item.gray" @click="goRemark(item.id, item.companyId, item.plateNumber)">我要评价</span>
           <span v-show="item.gray" class="gray" @click="goRemarkDetail(item.commentId)">查看评价</span>
         </ul>
         <div class="more_loading" v-show="showLoading">
@@ -40,52 +40,41 @@
     },
     created() {
       // 基本信息
-      let data={
-        accessToken: localStorage.getItem("ACCESSTOKEN"),
-        vin: this.$route.query.id,
-        pageNo: 1,
-        pageSize: 100,
-        vehicleplatenumber: this.$route.query.vehicleplatenumber
-      }
+
       this.axios({
         method: 'post',
         url: '/vehicle/carfile/query',
-        headers: {'Content-type': 'application/json'},
-        data: JSON.stringify(data)
+        data: {
+        	"companyName":"","pageNo":1,"pageSize":100,
+	        "vehicleplatenumber":this.$route.query.vehicleplatenumber,
+	        "vin":this.$route.query.id
+        }
       }).then(res=>{
-        console.log('res==========>',res);
-        this.info2=res.data.data;
+
+        this.info2=res.data.items;
         for(let i in this.info2){
-          this.getRemark(this.info2[i].repairbasicinfoId, i)
+          this.getRemark(this.info2[i].id, i)
         }
       })
     },
     methods: {
       getRemark(repairId, index){
         this.axios({
-          method: 'post',
-          url: '/comment/getComments/repair?accessToken='+ localStorage.getItem("ACCESSTOKEN"),
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            "repairId": repairId,
-            "page":  1,
-            "pageSize": 10
-          })
+          method: 'get',
+          url: '/comment/maintain/query/repairId?repairId='+ repairId,
         }).then(res=>{
           // console.log(res);
-          if(res.data.code==="0"){
-            if(res.data.comments&&res.data.comments.length){
+
+            if(res.data.id){
               this.info2[index].gray= true
-              this.info2[index].commentId= res.data.comments[0].id
-              console.log(this.info2)
+              this.info2[index].commentId= res.data.id
+              // console.log(this.info2)
             }else{
               this.info2[index].gray= false
             }
             this.times++
             if(this.times==this.info2.length) this.info=this.info2
-          }else {
-            Toast(res.data.status)
-          }
+
         })
       },
       goRemarkDetail(id){

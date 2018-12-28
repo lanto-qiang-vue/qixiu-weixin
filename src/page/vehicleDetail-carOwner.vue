@@ -1,8 +1,9 @@
 <template>
 <div class="box">
-        <div v-show="showComment|| showComplaint &&flag1 &&flag2" class="button_wrap" style="padding: 8px 10px; width: 100%; border-top: 1px solid #ccc; position: fixed; left: 0; bottom: 0;text-align: center;background-color: white;z-index: 1">
+        <div v-show="showComment|| showComplaint &&flag1 &&flag2" class="button_wrap">
           <mt-button v-show="showComment" :class="{half: showComplaint}" @click="goRemark" type="primary" size="large">我要评价</mt-button>
           <mt-button v-show="showComplaint" :class="{half: showComment}" @click="goComplaint" type="primary" size="large">我要反馈</mt-button>
+	        <span class="other"></span>
         </div>
         <div  :class="{bottom: showComment|| showComplaint &&flag1 &&flag2}">
           <div class="title">
@@ -12,7 +13,7 @@
           <ul class="repairRecord">
             <li>
               <span class="left">维修企业名称</span>
-              <span class="right">{{ repairInfo.companyname }}</span>
+              <span class="right">{{ repairInfo.companyName }}</span>
             </li>
             <li>
               <span class="left">结算清单编号</span>
@@ -24,23 +25,23 @@
             </li>
             <li>
               <span class="left">送修日期</span>
-              <span class="right">{{ repairInfo.repairdate }}</span>
+              <span class="right">{{ repairInfo.repairDate }}</span>
             </li>
             <li>
               <span class="left">送修里程</span>
-              <span class="right">{{ repairInfo.repairmileage }} 公里</span>
+              <span class="right">{{ repairInfo.repairMileage }} 公里</span>
             </li>
             <li>
               <span class="left">结算日期</span>
-              <span class="right">{{ repairInfo.settledate }}</span>
+              <span class="right">{{ repairInfo.settleDate }}</span>
             </li>
             <li>
               <span class="left">车牌号码</span>
-              <span class="right">{{  repairInfo.vehicleplatenumber }}</span>
+              <span class="right">{{  repairInfo.plateNumber }}</span>
             </li>
             <li>
               <span class="left">故障描述</span>
-              <span class="right">{{ repairInfo.faultdescription }}</span>
+              <span class="right">{{ repairInfo.faultDescription }}</span>
             </li>
           </ul>
           <div class="title">
@@ -78,13 +79,13 @@
           <ul class="repairItem">
             <li v-show="showComment" style="text-align: center">暂无评论</li>
             <li v-show="!showComment" class="comment" @click="goRemarkDetail(comment.id)">
-              <div class="left"><img v-if="comment.userInfo" :src="JSON.parse(comment.userInfo).headimgurl"/></div>
+              <div class="left"><img v-if="comment.photo" :src="comment.photo"/></div>
               <div class="right">
                 <div class="name">车友：{{comment.vehicleNum}} <span>{{comment.createTime | FormatDate}}</span></div>
                 <div class="avg">
-                  <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(comment.userAvgScore)||0" :key="'yellow'+index">
-                  <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(comment.userAvgScore))||0" :key="'gray'+index">
-                  {{comment.userAvgScore}}分
+                  <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(comment.avgScore)||0" :key="'yellow'+index">
+                  <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(comment.avgScore))||0" :key="'gray'+index">
+                  {{comment.avgScore}}分
                 </div>
                 <div class="all">
                   履约 {{comment.keepAppointment}}
@@ -107,8 +108,8 @@
           <ul class="repairItem">
             <li v-show="showComplaint" style="text-align: center">如果维修记录不正确，可向我们反馈</li>
             <li v-show="!showComplaint" class="complaint">
-              {{getType(complaint.complaintType)}}{{complaint.credits?'（有凭据）':''}}
-              <span>{{complaint.complaintTime | FormatDate}}</span>
+              {{getType(complaint.type)}}{{complaint.hasEvidence?'（有凭据）':''}}
+              <span>{{complaint.createDate | FormatDate}}</span>
             </li>
           </ul>
         </div>
@@ -140,21 +141,19 @@ export default {
   mounted(){
      // console.log(this.$router.replaceState)
     let self= this
-    let data={
-      accessToken: localStorage.getItem("ACCESSTOKEN"),
-      repairbasicinfoId: this.$route.query.repairbasicinfoId,
-    }
+
     this.axios({
       method: 'post',
       url: '/vehicle/carfile/queryDetail',
-      headers: {'Content-type': 'application/json'},
-      data: JSON.stringify(data)
+      data: {
+	    repairbasicinfoId: this.$route.query.repairbasicinfoId
+      }
     }).then(res=>{
         // console.log(res);
         if(res.data.code==="0"){
-          this.repairInfo = res.data.data.repairBasicinfo
-          this.weixiuxiangmu=res.data.data.repairprojectlist
-          this.weixiupeijian=res.data.data.vehiclepartslist
+          this.repairInfo = res.data.item.repairBasicinfo
+          this.weixiuxiangmu=res.data.item.repairprojectlist
+          this.weixiupeijian=res.data.item.vehiclepartslist
         }else {
           Toast(res.data.status)
           setTimeout(()=>{
@@ -163,19 +162,12 @@ export default {
         }
       })
     this.axios({
-      method: 'post',
-      url: '/comment/getComments/repair?accessToken='+ localStorage.getItem("ACCESSTOKEN"),
-      headers: {'Content-type': 'application/json'},
-      data: JSON.stringify({
-        "repairId": this.$route.query.repairbasicinfoId,
-        "page":  1,
-        "pageSize": 10
-      })
+      method: 'get',
+      url: '/comment/maintain/query/repairId?repairId='+  this.$route.query.repairbasicinfoId,
     }).then(res=>{
       // console.log(res);
-      if(res.data.code==="0"){
-        if(res.data.comments&&res.data.comments.length){
-          self.comment = res.data.comments[0]
+        if(res.data.id){
+          self.comment = res.data
           self.showComment=false
           if(self.$route.query.show=='yes') Toast('已经有评价')
         }else{
@@ -186,26 +178,15 @@ export default {
           self.showComment=true
         }
         self.flag1=true
-      }else {
-        Toast(res.data.status)
-      }
     })
 
     this.axios({
-      method: 'post',
-      url: '/comment/company/complaint/list?accessToken='+ localStorage.getItem("ACCESSTOKEN"),
-      headers: {'Content-type': 'application/json'},
-      data: JSON.stringify({
-        "repairId": this.$route.query.repairbasicinfoId,
-        "page":  1,
-        "pageSize": 10,
-        "complaintType": 1
-      })
+      method: 'get',
+      url: '/comment/complaint/maintain/query/repairId?repairId='+ this.$route.query.repairbasicinfoId,
     }).then(res=>{
       // console.log(res);
-      if(res.data.code==="0"){
-        if(res.data.content.length){
-          self.complaint = res.data.content[0]
+        if(res.data.id){
+          self.complaint = res.data
           self.showComplaint=false
 
         }else{
@@ -213,9 +194,7 @@ export default {
           self.showComplaint=true
         }
         self.flag2=true
-      }else {
-        Toast(res.data.status)
-      }
+
     })
   },
   methods: {
@@ -272,7 +251,18 @@ export default {
         width: 100%;
         position: relative;
         overflow: scroll;
-        .title {
+	    .button_wrap{
+		    padding: 8px 10px;
+		    width: 100%;
+		    border-top: 1px solid rgb(204, 204, 204);
+		    position: fixed;
+		    left: 0px;
+		    bottom: 0px;
+		    background-color: white;
+		    z-index: 1;
+		    text-align: justify;
+	    }
+	    .title {
             border-top: 10px solid #f8f8f8;
             width: 100%;
             box-sizing: content-box;
@@ -337,6 +327,9 @@ export default {
                     line-height: 22px;
                     margin-bottom: 0;
                     color: #333;
+	                white-space: nowrap;
+	                text-overflow: ellipsis;
+	                overflow: hidden;
                 }
             }
         }
@@ -418,5 +411,6 @@ export default {
   .mint-button.half{
     display: inline-block;
     width: 48%;
+	  margin: 0 1%;
   }
 </style>

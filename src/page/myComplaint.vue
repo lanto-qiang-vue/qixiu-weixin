@@ -18,7 +18,7 @@
     <mt-radio title="反馈类型" v-model="type" :options="options"></mt-radio>
   </mt-popup>
 
-  <div class="on button" @click="selectvisible=true">反馈类型：{{typeName}}</div>
+  <!--<div class="on button" @click="selectvisible=true">反馈类型：{{typeName}}</div>-->
 </div>
 </template>
 
@@ -69,13 +69,9 @@ export default {
       getComplaints(type,flag){
         let self=this
         this.axios({
-          method: 'post',
-          url: '/comment/company/getUserComplaints?accesstoken='+  localStorage.getItem('ACCESSTOKEN')+
-            '&pageNum='+this.page +'&pageSize=10&complaintType='+type,
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data:''
+          method: 'get',
+          // url: '/comment/company/getUserComplaints?accesstoken='+  localStorage.getItem('ACCESSTOKEN')+'&pageNum='+this.page +'&pageSize=10&complaintType='+type,
+          url: '/comment/complaint/maintain/query/userId?size=10&page='+(this.page-1),
         }).then(res => {
           // this.list = res.data.complaintInfoBOList
           if(res.data.code=='0'){

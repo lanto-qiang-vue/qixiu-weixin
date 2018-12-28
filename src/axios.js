@@ -30,13 +30,14 @@ axios.interceptors.request.use(config => {
     return Promise.reject(error);
 });
 
-
+let toast=null
 
 // Add a response interceptor 响应拦截器
 axios.interceptors.response.use(
   response => {
     Indicator.close()
     switch (response.data.code){
+	    case '0': break
       case '130410':
       case '130411':
       case '130412':
@@ -52,6 +53,15 @@ axios.interceptors.response.use(
       //   Toast('系统异常')
       //   return
       //   break
+	    default:{
+		    let content= ''
+		    if(response.data.status) content+= response.data.status
+		    if(response.data.message) content+= ' '+response.data.message
+		    if(content){
+		    	if(toast) toast.close()
+			    toast= Toast(content)
+		    }
+	    }
     }
     return response;
   },
