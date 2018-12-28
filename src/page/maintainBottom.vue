@@ -3,7 +3,7 @@
     <div class="lookall" @click="changeState(true)" v-show="location== 0">查看详情</div>
     <div class="lookmap" @click="changeState(false)" v-show="location== 1">显示地图</div>
     <div class="gps" @click="$emit('openMap', maintainDetail)">导航</div>
-    <div class="distance">距离您 {{maintainDetail.distance}}km</div>
+    <div class="distance">距离您 {{maintainDetail.distance.toFixed(1)}}km</div>
   </div>
 </template>
 
@@ -12,19 +12,19 @@
 		name: "maintain-bottom",
     props: ['location'],
     data(){
-		  return{
+	  return{
         documentHeight: $(document).height()
       }
     },
     computed: {
       show(){
-        return this.$store.state.slideState.showBody
+        return this.$store.state.app.slideState.showBody
       },
       maintainDetail(){
-        return this.$store.state.maintainDetail
+        return this.$store.state.app.maintainDetail
       },
       showAll(){
-        return this.$store.state.slideState.setBodyHeight < this.documentHeight*.5
+        return this.$store.state.app.slideState.setBodyHeight < this.documentHeight*.5
       }
     },
     watch:{

@@ -17,13 +17,14 @@ module.exports = {
 		port: 8888,
 		proxy: {
 			'/repair': {
-				target: 'http://115.159.101.204:7210/',
+				target: 'http://192.168.169.230:7210/',
+				// target: 'http://118.25.35.172:7210/',
 				pathRewrite: {'^/repair': ''},
 				secure: false
 			},
 			'/proxy': {
-				// target: 'http://192.168.169.233:8888/',
-				target: 'http://212.64.5.54:8888/',
+				target: 'http://192.168.169.233:8888/',
+				// target: 'http://212.64.5.54:8888/',
 				pathRewrite: {'^/proxy': ''},
 				secure: false
 			},

@@ -16,9 +16,9 @@
         </div>
       </li>
       <li :to="{path:'/remarkDetail', query:{id: item.id}}" tag="li" v-for="(item, index) in list" :key="index">
-        <div class="left"><img v-if="item.headimgurl" :src="item.headimgurl"/></div>
+        <div class="left"><img v-if="item.photo" :src="item.photo"/></div>
         <div class="right">
-          <div class="name">车友：{{hide(item.vehicleNum)}} <span>{{item.createTime | FormatDate}}</span></div>
+          <div class="name">车友：{{item.vehicleNum}} <span>{{item.createTime | FormatDate}}</span></div>
           <div class="avg">
             <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.userAvgScore)||0" :key="'yellow'+index">
             <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.userAvgScore))||0" :key="'gray'+index">
@@ -75,48 +75,22 @@
       },
 		  getList(flag){
 		    let self=this
-        this.axios({
-          method: 'post',
-          url: '/comment/getComments',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify({
-            companyId: this.$route.query.id,
-            page: this.page,
-            pageSize: 10,
-          })
-        }).then(res => {
-          if(res.data.code=='0'&& res.data.comments){
-            console.log(res.data)
 
-            for (let i in res.data.comments){
-              // if(res.data.comments[i].openId)
-              //   self.getimg(res.data.comments[i].openId)
-              if(res.data.comments[i].userInfo){
-                let img= JSON.parse(res.data.comments[i].userInfo).headimgurl
-                if(img) res.data.comments[i].headimgurl= img
-              }
-            }
+			  this.axios.get('/comment/maintain/query/companyId?size=10&page='+(this.page-1)+'&companyId='+this.$route.query.id).then( (res) => {
 
-
-            self.list=self.list.concat(res.data.comments)
-            // self.list=res.data.comments
-            if(self.list.length==res.data.count){
-              self.allLoaded=true
-            }
-            if(flag) self.$refs.loadmore.onBottomLoaded()
-          } else{
-            // Toast(res.data.status);
-          }
-
-        })
+				  self.list=self.list.concat(res.data.content)
+				  // self.list=res.data.comments
+				  if(self.list.length>=res.data.totalElements){
+					  self.allLoaded=true
+				  }
+				  if(flag) self.$refs.loadmore.onBottomLoaded()
+			  })
       },
       hide( content) {
         return content.substr(0,2)+"****"+content.substr(content.length-1,1)
       }
     }
-	}
+}
 </script>
 
 <style scoped lang='less'>

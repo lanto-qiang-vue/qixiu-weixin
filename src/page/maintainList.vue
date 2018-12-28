@@ -19,8 +19,8 @@
   </div>
   <ul class="area-block" :class="{show: showBlock=='area-block'}">
     <div class="close" @click="switchBlock( 'button')"></div>
-    <li v-for="(item, index) in area" :key="index" @click="select('area', item.value)"
-        :class="{on : tagIsOn('area', item.value)}">{{item.name}}</li>
+    <li v-for="(item, index) in area" :key="index" @click="select('area', item.code)"
+        :class="{on : tagIsOn('area', item.code)}">{{item.name}}</li>
   </ul>
   <ul class="sort-block" :class="{show: showBlock=='sort-block'}">
     <div class="close"  @click="switchBlock('button')"></div>
@@ -55,7 +55,7 @@
               <span v-show="!item.rating">暂无评分</span>
             </div>
             <div class="address">
-              <span class="miles">{{ item.distance }}km</span>
+              <span class="miles">{{ item.distance.toFixed(1) }}km</span>
               <span class="address_area">{{ item.addr }}</span>
             </div>
           </div>
@@ -81,7 +81,7 @@
               <span v-show="!item.rating">暂无评分</span>
             </div>
             <div class="address">
-              <span class="miles">{{ item.distance }}km</span>
+              <span class="miles">{{ item.distance.toFixed(1) }}km</span>
               <span class="address_area">{{ item.addr }}</span>
             </div>
           </div>
@@ -108,25 +108,7 @@
           sort: '',
           hot: ''
         },
-        area: [
-          {name: '全部', value: ''},
-          {name: '黄浦区', value: '310101'},
-          {name: '徐汇区', value: '310104'},
-          {name: '长宁区', value: '310105'},
-          {name: '静安区', value: '310106'},
-          {name: '普陀区', value: '310107'},
-          {name: '虹口区', value: '310109'},
-          {name: '杨浦区', value: '310110'},
-          {name: '闵行区', value: '310112'},
-          {name: '宝山区', value: '310113'},
-          {name: '嘉定区', value: '310114'},
-          {name: '浦东新区', value: '310115'},
-          {name: '金山区', value: '310116'},
-          {name: '松江区', value: '310117'},
-          {name: '青浦区', value: '310118'},
-          {name: '奉贤区', value: '310120'},
-          {name: '崇明区', value: '310230'}
-        ],
+        area: [{name: '全部', value: ''}],
         sort:[
           {name: '默认', value: ''},
           {name: '距离优先', value: 'distance'},
@@ -159,11 +141,11 @@
         return this.search.q
       },
       show(){
-        return this.$store.state.slideState.showBody
+        return this.$store.state.app.slideState.showBody
       },
       maintainListHistory(){
         // console.log('maintainListHistory')
-        return this.$store.state.maintainListHistory
+        return this.$store.state.app.maintainListHistory
       },
     },
     watch:{
@@ -227,6 +209,7 @@
       }
     },
     mounted(){
+		this.getArea()
       this.calcHeight(this.height)
       $(".roll").bind('touchmove',function(e){
         e.stopPropagation();
@@ -267,6 +250,11 @@
         this.clearList= clearList|| false
         this.$emit('query', this.search, this.clearList);
       },
+	    getArea(){
+		    this.axios.get('/area/query').then( (res) => {
+			    this.area.push(...res.data.items)
+		    })
+	    },
       key(e) {
         if ( e.keyCode == 13 || e=='search') {
          this.toQuery(true)

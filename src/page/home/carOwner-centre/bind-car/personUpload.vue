@@ -197,7 +197,7 @@
     },
 
     beforeMount(){
-      mui('.mui-input-row input').input();
+      // mui('.mui-input-row input').input();
       this.axios({
         url: '/scan/getCard/' + localStorage.getItem("ACCESSTOKEN"),
         method: 'get'

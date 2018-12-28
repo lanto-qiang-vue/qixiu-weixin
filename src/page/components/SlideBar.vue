@@ -41,7 +41,7 @@
       //   return this.$store.state.slideState.setBodyHeight
       // },
       showBody(){
-        return this.$store.state.slideState.showBody
+        return this.$store.state.app.slideState.showBody
       },
     },
     watch:{

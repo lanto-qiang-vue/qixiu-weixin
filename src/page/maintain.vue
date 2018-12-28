@@ -40,7 +40,7 @@
 
     <slide-bar @maintainListBlur="maintainListBlur=Math.random()" v-show="show=='maintainList'" :show="show=='maintainList'"
                @toLocation="toMaintainListLocation= $event" :toLocation="toMaintainListLocation" :minHeight="45" >
-      <maintain-list :data="compList" :blur="maintainListBlur" :total="total" :is4s="query.is4s"
+      <maintain-list :data="list" :blur="maintainListBlur" :total="total" :is4s="query.is4s"
                      slot-scope="maintainList" :height="maintainList.height" :location="maintainList.location"
                      @toLocation="toMaintainListLocation= $event" :clickTouchBar="maintainList.clickTouchBar"
                      @query="queryByList" @goMap="goMap($event)"></maintain-list>
@@ -90,20 +90,19 @@
         actions: [{
           name: '高德地图',
           method(){
-            let name= _this.companyDetail.name||_this.companyDetail.corpName
+            let name= _this.companyDetail.name
             window.location.href = `http://uri.amap.com/marker?position=${_this.companyDetail.lon},${_this.companyDetail.lat}&name=${name}&src=上海汽修平台&coordinate=wgs84&callnative=1`
           }
         },
         {
           name: '百度地图',
           method(){
-            let name= _this.companyDetail.name||_this.companyDetail.corpName
-            let address= _this.companyDetail.addr ||  _this.companyDetail.businessaddress[0].address
+            let name= _this.companyDetail.name
+            let address= _this.companyDetail.addr
             window.location.href = `http://api.map.baidu.com/marker?location=${_this.companyDetail.lat},${_this.companyDetail.lon}&title=${name}&content=${address}&output=html&src=上海汽修平台`
           }
         }],
-        Map: null,
-        markerClusterer: null,
+
         userinfo: {},
         popupVisible: false,   // 筛选框显示隐藏
         repairName: '',   // 搜索框维修企业名称
@@ -138,132 +137,11 @@
           }
         ],
         type: '',    // 企业类型的标志
-        starLevel: [
-          {
-            name: '全部',
-            value: ''
-          },
-          {
-            name: '★★★★★',
-            value: '5'
-          },
-          {
-            name: '★★★★',
-            value: '4'
-          },
-          {
-            name: '★★★',
-            value: '3'
-          },
-          {
-            name: '★★',
-            value: '2'
-          },
-          {
-            name: '★',
-            value: '1'
-          }
-        ],
+
         level: '',   // 星级评分标志
-        Area: [
-          {
-            name: '全部',
-            value: ''
-          },
-          {
-            name: '黄浦区',
-            value: '310101'
-          }, {
-            name: '徐汇区',
-            value: '310104'
-          },
-          {
-            name: '长宁区',
-            value: '310105'
-          },
-          {
-            name: '静安区',
-            value: '310106'
-          },
-          {
-            name: '普陀区',
-            value: '310107'
-          },
-          {
-            name: '虹口区',
-            value: '310109'
-          },
-          {
-            name: '杨浦区',
-            value: '310110'
-          },
-          {
-            name: '闵行区',
-            value: '310112'
-          },
-          {
-            name: '宝山区',
-            value: '310113'
-          },
-          {
-            name: '嘉定区',
-            value: '3101q4'
-          },
-          {
-            name: '浦东新区',
-            value: '310115'
-          },
-          {
-            name: '金山区',
-            value: '310116'
-          },
-          {
-            name: '松江区',
-            value: '310117'
-          },
-          {
-            name: '青浦区',
-            value: '310118'
-          },
-          {
-            name: '奉贤区',
-            value: '310120'
-          },
-          {
-            name: '崇明区',
-            value: '310230'
-          }
-        ],
-        area: '',
-        carBrand1: [
-          {
-            name: '奥迪'
-          },
-          {
-            name: '宝马'
-          },
-          {
-            name: '奔驰'
-          },
-          {
-            name: '本田'
-          },
-          {
-            name: '别克'
-          },
-          {
-            name: '比亚迪'
-          },
-          {
-            name: '丰田'
-          },
-          {
-            name: '凯迪拉克'
-          }
-        ],
+
         carBrand: [],
         brand: '',
-        page: 1,
         allLoaded: false,
         companyDetail: {},  // 企业详情
         companyDetailAll: {},
@@ -295,7 +173,30 @@
           "q": "",
           "sort": ""
         },
-        total: 0,
+
+	      search:{
+		      type: '164',
+		      q: '',
+		      sort:'',
+		      area: '',
+		      is4s: '',
+		      hot: '',
+		      lng: '121.480236',
+		      lat: '31.236301'
+	      },
+	      total: 0,
+	      limit: 10,
+	      page: 1,
+
+	      list:[],
+	      pointList: [],
+
+	      map: null,
+	      geolocation: null,
+	      markerClusterer: null,
+	      markers: null,
+
+
         showList: false,
         maintainListBlur: false,
         // maintainListLocation: 0,
@@ -309,7 +210,7 @@
     components: {comp_detail, SlideBar, maintainList, maintainBottom},
     computed: {
       show(){
-        return this.$store.state.slideState.showBody
+        return this.$store.state.app.slideState.showBody
       },
     },
     created(){
@@ -341,73 +242,78 @@
     },
 
     mounted(){
+		this.init()
+	    this.bodyNoScoll()
 
-      let that = this
-      this.Map = new BMap.Map("container")
 
-      let point = new BMap.Point(that.query.lon, that.query.lat)           // 创建中心坐标
-      that.Map.centerAndZoom(point, 14)                 // 初始化地图，设置中心点坐标和地图级别
-      that.Map.addControl(new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_LEFT}))         //添加放大缩小控件
+      // let that = this
+      // this.Map = new BMap.Map("container")
+      //
+      // let point = new BMap.Point(that.query.lon, that.query.lat)           // 创建中心坐标
+      // that.Map.centerAndZoom(point, 14)                 // 初始化地图，设置中心点坐标和地图级别
+      // that.Map.addControl(new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_LEFT}))         //添加放大缩小控件
+      //
+      // that.GeolocationControl= new BMap.GeolocationControl({
+      //   anchor: BMAP_ANCHOR_TOP_RIGHT,
+      //   offset: new BMap.Size(10, 10),
+      //   locationIcon: new BMap.Icon("/static/img/user.png", new BMap.Size(0,0), {offset: new BMap.Size(0, 0)})
+      // })
+      // that.Map.addControl(that.GeolocationControl);
+      //
+      // that.GeolocationControl.addEventListener('locationSuccess', function (point) {
+      //   // console.log(point)
+      //   that.query.lon = point.point.lng
+      //   that.query.lat = point.point.lat
+      //
+      //   // that.sendAjax(false, false)
+      //   that.getList(true, true)
+      //
+      // })
+      //
+      // let dragx=0,dragy=0
+      // this.Map.addEventListener("dragstart", function(e) {
+      //   // console.log('dragstart',e.offsetX, e.offsetY)
+      //   dragx=e.offsetX
+      //   dragy=e.offsetY
+      // })
+      // this.Map.addEventListener("dragend", function(e) {
+      //   // console.log(e)
+      //   let drageDistance= that.Map.getDistance(new BMap.Point(e.point.lng, e.point.lat),
+      //     new BMap.Point(that.query.lon, that.query.lat)
+      //   )
+      //   that.clickMarkerClusterer()
+      //   // console.log(new BMap.Point(that.currentPoint.pointX, that.currentPoint.pointY))
+      //   // console.log(drageDistance)
+      //   if(Math.abs(e.offsetX- dragx)<50 && Math.abs(e.offsetY-dragy)<50 && drageDistance< 2000) return
+      //   that.query.lon = that.Map.getCenter().lng;
+      //   that.query.lat = that.Map.getCenter().lat;
+      //   // that.sendAjax(false, false)
+      //   that.getList(false, true)
+      //   that.showDetail=false
+      // })
+      //
+      // this.Map.addEventListener("touchstart", function(e) {
+      //   // console.log(e)
+      //   if(!e.bb && that.showDetail) {
+      //     that.showDetail=false
+      //     that.clickMarkerClusterer()
+      //   }
+      //   that.showSmallList=false
+      //
+      //   that.maintainListBlur= Math.random()
+      // })
+      // this.Map.addEventListener("zoomend", function(e) {
+      //   console.log('zoomend')
+      //   setTimeout(function () {
+      //     // that.renderMap()
+      //     that.clickMarkerClusterer()
+      //   },500)
+      // })
+      // // this.bodyNoScoll()
+      //
+      // this.getLocation();
 
-      that.GeolocationControl= new BMap.GeolocationControl({
-        anchor: BMAP_ANCHOR_TOP_RIGHT,
-        offset: new BMap.Size(10, 10),
-        locationIcon: new BMap.Icon("/static/img/user.png", new BMap.Size(0,0), {offset: new BMap.Size(0, 0)})
-      })
-      that.Map.addControl(that.GeolocationControl);
 
-      that.GeolocationControl.addEventListener('locationSuccess', function (point) {
-        // console.log(point)
-        that.query.lon = point.point.lng
-        that.query.lat = point.point.lat
-
-        // that.sendAjax(false, false)
-        that.getList(true, true)
-
-      })
-
-      let dragx=0,dragy=0
-      this.Map.addEventListener("dragstart", function(e) {
-        // console.log('dragstart',e.offsetX, e.offsetY)
-        dragx=e.offsetX
-        dragy=e.offsetY
-      })
-      this.Map.addEventListener("dragend", function(e) {
-        // console.log(e)
-        let drageDistance= that.Map.getDistance(new BMap.Point(e.point.lng, e.point.lat),
-          new BMap.Point(that.query.lon, that.query.lat)
-        )
-        that.clickMarkerClusterer()
-        // console.log(new BMap.Point(that.currentPoint.pointX, that.currentPoint.pointY))
-        // console.log(drageDistance)
-        if(Math.abs(e.offsetX- dragx)<50 && Math.abs(e.offsetY-dragy)<50 && drageDistance< 2000) return
-        that.query.lon = that.Map.getCenter().lng;
-        that.query.lat = that.Map.getCenter().lat;
-        // that.sendAjax(false, false)
-        that.getList(false, true)
-        that.showDetail=false
-      })
-
-      this.Map.addEventListener("touchstart", function(e) {
-        // console.log(e)
-        if(!e.bb && that.showDetail) {
-          that.showDetail=false
-          that.clickMarkerClusterer()
-        }
-        that.showSmallList=false
-
-        that.maintainListBlur= Math.random()
-      })
-      this.Map.addEventListener("zoomend", function(e) {
-        console.log('zoomend')
-        setTimeout(function () {
-          // that.renderMap()
-          that.clickMarkerClusterer()
-        },500)
-      })
-      // this.bodyNoScoll()
-
-      this.getLocation();
 
     },
     activated(){
@@ -429,6 +335,92 @@
       // document.body.removeEventListener('touchmove', this.noscroll,false)
     },
     methods: {
+    	init(){
+		    this.map= new AMap.Map('container',{
+			    center: new AMap.LngLat(this.search.lng, this.search.lat),
+			    zoom: 10,
+		    });
+		    // 同时引入工具条插件，比例尺插件和鹰眼插件
+		    AMap.plugin(['AMap.ToolBar',], () => {
+			    // 在图面添加工具条控件，工具条控件集成了缩放、平移、定位等功能按钮在内的组合控件
+			    this.map.addControl(new AMap.ToolBar({
+				    locate: false,
+				    position: 'LT',
+				    offset: new AMap.Pixel(0,25)
+			    }));
+		    });
+
+		    this.map.on('complete', () => {
+			    // 地图图块加载完成后触发
+			    // console.log('this.map.on(complete)')
+			    this.getLocation()
+		    });
+
+		    this.map.on('dragend', () => {
+			    let center= this.map.getCenter()
+			    this.search.lng= center.lng
+			    this.search.lat= center.lat
+			    this.getCompList(false, true)
+		    });
+
+		    for(let key in this.$route.query){
+			    this.search[key]= this.$route.query[key]
+		    }
+		    // console.log(this.$route.query)
+		    // this.getArea()
+	    },
+	    getLocation(){
+		    if(this.map){
+			    AMap.plugin('AMap.Geolocation', () => {
+				    this.geolocation = new AMap.Geolocation({
+					    buttonPosition: 'RT',
+					    buttonOffset: new AMap.Pixel(10,10),
+					    timeout: 2000,
+				    });
+				    this.map.addControl(this.geolocation);
+				    this.geolocation.getCurrentPosition();
+				    AMap.event.addListener(this.geolocation, 'complete', (result)=>{
+					    this.map.setCenter(result.position)
+					    this.map.add(new AMap.Marker(result.position))
+					    this.search.lng= result.position.lng
+					    this.search.lat= result.position.lat
+					    this.getCompList()
+				    });//返回定位信息
+				    AMap.event.addListener(this.geolocation, 'error', (err)=>{
+					    this.getCity()
+				    });      //返回定位出错信息
+
+
+			    });
+		    }
+	    },
+	    getCity(){
+		    AMap.plugin('AMap.CitySearch', () => {
+			    let city = new AMap.CitySearch();
+			    city.getLocalCity((status, result)=>{
+				    console.log('getLocalCity', status, result)
+				    if(status== 'complete'){
+					    this.map.setCity(result.city, ()=>{
+						    let center= this.map.getCenter()
+						    // console.log('this.map.getCenter()', center)
+						    this.map.add(new AMap.Marker( center))
+						    // console.log('this.map.add(new AMap.Marker( center))')
+						    this.search.lng= center.lng
+						    this.search.lat= center.lat
+						    this.getCompList()
+						    // this.initPiontList()
+					    })
+				    }else{
+				    	let center= new AMap.LngLat(this.search.lng, this.search.lat)
+					    this.map.panTo(center)
+					    this.map.add(new AMap.Marker( {
+						    position: center
+					    }))
+					    this.getCompList()
+				    }
+			    })
+		    });
+	    },
       toQuery(){
         let compname= this.$route.query.compname
         if(compname){
@@ -437,6 +429,94 @@
           this.getList(false, true)
         }
       },
+	    getCompList(clearPoint, clearList){
+		    if(clearList) this.page=1
+		    else this.page++
+		    let query= this.calcQuery()
+		    this.axios({
+			    baseURL: '/repair',
+			    url: '/micro/search/company'+ query,
+			    method: 'get',
+		    }).then( (res) => {
+		    	let datas= res.data.content
+			    if(clearList){
+				    this.list= res.data.content
+				    // 最近的点
+				    this.search.lng = parseFloat(res.data.content[0].lon);
+				    this.search.lat = parseFloat(res.data.content[0].lat);
+			    }else{
+				    this.list= this.list.concat(res.data.content)
+			    }
+			    if(clearPoint){
+				    this.pointList= []
+				    for( let i in datas){
+					    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
+					    this.pointList.push(datas[i])
+				    }
+			    }else{
+				    let hasPoint= false
+				    for (let i in datas) {
+					    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
+					    hasPoint= false
+					    for(let j in this.pointList){
+						    if(this.pointList[j].sid== datas[i].sid){
+							    hasPoint= true
+							    break
+						    }
+					    }
+					    if(!hasPoint) this.pointList.push(datas[i])
+				    }
+			    }
+
+			    // this.calcPointList(res.data.content)
+			    this.total= res.data.totalElements
+			    this.renderMap()
+		    })
+	    },
+	    calcQuery(limit){
+		    let is164= this.search.type== 164
+		    let query='?fl=type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,openHours,rating'+
+			    '&q='+ this.search.q +
+			    '&page='+ (this.page-1) +','+ (limit ||this.limit)
+		    if(is164) query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
+		    if(this.search.lng) query+=('&point='+this.search.lat+','+this.search.lng)
+		    let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
+		    if(this.search.area && is164) fq+= '+AND+areaKey:'+ this.search.area
+		    if(this.search.is4s && is164){
+			    is4s= (this.search.is4s=='yes' ? 'kw:4s': '-kw:4s')
+			    fq+= '+AND+' + is4s
+		    }
+		    query += fq
+
+		    return query
+	    },
+	    // initPiontList(){
+		 //    let query= this.calcQuery(20)
+		 //    this.axios({
+			//     baseURL: '/repair',
+			//     url: '/micro/search/company'+ query,
+			//     method: 'get',
+		 //    }).then( (res) => {
+			//     this.calcPointList(res.data.content)
+		 //    })
+	    // },
+	    // calcPointList(list){
+		 //    let hasPoint= false
+		 //    let points= this.pointList
+		 //    for(let i in list){
+			//     if(list[i].kw.indexOf('4s')>=0) list[i].is4s= true
+			//     hasPoint= false
+			//     for(let j in points){
+			// 	    if(points[j].sid == list[i].sid){
+			// 		    hasPoint= true
+			// 		    break
+			// 	    }
+			//     }
+			//     if(!hasPoint) this.pointList.push(list[i])
+		 //    }
+		 //    this.renderMap()
+	    // },
+
       bodyNoScoll(){
         let overscroll = function(el) {
           el.addEventListener('touchstart', function() {
@@ -508,136 +588,38 @@
         this.sheetVisible = !this.sheetVisible
       },
 
-      getLocation() {  // 获取当前手机地理位置
-        let that = this;
-        let geolocation = new BMap.Geolocation();  // 开启SDK辅助定位
-        geolocation.getCurrentPosition(function(r){
-          if(this.getStatus() == BMAP_STATUS_SUCCESS){
-            that.query.lon = r.point.lng;
-            that.query.lat = r.point.lat;
-            let point = new BMap.Point(that.query.lon, that.query.lat)
-            let marker = new BMap.Marker(point);    // 创建标注
-            let myIcon = new BMap.Icon(that.userinfo.photo?that.userinfo.photo:"/static/img/user.png", new BMap.Size(50,50), {offset: new BMap.Size(0, 0)});
-            that.Map.addOverlay(marker,{icon: myIcon});
-            marker.setAnimation(BMAP_ANIMATION_BOUNCE);
-            that.Map.panTo(r.point)
+      // getLocation() {  // 获取当前手机地理位置
+      //   let that = this;
+      //   let geolocation = new BMap.Geolocation();  // 开启SDK辅助定位
+      //   geolocation.getCurrentPosition(function(r){
+      //     if(this.getStatus() == BMAP_STATUS_SUCCESS){
+      //       that.query.lon = r.point.lng;
+      //       that.query.lat = r.point.lat;
+      //       let point = new BMap.Point(that.query.lon, that.query.lat)
+      //       let marker = new BMap.Marker(point);    // 创建标注
+      //       let myIcon = new BMap.Icon(that.userinfo.photo?that.userinfo.photo:"/static/img/user.png", new BMap.Size(50,50), {offset: new BMap.Size(0, 0)});
+      //       that.Map.addOverlay(marker,{icon: myIcon});
+      //       marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+      //       that.Map.panTo(r.point)
+      //
+      //       let compname= that.$route.query.compname
+      //       if(compname){
+      //         that.toQuery()
+      //       }else{
+      //         // that.sendAjax()
+      //         that.getList(true, true)
+      //       }
+      //
+      //
+      //     }
+      //     else {
+      //       Toast('当前地理位置获取失败')
+      //       // that.sendAjax(true, false)
+      //     }
+      //   },{enableHighAccuracy: true})
+      //   // this.GeolocationControl.location()
+      // },
 
-            let compname= that.$route.query.compname
-            if(compname){
-              that.toQuery()
-            }else{
-              // that.sendAjax()
-              that.getList(true, true)
-            }
-
-
-          }
-          else {
-            Toast('当前地理位置获取失败')
-            // that.sendAjax(true, false)
-          }
-        },{enableHighAccuracy: true})
-        // this.GeolocationControl.location()
-      },
-
-      sendAjax(clearPoint, isList, loadMore) {
-        if(clearPoint) {
-          this.points=[]
-          this.page= 1
-          this.allLoaded= false
-        }
-        if(!isList) this.repairName=''
-        let self= this
-        let data = {
-          companycategory: this.type,
-          corpAreaEq: this.area,
-          corpName: this.repairName,
-          distance: 5,
-          lat: this.currentPoint.pointY,
-          limit: 20,
-          lng: this.currentPoint.pointX,
-          magorBrandsLk: this.brand,
-          page: this.page,
-          // searchOption: isList?'1':"2",
-          searchOption: (this.area||this.type||this.level)?'1':"2",
-          sortField: "",
-          starLevel: this.level,
-          systemToken: localStorage.getItem("SYSTEMTOKEN"),
-          type: this.searchCompanyType
-        }
-        this.axios({
-          method: 'post',
-          url: '/maintain/getRangeCorps',
-          // url: '/maintain/v2/getRangeCorps',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(data)
-        })
-        .then(res => {
-          let datas = res.data.data;
-          if(datas && datas.length>0){
-
-            // let poi=[]
-            // for (let i in datas) {
-            //   poi.push({
-            //     lng: datas[i].longitude,
-            //     lat: datas[i].latitude,
-            //     distance: datas[i].distance,
-            //     corpId: datas[i].corpId
-            //   })
-            // }
-            // this.points=poi
-
-            let has_point= false
-            for (let i in datas) {
-              has_point= false
-              for(let j in self.points){
-                if(self.points[j].corpId== datas[i].corpId){
-                  has_point= true
-                  break
-                }
-              }
-              if(!has_point) self.points.push({
-                lng: datas[i].longitude,
-                lat: datas[i].latitude,
-                distance: datas[i].distance,
-                corpId: datas[i].corpId,
-                corpName: datas[i].corpName,
-                corpAdd: datas[i].corpAdd,
-                creditLevel: datas[i].creditLevel,
-              })
-            }
-            if(isList) self.isShowCropList=true
-            // console.log(self.points.length, res.data.totalCount)
-            if(self.points.length >= res.data.totalCount){
-              self.allLoaded=true
-            }
-            if(loadMore) self.$refs.loadmore.onBottomLoaded()
-
-            self.nearPoint= datas[0]
-            if(!isList){
-              self.currentPoint.pointX = parseFloat(datas[0].longitude);   // 最近的点
-              self.currentPoint.pointY = parseFloat(datas[0].latitude);   // 最近的点
-            }
-
-            if(!isList){
-              self.compList=datas
-              self.showSmallList= true
-              setTimeout(function () {
-                $('.maplist').scrollTop(0)
-              })
-            }
-
-            this.renderMap()
-          } else {
-            self.isShowCropList= false
-            return Toast('未搜索到')
-
-          }
-
-        })
-      },
 
       getList( clearPoint, clearList){
         if(clearList) this.query.page=1
@@ -683,58 +665,101 @@
       },
 
       queryByList(query, clearList){
-        this.query.q= query.q
-        this.query.area= query.area
-        this.query.sort= query.sort
-        this.getList(clearList, clearList)
+        this.search.q= query.q
+        this.search.area= query.area
+        this.search.sort= query.sort
+        this.getCompList(clearList, clearList)
       },
 
       renderMap(){
-        if(this.markerClusterer){
-          this.markerClusterer.clearMarkers()
-        }
-        let that = this
-        let pt = null
+	      if(this.markerClusterer ) {
+		      this.markerClusterer.clearMarkers();
+		      this.markerClusterer.setMap(null);
+		      this.markerClusterer= null
+	      }
+	      let iconNormal = new AMap.Icon({
+		      image: "/static/img/maintain/icon-normal.png",
+		      size: new AMap.Size(52, 52),
+		      imageOffset: new AMap.Size(11, 11),
+		      imageSize: new AMap.Size(30, 30),
+	      });
+	      let icon4s = new AMap.Icon({
+		      image: "/static/img/maintain/icon-4s.png",
+		      size: new AMap.Size(52, 52),
+		      imageOffset: new AMap.Size(11, 11),
+		      imageSize: new AMap.Size(30, 30),
+	      });
+	      this.markers= []
+	      for (let i in this.pointList){
+		      let lngLat= new AMap.LngLat(this.pointList[i].lon|| this.search.lng, this.pointList[i].lat|| this.search.lat)
+		      let marker= new AMap.Marker({
+			      icon: this.pointList[i].is4s? icon4s: iconNormal,
+			      position: lngLat,
+			      extData: this.pointList[i]
+		      })
+		      marker.on('click', (e) => {
+			      this.getCompanyDetail(e.target.getExtData())
+		      })
+		      this.markers.push(marker)
+	      }
 
-        let iconNormal = new BMap.Icon("/static/img/maintain/icon-normal.png", new BMap.Size(52, 52),
-          {imageOffset: new BMap.Size(11, 11), imageSize: new BMap.Size(30, 30)});
-        let icon4s = new BMap.Icon("/static/img/maintain/icon-4s.png", new BMap.Size(52, 52),
-          {imageOffset: new BMap.Size(11, 11), imageSize: new BMap.Size(30, 30)});
-        let markers = []
-        for (let i = 0; i < that.points.length; i++) {
-          pt = new BMap.Point(that.points[i].lon, that.points[i].lat)
-          let marker = new BMap.Marker(pt, { icon: that.points[i].is4s? icon4s: iconNormal })
-          // marker.corpId = that.points[i].corpId
-          // marker.distance = that.points[i].distance
-          marker.compDetail = that.points[i]
-          markers.push(marker)
-        }
+	      let style={
+		      url: '/static/img/position-num.png',
+		      size: new AMap.Size(40, 40),
+		      textColor: '#fff',
+		      textSize: 14
+	      }
+	      AMap.plugin(["AMap.MarkerClusterer"],() => {
+		      this.markerClusterer = new AMap.MarkerClusterer(this.map, this.markers,{styles:[style, style, style]});
+		      // console.log('renderMap() over')
+	      });
 
 
-        // 点击维修企业图标查看详细信息
-        for (let i = 0; i < markers.length; i++) {
-          markers[i].addEventListener('click', function(e) {
-            // console.log('getCompanyDetail',this.compDetail)
-
-            that.getCompanyDetail(this.compDetail)
-
-          })
-        }
-
-        this.markerClusterer = new BMapLib.MarkerClusterer(that.Map, {
-          markers: markers,
-          girdSize: 200,
-          styles: [{
-            url: '/static/img/position-num.png',
-            // maxZoom: 10,
-            size: new BMap.Size(40, 40),
-            // offset: new BMap.Size(5, 5),
-            // imageSize: new BMap.Size(34, 34),
-            textColor: '#fff',
-            textSize: 14
-          }]
-        })
-        this.clickMarkerClusterer()
+        // if(this.markerClusterer){
+        //   this.markerClusterer.clearMarkers()
+        // }
+        // let that = this
+        // let pt = null
+        //
+        // let iconNormal = new BMap.Icon("/static/img/maintain/icon-normal.png", new BMap.Size(52, 52),
+        //   {imageOffset: new BMap.Size(11, 11), imageSize: new BMap.Size(30, 30)});
+        // let icon4s = new BMap.Icon("/static/img/maintain/icon-4s.png", new BMap.Size(52, 52),
+        //   {imageOffset: new BMap.Size(11, 11), imageSize: new BMap.Size(30, 30)});
+        // let markers = []
+        // for (let i = 0; i < that.points.length; i++) {
+        //   pt = new BMap.Point(that.points[i].lon, that.points[i].lat)
+        //   let marker = new BMap.Marker(pt, { icon: that.points[i].is4s? icon4s: iconNormal })
+        //   // marker.corpId = that.points[i].corpId
+        //   // marker.distance = that.points[i].distance
+        //   marker.compDetail = that.points[i]
+        //   markers.push(marker)
+        // }
+        //
+        //
+        // // 点击维修企业图标查看详细信息
+        // for (let i = 0; i < markers.length; i++) {
+        //   markers[i].addEventListener('click', function(e) {
+        //     // console.log('getCompanyDetail',this.compDetail)
+        //
+        //     that.getCompanyDetail(this.compDetail)
+        //
+        //   })
+        // }
+        //
+        // this.markerClusterer = new BMapLib.MarkerClusterer(that.Map, {
+        //   markers: markers,
+        //   girdSize: 200,
+        //   styles: [{
+        //     url: '/static/img/position-num.png',
+        //     // maxZoom: 10,
+        //     size: new BMap.Size(40, 40),
+        //     // offset: new BMap.Size(5, 5),
+        //     // imageSize: new BMap.Size(34, 34),
+        //     textColor: '#fff',
+        //     textSize: 14
+        //   }]
+        // })
+        // this.clickMarkerClusterer()
       },
 
       clickMarkerClusterer(){
@@ -763,16 +788,8 @@
       },
 
       goLatePoint(){
-        // console.log(this.points[0].lng, this.points[0].lat)
-        // this.Map.panTo(new BMap.Point(this.compList[0].lon, this.compList[0].lat))
-        this.Map.panTo(new BMap.Point(this.query.lon, this.query.lat))
+	      this.map.panTo(new AMap.LngLat(this.search.lng, this.search.lat))
 
-        let self=this
-        setTimeout(function () {
-          // self.clickMarkerClusterer()
-          self.renderMap()
-          // self.getCompanyDetail(self.nearPoint.corpId, self.nearPoint.distance)
-        },500)
 
       },
 
@@ -826,30 +843,13 @@
         // console.log(this.points);
         // console.log(this.currentPoint);
 
-        this.query.lon= item.lon
-        this.query.lat= item.lat
-        this.Map.panTo(new BMap.Point(item.lon || item.longitude, item.lat || item.latitude))
-        setTimeout(()=>{
-          this.clickMarkerClusterer()
-          // this.renderMap()
-        },1000)
+        this.search.lng= item.lon
+        this.search.lat= item.lat
+	      this.map.panTo(new AMap.LngLat(this.search.lng, this.search.lat))
+
 
       },
 
-      clear() {   // 清空
-        if(this.type||this.level||this.area||this.brand){
-          this.type = ''
-          this.level = ''
-          this.area = ''
-          this.brand = ''
-          // this.sendAjax(true, false)
-        }
-      },  // 筛选清空
-      submit() {  // 确定
-        this.popupVisible = !this.popupVisible
-
-        // this.sendAjax(true, true)
-      }, // 筛选确定
       closeFilter() {  // 关闭筛选框
         this.popupVisible = !this.popupVisible
       },  // 侧边点击关闭筛选框
@@ -865,47 +865,8 @@
         this.area = v
         this.addclass(e)
       },  // 获得区域
-      getBrand1(e) {
-        this.brand = e.target.getAttribute("data-code")
-        this.addclass(e)
-      },   // 获取车辆品牌1
-      getBrand(e) {
-        $(e.target).parents(".mint-indexlist-content").children().find("input").removeClass("choosed")
-        $(e.target).toggleClass("choosed")
-        this.brand = $(e.target).attr("data-code")
-      },    // 获得车辆品牌2
-      showMoreBrand() {
-        this.isShowBrandList = true;
-        this.isShowAllList = false;
-        this.ShowBottomButton = false;
-        // 获取汽车品牌列表
-        this.axios({
-          url: '/brands/carsBrands',
-          method: 'post',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify({
-            page: 1,
-            limit: 1000
-          })
-        }).then(res=>{
-          // this.carBrand=res.data.data
-          let carBrand=[],newArr=[];
-          let carBrands=res.data.data
-          let arr=["A","B","C","D","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","W","X","Y","Z"]
-          arr.map((item, index)=>{
-            carBrands.map((item2, i)=>{
-              if(item === item2.bfirstLatter){
-                newArr.push({name:item2.name})
-              }
-            })
-            carBrand.push({index: item, brand: newArr})
-            newArr=[]
-          })
-          this.carBrand=carBrand
-        })
-      },  // 展示车辆品牌
+
+
       complete(){
         this.isShowBrandList = false;
         this.isShowAllList = true;
@@ -956,6 +917,9 @@
     position: relative;
     overflow: hidden;
     height: 100vh;
+	  .amap-toolbar, .amap-touch-toolbar .amap-zoomcontrol, .amap-logo, .amap-geolocation-con{
+		  z-index: 10!important;
+	  }
     .company_type_list {
       width: 240px;
       background-color: #70b8ef;

@@ -3,15 +3,15 @@
 <div id="compDetail" v-show="maintainDetailShow">
 <img class="close" @click="closeDetail" src="../assets/img/maintain/关闭.png" />
 <div class="info" >
-  <div class="head">{{all.companyName}}<span :class="{rest: !isOpenTime(all.openHours)}">{{isOpenTime(all.openHours)?'营业中': '休息中'}}</span></div>
-  <div class="text address">{{all.companyAddress}}</div>
+  <div class="head">{{all.name}}<span :class="{rest: !isOpenTime(all.openHours)}">{{isOpenTime(all.openHours)?'营业中': '休息中'}}</span></div>
+  <div class="text address">{{all.addr}}</div>
   <div class="avg">
-    <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(all.avgCompany)||0" :key="'yellow'+index">
-    <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(all.avgCompany))||0" :key="'gray'+index">
-    {{all.avgCompany?all.avgCompany+'分':'暂无评分'}}
+    <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(all.rating)||0" :key="'yellow'+index">
+    <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(all.rating))||0" :key="'gray'+index">
+    {{all.rating?all.rating+'分':'暂无评分'}}
   </div>
-  <div class="text">特约维修：{{compinfo.brand}}</div>
-  <div class="text">经营范围：{{all.companyProperty}}</div>
+  <div class="text">特约维修：{{all.brand}}</div>
+  <div class="text">经营范围：{{all.bizScope}}</div>
   <div class="button">
     <router-link tag="div" :to="{path: '/carOwner-centre/appointment', query: {id: maintainDetail.sid} }">
       <span class="yuyue">预约服务</span></router-link>
@@ -19,17 +19,17 @@
       <!--<span class="shangmeng">上门服务</span></router-link>-->
     <router-link tag="div" :to="{ path : '/remarkMatch', query: { corpId: maintainDetail.sid }}">
       <span class="dianping">点评</span></router-link>
-    <div v-show="all.companyTel" ><a class="lianxi" :href="'tel:'+ all.companyTel">联系</a></div>
-    <div v-show="!all.companyTel"><a class="lianxi" @click="noTal">联系</a></div>
+    <div v-show="all.tel" ><a class="lianxi" :href="'tel:'+ all.tel">联系</a></div>
+    <div v-show="!all.tel"><a class="lianxi" @click="noTal">联系</a></div>
   </div>
 </div>
 <div class="list" :style="{height: listHeight+'px'}">
   <div id="list">
     <div class="img">
-      <img :src="all.companyIcon||'/static/img/shqxwbig.png'"/>
+      <img :src="all.pic||'/static/img/shqxwbig.png'"/>
       <!--<img @click="small();$emit('back')" class="back" src="../assets/img/maintain/back.png" />-->
     </div>
-    <div class="head">累计评论（{{comment.count+1}}条）
+    <div class="head">累计评论（{{comment.totalElements+1}}条）
       <router-link tag="a" :to="{path: '/maintainRemark', query: {id: maintainDetail.sid, joint: all.joint} }">
         <img src="../assets/img/maintain/箭头.png"/>
       </router-link>
@@ -48,10 +48,10 @@
           <div class="msg">企业未能遵照相关法律法规和政策完成《汽车维修电子健康档案系统》对接，因此设置默认评分。</div>
         </div>
       </li>
-      <li v-for="(item, index) in comment.comments" :key="index">
-        <div class="left"><img v-if="item.headimgurl" :src="item.headimgurl"/></div>
+      <li v-for="(item, index) in comment.content" :key="index">
+        <div class="left"><img v-if="item.photo" :src="item.photo"/></div>
         <div class="right">
-          <div class="name">车友：{{hide(item.vehicleNum)}} <span>{{item.createTime | FormatDate}}</span></div>
+          <div class="name">车友：{{item.vehicleNum}} <span>{{item.createTime | FormatDate}}</span></div>
           <div class="avg">
             <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.userAvgScore)||0" :key="'yellow'+index">
             <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.userAvgScore))||0" :key="'gray'+index">
@@ -86,12 +86,6 @@
 
 </div>
 
-<!--<div class="bottom" v-show="showDetail">-->
-  <!--<div class="lookall" @click="showAll(true)" v-show="translateY">查看详情</div>-->
-  <!--<div class="lookmap" @click="showAll(false)" v-show="!translateY">显示地图</div>-->
-  <!--<div class="gps" @click="$emit('openMap', compinfo);$emit('back')">导航</div>-->
-  <!--<div class="distance">距离您 {{distance}}km</div>-->
-<!--</div>-->
 </div>
 </template>
 
@@ -104,11 +98,9 @@ export default {
   data() {
     return {
       all: {},
-      compinfo: {},
-      // translateY2:0,
-      // translateY: $(window).height(),
+
       opacity: 1,
-      // windowHeight: $(window).height(),
+
       comment:{},
 
       maintainDetailShow: false,
@@ -116,139 +108,23 @@ export default {
     }
   },
   computed: {
-    // bodyHeight(){
-    //   return this.$store.state.slideState.bodyHeight
-    // },
+
     show(){
-      return this.$store.state.slideState.showBody
+      return this.$store.state.app.slideState.showBody
     },
     maintainDetail(){
-      return this.$store.state.maintainDetail
+      return this.$store.state.app.maintainDetail
     },
   },
   watch: {
-    // random(val){
-    //   this.translateY= $(window).height()
-    //   this.all={}
-    //   this.compinfo={}
-    //   let self= this
-    //   // console.log(this.searchCompanyType)
-    //   if(this.searchCompanyType=='164'){
-    //     this.axios({
-    //       method: 'get',
-    //       url: '/comment/company/detail?companyId='+this.id ,
-    //       headers: {
-    //         'Content-type': 'application/json'
-    //       },
-    //     }).then(res => {
-    //       // console.log(res.data)
-    //       self.all=res.data
-    //       self.compinfo=res.data.companyInfo
-    //       setTimeout(function () {
-    //         self.small()
-    //         self.opacity=1
-    //         // console.log(this.translateY)
-    //       },100)
-    //     })
-    //   }else{
-    //     this.axios({
-    //       method: 'post',
-    //       url: '/maintain/corpDetail' ,
-    //       headers: {
-    //         'Content-type': 'application/json'
-    //       },
-    //       data: JSON.stringify({
-    //         corpId : this.id ,
-    //         systemToken : localStorage.getItem('SYSTEMTOKEN')
-    //       })
-    //     }).then(res => {
-    //       console.log(res.data)
-    //       self.all.companyName=res.data.data.corpName
-    //       self.all.companyTel=res.data.data.linkTel
-    //       self.all.businessStatus=1
-    //       self.all.companyAddress=res.data.data.corpAdd
-    //       self.compinfo=res.data.data
-    //       setTimeout(function () {
-    //         self.small()
-    //         self.opacity=1
-    //         console.log(this.translateY)
-    //       },100)
-    //     })
-    //   }
-    //
-    //
-    //   this.axios({
-    //     method: 'post',
-    //     url: '/comment/getComments' ,
-    //     headers: {
-    //       'Content-type': 'application/json'
-    //     },
-    //     data: JSON.stringify({"companyId": this.id,"page":1,"pageSize":10})
-    //   }).then(res => {
-    //     // console.log(res.data)
-    //     for (let i in res.data.comments){
-    //       // if(res.data.comments[i].openId)
-    //       //   self.getimg(res.data.comments[i].openId)
-    //       if(res.data.comments[i].userInfo){
-    //         let img= JSON.parse(res.data.comments[i].userInfo).headimgurl
-    //         if(img) res.data.comments[i].headimgurl= img
-    //       }
-    //     }
-    //     self.comment= res.data
-    //   })
-    // },
-    // show(val){
-    //   if(val=== 'maintainDetail'){
-    //     this.maintainDetailShow= false
-    //     this.getData()
-    //     // this.$store.commit('setSlideBodyHeight', 300)
-    //     // this.$store.commit('setSlideMinHeight', 45)
-    //   }else{
-    //     // this.maintainDetailShow= false
-    //   }
-    // },
     maintainDetail(){
       if(this.show=== 'maintainDetail') this.getData()
     },
     height(val){
       this.calcHeight(val)
     }
-    // bodyHeight(val){
-    //   // console.log('bodyHeightDetail',val)
-    //   if (this.show=='maintainDetail') this.calcHeight(val)
-    // },
   },
-  // mounted(){
-  //   let self=this
-  //
-  //   let overscroll = function(el) {
-  //     el.addEventListener('touchstart', function() {
-  //       let top = el.scrollTop
-  //         ,totalScroll = el.scrollHeight
-  //         ,currentScroll = top + el.offsetHeight;
-  //       if(top === 0) {
-  //         el.scrollTop = 1;
-  //       }else if(currentScroll === totalScroll) {
-  //         el.scrollTop = top - 1;
-  //       }
-  //     });
-  //
-  //     el.addEventListener('touchmove', function(evt) {
-  //       if(el.offsetHeight < el.scrollHeight)
-  //         evt._isScroller = true;
-  //     });
-  //   }
-  //   overscroll(document.querySelector('#compDetail'));
-  //
-  //   document.body.addEventListener('touchmove',this.noscroll,{ passive: false });
-  // },
 
-  // deactivated(){
-  //   document.body.removeEventListener('touchmove', this.noscroll,false)
-  // },
-  // beforeDestory(){
-  //   document.body.removeEventListener('touchmove', this.noscroll,false)
-  // },
   mounted(){
     let self= this
     if(this.show=== 'maintainDetail') this.getData()
@@ -271,48 +147,40 @@ export default {
       let self= this
       this.$store.commit('setMaintainListHistory', false)
       this.$store.commit('setMaintainListHistory', this.maintainDetail)
-      this.axios({
-        method: 'get',
-        url: '/maintain/v2/company/detail?companyId='+this.maintainDetail.sid ,
-        // url: '/comment/company/detail?companyId='+this.maintainDetail.sid ,
-        headers: {
-          'Content-type': 'application/json'
-        },
-      }).then(res => {
-        self.all=res.data
-        self.compinfo=res.data
-        this.maintainDetailShow= true
-        setTimeout(function () {
-          // console.log('$("#compDetail .info").outerHeight()',$("#compDetail .info").outerHeight())
-          // self.$store.commit('reSetSlideBodyHeight', $("#compDetail .info").outerHeight())
-          // self.$store.commit('setSlideMinHeight', $("#compDetail .info").outerHeight())
 
-          self.$emit('minHeight', $("#compDetail .info").outerHeight())
-          self.$emit('toLocation', 0)
-          self.$emit('init')
-        },0)
+	    this.axios({
+		    method: 'get',
+		    baseURL: '/repair',
+		    url: '/micro/search/company/repair/'+this.maintainDetail.sid ,
+	    }).then(res => {
+		    this.all=res.data
+		    this.maintainDetailShow= true
+		    setTimeout( ()=> {
+			    // console.log('$("#compDetail .info").outerHeight()',$("#compDetail .info").outerHeight())
+			    // self.$store.commit('reSetSlideBodyHeight', $("#compDetail .info").outerHeight())
+			    // self.$store.commit('setSlideMinHeight', $("#compDetail .info").outerHeight())
 
-      })
+			    this.$emit('minHeight', $("#compDetail .info").outerHeight())
+			    this.$emit('toLocation', 0)
+			    this.$emit('init')
+		    },0)
 
-      this.axios({
-        method: 'post',
-        url: '/comment/getComments' ,
-        headers: {
-          'Content-type': 'application/json'
-        },
-        data: JSON.stringify({"companyId": this.maintainDetail.sid,"page":1,"pageSize":9})
-      }).then(res => {
-        // console.log(res.data)
-        for (let i in res.data.comments){
-          // if(res.data.comments[i].openId)
-          //   self.getimg(res.data.comments[i].openId)
-          if(res.data.comments[i].userInfo){
-            let img= JSON.parse(res.data.comments[i].userInfo).headimgurl
-            if(img) res.data.comments[i].headimgurl= img
-          }
-        }
-        self.comment= res.data
-      })
+	    })
+
+	    this.axios.get('/comment/maintain/query/companyId?size=10&page=0&companyId='+this.maintainDetail.sid).then( (res) => {
+			    let data=res.data;
+			    // this.total=res.data.totalElements;
+		    // for (let i in data.content){
+			 //    // if(res.data.comments[i].openId)
+			 //    //   self.getimg(res.data.comments[i].openId)
+			 //    if(data.content[i].userInfo){
+				//     let img= JSON.parse(data.content[i].userInfo).headimgurl
+				//     if(img) data.content[i].headimgurl= img
+			 //    }
+		    // }
+		    this.comment= data
+	    })
+
     },
     calcHeight(height){
       let lh= parseInt(height - document.querySelector("#compDetail .info").offsetHeight)
