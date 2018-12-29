@@ -69,6 +69,15 @@ export const deepClone = (data) => {
   return obj;
 }
 
+export const  base64ToBlob= (dataurl) => {
+	var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+		bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+	while (n--) {
+		u8arr[n] = bstr.charCodeAt(n);
+	}
+	return new Blob([u8arr], { type: mime });
+}
+
 /**
  * @param {thisfile} 图片文件
  * @param {callBack} 回调函数

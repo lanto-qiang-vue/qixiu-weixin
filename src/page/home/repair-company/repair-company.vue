@@ -43,14 +43,14 @@
           </a>
         </li>
 
-        <li class="mui-col-sm-3 mui-col-xs-3" @click="goPJ">
+        <li class="mui-col-sm-3 mui-col-xs-3" @click="goOut('parts')">
           <a href="javascript:;">
             <div style="width: 40px; height: 40px; margin: 0 auto;"></div>
             <p class="text-one-cut" style="text-align: center; margin: 0; line-height: 35px;">配件需求</p>
           </a>
         </li>
 
-        <li class="mui-col-sm-3 mui-col-xs-3" @click="goQB">
+        <li class="mui-col-sm-3 mui-col-xs-3" @click="goOut('equip')">
           <a href="javascript:;">
             <div style="width: 40px; height: 40px; margin: 0 auto;"></div>
             <p class="text-one-cut" style="text-align: center; margin: 0; line-height: 35px;">汽保设备需求</p>
@@ -101,7 +101,9 @@
       goTechnologyInfo(){this.$router.push("/repair-company/technology-info")},
       goRepairCertificate(){this.$router.push("/repair-company/repair-certificate")},
 
-
+	    goOut(infoId){
+		    this.$router.push({ path: '/infoDetail', query: {infoId: infoId}})
+	    },
       goPJ(){window.location.href='https://www.shanghaiqixiu.org/phone/business/parts'},
       goQB(){window.location.href='https://www.shanghaiqixiu.org/phone/business/equip'},
       goJS(){this.$router.push('/doctor')},

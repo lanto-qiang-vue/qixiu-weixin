@@ -16,9 +16,9 @@
       <img src="../assets/img/my/user.png" alt="">
     </div>
 
-    <div class="list" @click="goOperate" v-if="this.jueSe===4">
-      <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>运营统计</span> <i></i>
-    </div>
+    <!--<div class="list" @click="goOperate" v-if="this.jueSe===4">-->
+      <!--<img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>运营统计</span> <i></i>-->
+    <!--</div>-->
 
     <div class="list" @click="goCarListManager" v-if="this.jueSe===7">
       <img src="../assets/img/my/health.png" alt=""><span>电子健康档案</span> <i></i>
@@ -53,9 +53,9 @@
       <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的反馈</span> <i></i>
       <!--</div>-->
     </router-link>
-    <div @click="goMyDiscount" class="list">
-      <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的优惠券</span> <i></i>
-    </div>
+    <!--<div @click="goMyDiscount" class="list">-->
+      <!--<img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的优惠券</span> <i></i>-->
+    <!--</div>-->
     <div @click="goExpertList" class="list">
       <img src="../assets/img/my/expert_info.png" alt=""><span>专家信息</span> <i></i>
     </div>

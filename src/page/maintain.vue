@@ -196,6 +196,7 @@
 	      markerClusterer: null,
 	      markers: null,
 
+	      indicator: null,
 
         showList: false,
         maintainListBlur: false,
@@ -335,7 +336,7 @@
     },
     methods: {
     	init(){
-		    Indicator.open({
+		   Indicator.open({
 			    text: '请稍候...',
 			    spinnerType: 'snake'
 		    });

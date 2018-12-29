@@ -140,7 +140,7 @@ export default new Router({
 		{path: '/remarkMatch', name: 'remark-match', component: resolve => require(['@/page/remark/match'], resolve)},
 		{path: '/remarkDetail', name: 'remark-detail', component: resolve => require(['@/page/remark/remarkDetail'], resolve)},
 		{path: '/maintainRemark', name: 'maintainRemark', component: resolve => require(['@/page/maintainRemark'], resolve)},
-		{path: '/upComplain', name: 'upComplain', component: resolve => require(['@/page/remark/upComplain'], resolve)},
+		{path: '/upComplain', name: 'upComplain', component: resolve => require(['@/page/remark/upComplain'], resolve), meta: {requiresAuth: true}},
 		{path: '/myComplaint', name: 'myComplaint', component: resolve => require(['@/page/myComplaint'], resolve), meta: {requiresAuth: true}},
 		{path: '/tips-list', name: 'tips-list', component: resolve => require(['@/page/home/tips-list'], resolve)},
 	]

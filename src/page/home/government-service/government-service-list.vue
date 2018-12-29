@@ -8,9 +8,9 @@
     <div style="overflow: auto; height: calc(100vh - 40px)">
       <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
 
-      <div @click="goOut(item.infoId)" class="msg" v-for="(item, index) in infoPublicList">
+      <div @click="goOut(item.id)" class="msg" v-for="(item, index) in infoPublicList">
         <p>{{item.title}}</p>
-        <span>{{item.typeName}}-{{ item.publishTime | FormatDate}}</span>
+        <span>{{item.category.name}}-{{ item.publishTime | FormatDate}}</span>
         <div>
           <img :src="item.photo"/>
         </div>
@@ -72,36 +72,27 @@
           // }else if(this.$route.query.id==="11"){
           //   this.category="10281016"
           // }
-          let data = {
-            systemToken: localStorage.getItem("SYSTEMTOKEN"),
-            category: this.category,
-            // category: '10281013',
-            page: this.page,
-            size: 10
-          }
           this.axios({
             method: 'post',
-            url: '/infopublic/list',
-            headers: {
-              'Content-type': 'application/json'
-            },
-            data: JSON.stringify(data)
+            url: '/infopublic/home/all',
+            data: {
+	            "infoType": this.category,
+	            "pageNo": this.page,
+	            "pageSize": 10
+            }
           })
           .then(res => {
             // this.infoPublicList = res.data.data.dataList;
 
-            if(res.data.code=='0'){
               // console.log(res.data)
-              self.infoPublicList =self.infoPublicList.concat(res.data.data.dataList)
+              self.infoPublicList =self.infoPublicList.concat(res.data.items)
               // self.list=self.list.concat(res.data.comments)
               // self.list=res.data.comments
-              if(self.infoPublicList.length>=res.data.data.total){
+              if(self.infoPublicList.length>=res.data.total){
                 self.allLoaded=true
               }
               if(flag) self.$refs.loadmore.onBottomLoaded()
-            } else{
-              Toast(res.data.status);
-            }
+
           })
       },
       goOut(infoId){

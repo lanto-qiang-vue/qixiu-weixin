@@ -1,11 +1,11 @@
 <template>
 <div style="height: 100vh;overflow: auto">
   <mt-header title="匹配车辆" style="position: fixed;top: 0;width: 100%;z-index: 1"><mt-button icon="back" slot="left" @click="$router.go(-1)"></mt-button></mt-header>
-  <img class="compImg" :src="companyDetail.companyIcon||'/static/img/shqxwbig.png'">
+  <img class="compImg" :src="companyDetail.pic||'/static/img/shqxwbig.png'">
   <div class="content" >
     <div class="row">
-      <p>{{companyDetail.companyName}}</p>
-      <span style="padding-left: 15px;background-image: url('/static/img/remark/address_gray.png');background-size: 12px auto;background-position: left center;background-repeat: no-repeat">门店地址：{{companyDetail.companyAddress}}</span>
+      <p>{{companyDetail.name}}</p>
+      <span style="padding-left: 15px;background-image: url('/static/img/remark/address_gray.png');background-size: 12px auto;background-position: left center;background-repeat: no-repeat">门店地址：{{companyDetail.addr}}</span>
     </div>
     <div class="row" style="margin-bottom: 5px">
       <p>匹配车辆信息</p>
@@ -82,7 +82,6 @@
 
 <script>
   import { Toast, Popup, Header, MessageBox, Navbar, TabItem, IndexList, IndexSection, Radio, Actionsheet } from 'mint-ui'
-  import pic_verification from '../../components/picVerification.vue'
 	export default {
 		name: "remark-match",
     data(){
@@ -151,11 +150,9 @@
 		  // console.log(this.$router)
       if(this.$route.query.show=='yes') this.remarkvisible=true
       this.axios({
-        method: 'get',
-        url: '/comment/company/detail?companyId='+ this.$route.query.corpId,
-        headers: {
-          'Content-type': 'application/json'
-        },
+	      method: 'get',
+	      baseURL: '/repairproxy',
+	      url: '/micro/search/company/repair/'+this.$route.query.corpId ,
       }).then(res => {
           this.companyDetail = res.data
       })
@@ -360,7 +357,7 @@
         for (let i in this.tags){
           if(this.tags[i].checked) tag.push(this.tags[i].name)
         }
-        let url= '/comment/commit',
+        let url= '/comment/maintain',
           param={
             "attitude": this.serviceQuality,
             "companyId": this.$route.query.corpId,
@@ -372,14 +369,12 @@
             "quality": this.repairQuality,
             "speed": this.repairSpeed,
             "tags": tag,
-            "vehicleNumber": this.area+ this.cardno.trim(),
+            "vehicleNum": this.area+ this.cardno.trim(),
             'needJudgeVehicleExist': false,
-            'weixinId': localStorage.getItem("QXWOPENID"),
+            'openId': localStorage.getItem("QXWOPENID"),
             'unionid': localStorage.getItem("UNIONID")
           };
           if(this.$route.query.repairId){
-            url='/comment/commit/repair'
-            param.access_token= localStorage.getItem("ACCESSTOKEN")
             param.repairId= this.$route.query.repairId
             param.vehicleNumber= this.$route.query.vehicleplatenumber
             delete param.weixinId
@@ -389,8 +384,7 @@
         this.axios({
           method: 'post',
           url: url,
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify(param)
+          data: param
         }).then(res => {
           if(res.data.code=='0'){
 
@@ -415,7 +409,6 @@
       }
     },
 
-    components: {pic_verification},
 	}
 </script>
 

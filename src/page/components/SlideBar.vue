@@ -30,7 +30,9 @@
         },
         minTop: 80,
         bodyHeight: 0,
-        location: 0
+        location: 0,
+
+	    // footerHeight: 0
       }
     },
     computed: {
@@ -43,6 +45,14 @@
       showBody(){
         return this.$store.state.app.slideState.showBody
       },
+	    footerHeight(){
+      	    let height= 50
+      	    if (this.$route.query.mapType=='remarkMap'){
+      	    	$('.footer').hide()
+	            height=0
+            }
+            return height
+	    }
     },
     watch:{
       // showBody(){
@@ -89,7 +99,7 @@
       // this.$emit('toLocation', this.location)
       let self=this
       let dom= $(this.$refs.slide)
-      let docHeight= $(document).height()- 50
+      let docHeight= $(document).height()- this.footerHeight
       let touchBarHeight= $('.touch-bar').outerHeight(true) //bar高度（20）
       let startY= 0
       let endY= 0
@@ -151,7 +161,7 @@
       document.body.addEventListener('touchend', this.bodyScrollTop)
 
       window.onresize = function(){
-        if($(document).height()== (docHeight+50)) self.$emit('maintainListBlur')
+        if($(document).height()== (docHeight+ self.footerHeight)) self.$emit('maintainListBlur')
         self.resize(docHeight- self.minTop -touchBarHeight)
       }
     },
@@ -174,7 +184,7 @@
         // console.log('resize', height)
         let self= this
         let timeout= (time=== undefined? 500: time)
-        let docHeight= $(document).height()- 50
+        let docHeight= $(document).height()- this.footerHeight
         let touchBarHeight= $('.touch-bar').outerHeight(true)
         let calcHeight= 0
         if(height> docHeight- this.minTop -touchBarHeight){

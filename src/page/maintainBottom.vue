@@ -3,7 +3,7 @@
     <div class="lookall" @click="changeState(true)" v-show="location== 0">查看详情</div>
     <div class="lookmap" @click="changeState(false)" v-show="location== 1">显示地图</div>
     <div class="gps" @click="$emit('openMap', maintainDetail)">导航</div>
-    <div class="distance">距离您 {{maintainDetail.distance.toFixed(1)}}km</div>
+    <div class="distance">距离您 {{maintainDetail.distance?maintainDetail.distance.toFixed(1):0}}km</div>
   </div>
 </template>
 

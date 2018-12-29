@@ -112,7 +112,15 @@ export default {
 
     },
 
-    getData(){
+    getData(e){
+	    if (e.keyCode == '13') {
+		    e.target.blur()
+		    this.pageNo=1
+		    if (this.vehicleplatenumber.trim() == '') {
+			    Toast('请输入车牌号')
+			    return
+		    }
+	    }
 	    this.axios.post('/vehicle/owner/queryVehicelist', {
 		    "cartype": "",
 		    "pageNo": this.pageNo,
@@ -147,58 +155,16 @@ export default {
     },
 
     // 输入车牌号进行搜索
-    key(e) {
-      this.pageNo=1
-      if (e.keyCode == '13') {
-        e.target.blur()
-        if (this.vehicleplatenumber.trim() == '') {
-          Toast('请输入车牌号')
-          return
-        }
-        let data = {
-          accessToken: localStorage.getItem("ACCESSTOKEN"),
-          vehicleplatenumber: this.vehicleplatenumber,
-          pageSize: 10,
-          pageNo: this.pageNo
-        }
-        this.axios({
-          method: 'post',
-          url: '/vehicle/owner/queryVehicelist',
-          headers: { 'Content-type': 'application/json' },
-          data: JSON.stringify(data)
-        }).then(res => {
-            console.log("search---res", res);
-          if (res.data.data == null || res.data.data.length < 1){
-            Toast('未找到匹配车辆')
-            return
-          }
-          this.carList = res.data.data
-          this.allLoaded = true
-          console.log(this.carList)
-        })
-      }
-    },
 
     deleteVehicle(id) {
-      MessageBox.confirm('确定执行此操作?').then(action => {
-        let param = {
-          accessToken: localStorage.getItem('ACCESSTOKEN'),
-          vehicleId: id
-        }
+      MessageBox.confirm('确定解绑?').then(action => {
         this.axios({
           method: 'post',
-          url: '/vehicle/carfile/remove-bind',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(param)
-        })
-          .then(res => {
+          url: '/vehicle/carfile/remove-bind/'+ id,
+        }).then(res => {
             if(res.data.code === '0') {
               Toast('解绑成功!');
-              this.plate=''
-              this.frame=''
-              window.location.reload()
+              this.getData({keyCode: '13'})
             } else {
               Toast(res.data.status);
             }

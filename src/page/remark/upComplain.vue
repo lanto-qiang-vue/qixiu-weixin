@@ -2,16 +2,15 @@
 <div style="height: 100vh;overflow: auto;">
   <mt-header title="反馈凭证" style="position: fixed;top: 0;width: 100%;z-index: 100"><mt-button icon="back" slot="left" @click="$router.go(-1)"></mt-button></mt-header>
   <div class="above">
-    <div class="title"><i></i>请上传维修凭证（可选）<i></i></div>
+    <div class="title"><i></i>请上传维修凭证（必填）<i></i></div>
     <div class="picblock">
       <div class="pic mui-content-padded">
       <!--<div class="pic">-->
         <img v-show="!!img" :src="img" data-preview-src="" data-preview-group="1"/>
       </div>
-      <p @click="goLogin">拍摄/上传照片
-        <input type="file" accept="image/jpg,image/png,image/bmp" @change="getImg($event)" v-if="ACCESSTOKEN"/>
+      <p>拍摄/上传照片
+        <upload @done="getPic"></upload>
       </p>
-      <!--<input type="file" accept="image/jpg,image/png,image/bmp" capture="camera" @change="getImg($event)" />-->
 
     </div>
   </div>
@@ -32,8 +31,10 @@
 
 <script>
   import { Toast, MessageBox} from 'mint-ui'
+  import Upload from '@/page/components/compress-upload.vue'
 	export default {
 		name: "up-complain",
+		components: {Upload},
     data(){
       return{
         img:'',
@@ -42,167 +43,42 @@
       }
     },
     created(){
-		  let self= this
 
-      if(!this.$route.query.type) this.upComplain(false)
-
-      this.axios({
-        method: 'post',
-        url: '/app/signature',
-        headers: {'Content-type': 'application/json'},
-        data: JSON.stringify({url: encodeURIComponent(window.location.href.split('#')[0])})
-      }).then(res=>{
-        wx.config({
-          debug: false,
-          appId: window.location.origin==='https://weixin.shanghaiqixiu.org' ? self.consts.onlineAppId : self.consts.testAppId,
-          timestamp: res.data.timeStamp,
-          nonceStr: res.data.uuid,
-          signature: res.data.signature,
-          jsApiList: ['closeWindow']
-        })
-      })
     },
     methods:{
-		  goLogin(){
-        let self=this
-        if(this.ACCESSTOKEN){
-          return
-        }else{
-          // console.log(self.$route)
-          MessageBox({
-            title: '是否跳转',
-            message: '上传凭证需要登录，是否进入登录页面？',
-            showCancelButton: true
-          }).then(action => {
-            if(action=='confirm')
-              self.$router.push({path: '/login', query: { redirect: self.$route.fullPath }})
-          })
-        }
-      },
-      getImg(e){
-        // console.log(e)
-        let self=this
-        let file= e.target.files[0]
-        let reader = new FileReader();
-        reader.readAsDataURL(file)
-        reader.onload = function (ev) {
-          let image = new Image();
-          let selffile= this
-          image.onload=function(){
-            let width = image.width;
-            let height = image.height;
-            self.compress(selffile.result,
-              {width: width, height:height, quality: 0.6, type: file.type} ,
-              self.pushImg, file.name)
-          };
-          image.src= ev.target.result;
+	    getPic(res){
+	    	console.log('res', res)
+		    this.img= res.item.path
+	    },
 
-          // self.compress(this.result, {width: 1000, height:1000, quality: 0.7} , self.pushImg)
-        }
-      },
-      compress(path, obj, callback, name){
-        let img = new Image();
-        img.src = path;
-        img.onload = function () {
-          let that = this;
-          // 默认按比例压缩
-          let w = that.width,
-            h = that.height,
-            scale = w / h;
-          w = obj.width || w;
-          h = obj.height || (w / scale);
-          let quality = 0.7;  // 默认图片质量为0.7
-          //生成canvas
-          let canvas = document.createElement('canvas');
-          let ctx = canvas.getContext('2d');
-          // 创建属性节点
-          let anw = document.createAttribute("width");
-          anw.nodeValue = w;
-          let anh = document.createAttribute("height");
-          anh.nodeValue = h;
-          canvas.setAttributeNode(anw);
-          canvas.setAttributeNode(anh);
-          ctx.drawImage(that, 0, 0, w, h);
-          // 图像质量
-          if (obj.quality && obj.quality <= 1 && obj.quality > 0) {
-            quality = obj.quality;
-          }
-          // quality值越小，所绘制出的图像越模糊
-          let base64 = canvas.toDataURL(obj.type|| 'image/png', quality);
-          // console.log(base64)
-          // 返回base64的值
-          callback(base64, name)
-        }
-      },
-      pushImg(base64, name){
-        let self= this
-        let formdata = new FormData();
-        formdata.append('file' , self.base64ToBlob(base64), name);
-        this.axios({
-          url: '/image/add/'+localStorage.getItem('ACCESSTOKEN'),
-          method: 'post',
-          headers: {
-            // 'Content-type': 'application/json'
-          },
-          data: formdata
-        }).then(res => {
-          if(res.data.code==='0'){
-            console.log(res.data)
-            self.img= res.data.data.picPath
-          } else {
-            Toast(res.data.status)
-          }
-        })
-      },
-      base64ToBlob(dataurl) {
-        let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        return new Blob([u8arr], { type: mime });
-      },
       submit(){
         let self= this
         if(this.img) this.upComplain(true)
-        else MessageBox({
-          title: '提示',
-          message: '您还没上传维修凭证，是否继续反馈？',
-          showCancelButton: true
-        }).then(action => {
-          if(action=='confirm') self.upComplain(true)
-        })
+        else Toast('请上传维修凭证')
       },
       upComplain(jump){
         let self= this
-        let url= '/comment/company/complaint'
+        let url= '/comment/complaint/maintain'
         let param={
-          "commentId": this.$route.query.id,
-          "complaintFile": this.img,
-          "complaintDeatilInfo": "维修记录未上传",
-          "unionid": localStorage.getItem("UNIONID")
+	        "details": "",
+	        "photoUrl": this.img,
         }
+        if(this.$route.query.id) param.cmId= this.$route.query.id
         switch (this.$route.query.type){
           case 0: break;
           case 1: {
-            url= '/comment/company/complaint/repair?accessToken='+localStorage.getItem("ACCESSTOKEN")
+            url= '/comment/complaint/maintain/repairId'
             param={
-              "commentId": this.$route.query.repairId,
-              "complaintFile": this.img,
+              "repairId": this.$route.query.repairId,
             }
             break
           }
         }
-
         this.axios({
           url: url,
           method: 'post',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(param)
+          data: param
         }).then(res => {
-          if(res.data.code==='0'){
             console.log(res.data)
             if(jump) {
               Toast('提交成功')
@@ -210,13 +86,10 @@
                   self.$router.replace({path:'/myComplaint', query:{type: this.$route.query.type} })
                 }else{
                   setTimeout(function () {
-                    wx.closeWindow()
+                    this.$router.go(-1)
                   },1000)
                 }
             }
-          } else {
-            Toast(res.data.status)
-          }
         })
       }
     }

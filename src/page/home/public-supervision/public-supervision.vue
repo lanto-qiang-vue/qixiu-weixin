@@ -8,7 +8,7 @@
     </mt-header>
     <div class="grid" style="padding: 15px 0;">
       <ul class="mui-row">
-        <li class="mui-col-sm-3 mui-col-xs-3" @click="goSurveyList">
+        <li class="mui-col-sm-3 mui-col-xs-3" @click="goList('10281033','满意度调查')">
           <div style="width: 40px; height: 40px; margin: 0 auto;"></div>
           <p style="text-align: center; margin: 0; line-height: 35px;">满意度调查</p>
         </li>
@@ -39,7 +39,15 @@
 
     },
     methods: {
-      goSurveyList(){this.$router.push("/public-supervision/survey-list")},
+	    goList(id, name){
+		    this.$router.push({
+			    path: '/government-service/government-service-list',
+			    query: {
+				    id,
+				    name
+			    }
+		    })
+	    },
       goComplaint(){this.$router.push("/public-supervision/complaint")}
     }
   }

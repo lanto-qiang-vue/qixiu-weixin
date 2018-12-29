@@ -2,7 +2,7 @@
   <div id="carList">
     <div class='search'>
       <form action="javascript:return true;">
-        <input type="search" placeholder="搜索车牌号码" class="mui-input-clear" v-model='vehicleplatenumber' @keydown="key($event)" style="padding-left: 35px; text-indent: 0;">
+        <input type="search" placeholder="搜索车牌号码" class="mui-input-clear" v-model='vehicleplatenumber' @keydown="getData($event)" style="padding-left: 35px; text-indent: 0;">
       </form>
     </div>
     <div>
@@ -76,22 +76,27 @@ export default {
       }
     },
 
-    getData(){
-      let data = {
-        accessToken: localStorage.getItem("ACCESSTOKEN"),
-        vehicleplatenumber: this.vehicleplatenumber,
-        pageSize: 10,
-        pageNo: this.pageNo
-      }
-      if(!arguments.length){
-      }
+    getData(e){
+	    if (e.keyCode == '13') {
+		    // e.target.blur()
+		    if (this.vehicleplatenumber.trim() == '') {
+			    Toast('请输入车牌号')
+			    return
+		    }
+	    }
       this.axios({
         method: 'post',
         url: '/vehicle/carfile/query4manager',
-        headers: {'Content-type': 'application/json'},
-        data: JSON.stringify(data)
-      })
-      .then(res=>{
+        data: {
+	        byVehicleNumberStandard: "all",
+	        byVinStandard: "all",
+	        companyName: "",
+	        pageNo: this.pageNo,
+	        pageSize: 10,
+	        vehicleplatenumber: this.vehicleplatenumber,
+	        vin: ""
+        }
+      }).then(res=>{
         if(arguments.length==2){
           this.carList=[...this.carList, ...res.data.data]
           this.$refs.loadmore.onBottomLoaded();
@@ -119,38 +124,6 @@ export default {
     },
 
     // 输入车牌号进行搜索
-    key(e) {
-      this.pageNo=1
-      console.log(this.userRoleId);
-      if (e.keyCode == '13') {
-        e.target.blur()
-        if (this.vehicleplatenumber.trim() == '') {
-          Toast('请输入车牌号')
-          return
-        }
-        let data = {
-          accessToken: localStorage.getItem("ACCESSTOKEN"),
-          vehicleplatenumber: this.vehicleplatenumber,
-          pageSize: 10,
-          pageNo: this.pageNo
-        }
-        this.axios({
-          method: 'post',
-          url: '/vehicle/carfile/query4manager',
-          headers: { 'Content-type': 'application/json' },
-          data: JSON.stringify(data)
-        }).then(res => {
-            console.log("search---res", res);
-          if (res.data.data == null || res.data.data.length < 1){
-            Toast('未找到匹配车辆')
-            return
-          }
-          this.carList = res.data.data
-          this.allLoaded = true
-          console.log(this.carList)
-        })
-      }
-    },
 
     deleteVehicle(id) {
       MessageBox.confirm('确定执行此操作?').then(action => {

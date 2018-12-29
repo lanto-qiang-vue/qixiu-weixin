@@ -57,7 +57,7 @@ axios.interceptors.response.use(
 		    let content= ''
 		    if(response.data.status) content+= response.data.status
 		    if(response.data.message) content+= ' '+response.data.message
-		    if(content){
+		    if(response.data.code &&content){
 		    	if(toast) toast.close()
 			    toast= Toast(content)
 		    }

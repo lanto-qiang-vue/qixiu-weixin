@@ -26,13 +26,10 @@
     },
     created() {
       this.axios({
-        method: 'get',
-        url: '/infopublic/article/detail/' + localStorage.getItem("SYSTEMTOKEN") + '/' + this.$route.query.infoId,
-        headers: {
-          'Content-type': 'application/json'
-        }
+        method: 'post',
+        url: '/infopublic/detail/' + this.$route.query.infoId,
       }).then(res => {
-        this.infoDetail = res.data.data;
+        this.infoDetail = res.data.item;
         // this.share()
       }).catch(function (error) {
       })

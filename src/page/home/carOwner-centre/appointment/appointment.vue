@@ -7,7 +7,7 @@
         <mt-field label="联系电话:" type="number" placeholder="请输入联系方式" v-model="tel"></mt-field>
         <mt-field label="服务内容:" placeholder="请输入服务内容" v-model="content"></mt-field>
         <div @click="chooseDate">
-          <mt-field label="预约时间:" readonly disableClear placeholder="请选择预约时间" :value="pickerValue | FormatDate('YYYY-MM-DD HH:mm')"></mt-field>
+          <mt-field label="预约时间:" readonly disableClear placeholder="请选择预约时间" :value="pickerValue | FormatDate"></mt-field>
         </div>
 
       </div>
@@ -46,18 +46,12 @@ export default {
     },
     created(){
       this.axios({
-        url: '/maintain/corpDetail',
-        method: 'post',
-        headers: {'Content-type': 'application/json'},
-        data: JSON.stringify({
-          corpId: this.$route.query.id,
-          systemToken: localStorage.getItem("SYSTEMTOKEN")
-        })
-      })
-        .then(res=>{
-          console.log(res);
-          this.cropName=res.data.data.corpName
-          this.cropAddress=res.data.data.corpAdd
+	      method: 'get',
+	      baseURL: '/repairproxy',
+	      url: '/micro/search/company/repair/'+this.$route.query.id ,
+      }).then(res=>{
+          this.cropName=res.data.name
+          this.cropAddress=res.data.addr
         })
     },
     watch: {
@@ -89,36 +83,25 @@ export default {
               return Toast("请输入服务内容")
           }
 
-          let params={
-              accessToken: localStorage.getItem("ACCESSTOKEN"),
-              ownerName: this.username,
-              serviceContent: this.content,
-              contactMobile: this.tel,
-              companyId: this.$route.query.id || '',
-              onSiteTime: this.pickerValue
-          }
+
         that.axios({
           method: 'post',
-          url: '/maintain/addOnsiteOrder',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(params)
+          url: '/service/order/add',
+          data: {
+	          companyId: this.$route.query.id,
+	          contactMobile: this.tel,
+	          onSiteTime: this.pickerValue,
+	          ownerName: this.username,
+	          serviceContent: this.content
+          }
         })
           .then(res => {
             var _this=this
-
-              console.log('res',res)
-            if(res.data.code=='130410'){
-              Toast('登录过期,请重新登录')
-              this.$router.push('/login')
-            }else if(res.data.code=='0'){
+	          if(res.data.code=='0'){
               Toast('提交成功')
               setTimeout(function(){
                 _this.$router.push("/myOrder")
               },1000)
-            }else{
-              Toast(res.data.status)
             }
           })
 

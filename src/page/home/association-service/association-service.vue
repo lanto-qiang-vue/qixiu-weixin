@@ -37,7 +37,7 @@
           <div style="width: 40px; height: 40px; margin: 0 auto;"></div>
           <p style="text-align: center; margin: 0; line-height: 35px;">行业党建</p>
         </li>
-        <li class="mui-col-sm-3 mui-col-xs-3" @click="goExperts">
+        <li class="mui-col-sm-3 mui-col-xs-3" @click="goList('10281024','专家组')">
           <div style="width: 40px; height: 40px; margin: 0 auto;"></div>
           <p style="text-align: center; margin: 0; line-height: 35px;">专家组</p>
         </li>
@@ -57,25 +57,27 @@
       }
     },
     created(){
-      this.axios({
-        url: '/article/category/list/'+ localStorage.getItem("SYSTEMTOKEN"),
-        method: "get"
-      })
-        .then(res=>{
-          if(res.data.code==="0"){
-            this.tabList=res.data.data[1].children
-            console.log(this.tabList);
-          }else {
-            Toast(res.data.status)
-          }
-        })
+      // this.axios({
+      //   url: '/article/category/list/'+ localStorage.getItem("SYSTEMTOKEN"),
+      //   method: "get"
+      // })
+      //   .then(res=>{
+      //     if(res.data.code==="0"){
+      //       this.tabList=res.data.data[1].children
+      //       console.log(this.tabList);
+      //     }else {
+      //       Toast(res.data.status)
+      //     }
+      //   })
     },
     components: {
 
     },
     methods: {
       goIntroduce(){this.$router.push('/association-service/association-introduce')},
-      goExperts(){this.$router.push("/association-service/experts-list")},
+      goExperts(){
+
+      },
       goAssociationDuty(){this.$router.push("/association-service/association-duty")},
       goWorkingChange(){this.$router.push("/association-service/working-change")},
       goIndustryShow(){this.$router.push("/association-service/industry-show-list")},

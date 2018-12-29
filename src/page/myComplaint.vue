@@ -2,21 +2,21 @@
 <div id='complaint' style="height: 100vh;overflow: auto;">
   <mt-header title="我的反馈" style="position: fixed;top: 0;width: 100%;z-index: 100"><mt-button icon="back" slot="left" @click="$router.go(-1)"></mt-button></mt-header>
 
-  <div class="mycomplaint" v-show="userinfo">
+  <div class="mycomplaint">
     <!--<h3>我的反馈</h3>-->
     <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
       <ul>
         <li v-for="(item, index) in list" :key="index">
-          {{getType(item.complaintType)}}{{item.credits?'（有凭据）':''}}<span>{{item.complaintTime | FormatDate}}</span>
+          {{getType(item.type)}}{{item.photoUrl?'（有凭据）':''}}<span>{{item.createDate | FormatDate}}</span>
         </li>
       </ul>
       <div v-show="allLoaded" style="text-align: center; line-height: 30px; background-color: #f8f8f8; font-size: 14px; color: #999;">已经到底啦...</div>
     </mt-loadmore>
   </div>
 
-  <mt-popup v-model="selectvisible"  style="width: 90%" class="select">
-    <mt-radio title="反馈类型" v-model="type" :options="options"></mt-radio>
-  </mt-popup>
+  <!--<mt-popup v-model="selectvisible"  style="width: 90%" class="select">-->
+    <!--<mt-radio title="反馈类型" v-model="type" :options="options"></mt-radio>-->
+  <!--</mt-popup>-->
 
   <!--<div class="on button" @click="selectvisible=true">反馈类型：{{typeName}}</div>-->
 </div>
@@ -74,19 +74,14 @@ export default {
           url: '/comment/complaint/maintain/query/userId?size=10&page='+(this.page-1),
         }).then(res => {
           // this.list = res.data.complaintInfoBOList
-          if(res.data.code=='0'){
-            self.list=self.list.concat(res.data.complaintInfoBOList)
+
+            self.list=self.list.concat(res.data.content)
             // self.list=res.data.comments
-            if(self.list.length>=res.data.total){
+            if(self.list.length>=res.data.totalElements){
               self.allLoaded=true
             }
             if(flag) self.$refs.loadmore.onBottomLoaded()
-          }
-          else if(res.data.code=='000003'){
-            Toast('请绑定微信号')
-          }else{
-            Toast(res.data.status)
-          }
+
         })
       },
       getType(type){
@@ -111,8 +106,8 @@ export default {
 .mycomplaint{
   /*border-top: 10px solid #f8f8f8;*/
   margin-top: 40px;
-  padding: 15px;
-  margin-bottom: 50px;
+  padding: 0 15px;
+  /*margin-bottom: 50px;*/
   h3{
     font-size: 18px;
     line-height: 30px;
