@@ -1,7 +1,7 @@
 <template>
   <div id="myAnswer">
     <div class="block">
-      <p class="question" v-html="questionDetail.quesContent"></p>
+      <p class="question" v-html="questionDetail.content"></p>
       <div class="imgsWrap mui-content-padded">
         <img v-for="(item, index) in questionDetail.images" :key="index" :src="item" data-preview-src="" data-preview-group="1" />
       </div>
@@ -30,15 +30,11 @@ export default {
   created(){
     this.axios({
       method: "get",
-      url: "/QxwCdf/article/detail/" + localStorage.getItem("SYSTEMTOKEN") + "/" + this.$route.query.questionId,
-      heardes: {
-        "Content-type": "application/json"
-      }
+      url: "/question/detail/" + this.$route.query.questionId,
+    }).then(res => {
+        this.questionDetail = res.data.item;
+        this.questionDetail.answerCount = this.questionDetail.answerCount;
     })
-      .then(res => {
-        this.questionDetail = res.data.data;
-        this.questionDetail.answerCount = this.questionDetail.answer.length;
-      })
   },
   mounted(){
 
@@ -50,28 +46,19 @@ export default {
         return Toast("请输入回答内容")
       }
 
-      let param = {
-        accessToken: localStorage.getItem("ACCESSTOKEN"),
-        content: this.answerText,
-        isanonymous: false,
-        questionId: this.$route.query.questionId
-      }
       this.axios({
         method: 'post',
-        url: '/QxwCdf/addanswer',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        data: JSON.stringify(param)
+        url: '/question/answer',
+        data: {
+	        "content": this.answerText,
+	        "questionId": this.$route.query.questionId,
+        }
       })
       .then(res => {
         if(res.data.code==='0'){
           Toast('提交成功,待审核通过')
           that.$router.go(-1)
-        }else{
-          Toast(res.data.status)
         }
-
         that.answerText=''
       })
     }

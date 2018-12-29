@@ -11,6 +11,7 @@
             <i style="position: absolute; bottom: -1.5px; left: 0; width: 4px; height: 4px; border-radius: 2px; background-color: #ddd;"></i>
           </div>
         </div>
+	      <div id="id123"></div>
         <p style="font-size: 13px; text-align: center;">若您上传了非本人的身份证, 您将无法绑定您名下的车辆</p>
         <div style="margin: 25px 15px;">
           <div id="front_idcard" style="width: 220px; height: 150px; background: #f2f7fd; margin: 0 auto; overflow: hidden; border-radius: 5px; position: relative;">
@@ -151,6 +152,7 @@
 
 <script>
   import { Field, Button, Toast, MessageBox, Popup } from 'mint-ui'
+  import { imgUrlToBase64, getwxticket, isIos} from '@/util.js'
   export default{
     name: "personUpload",
 
@@ -177,50 +179,36 @@
       }
     },
 
-    created(){
-      let self= this
-      this.axios({
-        method: 'post',
-        url: '/app/signature',
-        headers: {'Content-type': 'application/json'},
-        data: JSON.stringify({url: encodeURIComponent(window.location.href.split('#')[0])})
-      }).then(res=>{
-        wx.config({
-          debug: false,
-          appId: window.location.origin==='https://weixin.shanghaiqixiu.org' ? self.consts.onlineAppId : self.consts.testAppId,
-          timestamp: res.data.timeStamp,
-          nonceStr: res.data.uuid,
-          signature: res.data.signature,
-          jsApiList: ['chooseImage', 'previewImage', 'getLocalImgData']
-        })
-      })
-    },
 
     beforeMount(){
       // mui('.mui-input-row input').input();
-      this.axios({
-        url: '/scan/getCard/' + localStorage.getItem("ACCESSTOKEN"),
-        method: 'get'
-      }).then(res=>{
-        if(res.data.code==='0'){
-          if(!res.data.data.userId){
-            return
-          }
-          if((res.data.data.frontImage != '') || res.data.data.frontImage){
-            $('#IDCARDUP').attr('src', 'data:image/png;base64,'+res.data.data.frontImage)
-            this.flag1 = true
-            this.showUploadBtn = false
-            this.modify = false
-            $('#front_idcard').css({'height': 'auto'})
-            this.name = res.data.data.reviseOwnerName
-            this.IDCardNum = res.data.data.reviseIdCardNo
-            this.IDCardID = res.data.data.creditId
-            this.showIDCardUpInfo = true
-          }
-        }
-      })
+      // this.axios({
+      //   url: '/scan/getCard/' + localStorage.getItem("ACCESSTOKEN"),
+      //   method: 'get'
+      // }).then(res=>{
+      //   if(res.data.code==='0'){
+      //     if(!res.data.data.userId){
+      //       return
+      //     }
+      //     if((res.data.data.frontImage != '') || res.data.data.frontImage){
+      //       $('#IDCARDUP').attr('src', 'data:image/png;base64,'+res.data.data.frontImage)
+      //       this.flag1 = true
+      //       this.showUploadBtn = false
+      //       this.modify = false
+      //       $('#front_idcard').css({'height': 'auto'})
+      //       this.name = res.data.data.reviseOwnerName
+      //       this.IDCardNum = res.data.data.reviseIdCardNo
+      //       this.IDCardID = res.data.data.creditId
+      //       this.showIDCardUpInfo = true
+      //     }
+      //   }
+      // })
     },
 
+	  mounted(){
+		  getwxticket(['chooseImage', 'previewImage', 'getLocalImgData'])
+
+	  },
     methods: {
       uploadIDCardUp(){
         let _this = this
@@ -231,13 +219,21 @@
             sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
             success: function (resp) {
               _this.flag1 = true
+	            for(let key in resp){
+		            $('#id123').append('<p>'+key+ ':'+JSON.stringify(resp[key])+'</p>')
+	            }
               $('#IDCARDUP').attr('src', resp.localIds)
-              wx.getLocalImgData({
-                localId: resp.localIds.toString(), // 图片的localID
-                success: function (res) {
-                  _this.identifyIDCard(res.localData)  // localData是图片的base64数据，可以用img标签显示
-                }
-              });
+	            // $('#id123').text(resp.localIds)
+	            imgUrlToBase64('http://download.image.lanto.com/2018/12/20/1545283573356.png', (base64)=>{
+		            $('#id123').append('<p>base64:'+base64+'</p>')
+		            _this.identifyIDCard(base64)
+	            })
+              // wx.getLocalImgData({
+              //   localId: resp.localIds.toString(), // 图片的localID
+              //   success: function (res) {
+              //     _this.identifyIDCard(res.localData)  // localData是图片的base64数据，可以用img标签显示
+              //   }
+              // });
             }
           })
         })
@@ -275,16 +271,14 @@
         this.axios({
           url: '/scan/newUpload',
           method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
-            accuracy: 'normal',
-            detect_direction: true,
-            detect_risk: 'true',
-            id_card_side: 'front',
-            image: baseImg.split(',')[1],
-            property: 1
-          })
+          data: {
+	          "accuracy": "normal",
+	          "detect_direction": true,
+	          "detect_risk": "true",
+	          "id_card_side": "front",
+	          "image": baseImg.split(',')[1],
+	          "property": 1
+          }
         }).then(res => {
           if(res.data.code==='0'){
             this.IDCardID = res.data.data.creditId

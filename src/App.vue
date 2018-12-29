@@ -25,16 +25,16 @@
 			// console.log(this.getUrlParam('state'))
 			// console.log(encodeURIComponent(window.location.href))
 			if(this.isWeixn()){
-
+				let unionid= localStorage.getItem("UNIONID");
 				let state= this.getUrlParam('state')
 				let URL = encodeURIComponent(window.location.href)
-				if( !state){
+				if( !unionid &&!state){
 					// let URL = encodeURIComponent('http://192.168.169.109:8888')
 					// let appId = window.location.origin === 'https://weixin.shanghaiqixiu.org' ? config : this.consts.testAppId
 					let appId = config.appid
 					window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${URL}&response_type=code&scope=snsapi_userinfo&state=snsapi_base#wechat_redirect`
 				}
-				if(state=='snsapi_base'){
+				if(!unionid && state=='snsapi_base'){
 					this.axios({
 						url: '/user/useraccount/access/openid',
 						method: 'post',
@@ -46,8 +46,8 @@
 					}).then(res=>{
 						if(res.data.code==='0') {
 							// this.UnionID = res.data.openId.openId
-							localStorage.setItem("UNIONID",res.data.openId.openId);
-							localStorage.setItem("QXWOPENID",res.data.openId.openIdReal);
+							localStorage.setItem("UNIONID",res.data.item.openId);
+							localStorage.setItem("QXWOPENID",res.data.item.openIdReal);
 							history.replaceState(null, null, window.location.origin + window.location.hash)
 						}
 					})

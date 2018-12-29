@@ -24,6 +24,7 @@ module.exports = {
 			},
 			'/proxy': {
 				target: 'http://192.168.169.233:8888/',
+				// target: 'http://192.168.169.128:7310/',
 				// target: 'http://212.64.5.54:8888/',
 				pathRewrite: {'^/proxy': ''},
 				secure: false

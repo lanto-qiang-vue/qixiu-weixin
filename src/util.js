@@ -1,4 +1,5 @@
-
+import axios from './axios.js'
+import config from '~/config.js'
 
 /**
  * @param {String} url
@@ -76,6 +77,27 @@ export const  base64ToBlob= (dataurl) => {
 		u8arr[n] = bstr.charCodeAt(n);
 	}
 	return new Blob([u8arr], { type: mime });
+}
+
+export const imgUrlToBase64 = (url, callBack) => {
+	var image = new Image();
+
+	image.onload=function(){
+
+		for( let key in image){
+			console.log('key', key)
+		}
+		console.log('image.currentSrc', image.currentSrc)
+		var width = image.width;
+		var height = image.height;
+		_compress( url,
+			{width: width, height:height, quality: 0.6, type: ''} ,
+			image.name,
+			callBack
+		)
+	};
+	image.src= url;
+
 }
 
 /**
@@ -203,3 +225,23 @@ export const formatDate= (value, format) => {
 		return '';
 	}
 };
+
+export const getwxticket= (jsApiList, callback) => {
+	axios.get('/weixin/qixiu/ticket/jsapi?url='+ (window.location.href.split('#')[0])).then(res=>{
+	// axios.get('/weixin/qixiu/ticket/jsapi?url='+('http://192.168.169.121:8888?code=0716QWVV0hJ0b22adjVV0QF6WV06QWVe&state=snsapi_base')).then(res=>{
+		wx.config({
+			debug: false,
+			appId: config.appid,
+			timestamp: res.data.timeStamp,
+			nonceStr: res.data.uuid,
+			signature: res.data.signature,
+			jsApiList: jsApiList
+		})
+	})
+}
+
+export const isIos= () => {
+	let u = navigator.userAgent
+	let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
+	return isIOS
+}

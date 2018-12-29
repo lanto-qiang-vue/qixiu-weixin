@@ -44,7 +44,7 @@ export default {
             let self= this
             this.axios({
                 method: 'get',
-                url: '/user/useraccount/logout/'+ localStorage.getItem("ACCESSTOKEN")
+                url: '/user/useraccount/logout'
             }).then(function (response) {
                 if(response.data.code!='0'){
                   MessageBox('提示', response.data.status);
@@ -90,7 +90,8 @@ export default {
         /*background-color: #f8f8f8;*/
     }
     .wrap {
-        /*background-color: #f8f8f8;*/
+        background-color: #f8f8f8;
+	    height: 100vh;
         ul {
             margin-top: 8px;
             li{

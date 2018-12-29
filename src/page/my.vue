@@ -69,9 +69,9 @@
     <!--<div class="list" @click='goBind' v-if="notbind">-->
       <!--<img src="../assets/img/my/set.png" alt=""><span>绑定此微信号</span> <i></i>-->
     <!--</div>-->
-    <div class="list" @click='goSuggestion'>
-      <img src="../assets/img/my/feedback.png" alt=""><span>意见建议</span> <i></i>
-    </div>
+    <!--<div class="list" @click='goSuggestion'>-->
+      <!--<img src="../assets/img/my/feedback.png" alt=""><span>意见建议</span> <i></i>-->
+    <!--</div>-->
     <div class="list" @click='goComplaint'>
       <img src="../assets/img/my/report.png" alt=""><span>投诉举报</span> <i></i>
     </div>

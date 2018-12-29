@@ -278,6 +278,7 @@
 		      }
 		      case 'weixin':{
 			      data.loginMethod= "微信"
+			      data.workOn= window.location.origin === 'https://weixin.shanghaiqixiu.org' ? 'pPro' : 'pDev'
 		      }
 	      }
 
