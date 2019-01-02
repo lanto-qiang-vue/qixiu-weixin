@@ -11,8 +11,7 @@
       <p class="question" v-html="questionDetail.content"></p>
 
       <div class="imgsWrap mui-content-padded">
-        <img v-for="(item, index) in questionDetail.images" :key="index" :src="item" data-preview-src=""
-             data-preview-group="1"/>
+        <img v-for="(item, index) in questionDetail.questionPhoto" :key="index" :src="item" v-img/>
       </div>
 
       <!--<div class="answer">-->
@@ -128,22 +127,24 @@
       position: relative;
       .user {
         overflow: hidden;
+	      position: relative;
         .img_wrap {
           width: 50px;
           height: 50px;
           border-radius: 50%;
           overflow: hidden;
           float: left;
-          margin-right: 10px;
           img {
             width: 50px;
 	          height: 50px;
           }
         }
         .userright {
-          float: left;
-          height: 50px;
+          position: absolute;
+          padding-left: 60px;
           line-height: 25px;
+	        width: 100%;
+	        overflow: hidden;
           p {
             font-size: 14px;
             margin-bottom: 0;

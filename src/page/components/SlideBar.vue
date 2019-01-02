@@ -32,7 +32,7 @@
         bodyHeight: 0,
         location: 0,
 
-	    // footerHeight: 0
+	    footerHeight: 50
       }
     },
     computed: {
@@ -45,16 +45,32 @@
       showBody(){
         return this.$store.state.app.slideState.showBody
       },
-	    footerHeight(){
-      	    let height= 50
-      	    if (this.$route.query.mapType=='remarkMap'){
-      	    	$('.footer').hide()
-	            height=0
-            }
-            return height
-	    }
+	    // footerHeight(){
+      	// console.log('footerHeight')
+      	//     let height= 50
+      	//     if (this.$route.query.mapType=='remarkMap'){
+      	//     	$('.footer').hide()
+	    //         height=0
+         //    }else{
+	    //         height= 50
+	    //         $('.footer').show()
+         //    }
+         //    return height
+	    // }
     },
     watch:{
+			'$route'(route){
+				let height= 50
+				if (route.query.mapType=='remarkMap'){
+					$('.footer').hide()
+					height=0
+				}else{
+					height= 50
+					$('.footer').show()
+				}
+				this.footerHeight= height
+				this.resize(this.moveLocation[this.showBody][this.location].height, 10)
+			},
       // showBody(){
       //   let docHeight= $(document).height()- 50
       //   let touchBarHeight= $('.touch-bar').outerHeight(true) //bar高度（20）

@@ -119,13 +119,11 @@
         this.axios({
           url: '/scan/authorize',
           method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            accessToken: localStorage.getItem('ACCESSTOKEN'),
+          data: {
             relation: this.relation,
             telephone: this.tel,
             vehicleNumber: this.vehicleNumber
-          })
+          }
         }).then(res=>{
           if(res.data.code==='0'){
             this.popupVisible = !this.popupVisible

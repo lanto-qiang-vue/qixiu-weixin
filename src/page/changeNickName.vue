@@ -36,29 +36,17 @@ export default {
 
       this.axios({
         method: 'post',
-        url: '/center/nickName',
-        headers: {
-            'Content-type': 'application/json'
-        },
+        url: '/user/update',
         data: {
-          "accessToken": localStorage.getItem("ACCESSTOKEN"),
           "nickName": this.nickName.trim()
         }
       }).then(res=>{
-        if(res.data.code==="0"){
           Toast("修改成功")
           let userInfo = JSON.parse(localStorage.getItem("USERINFO"));
           userInfo.nickname = this.nickName
           localStorage.setItem("USERINFO",JSON.stringify(userInfo))
 
           this.$router.go(-1)
-        }else if(res.data.code==='130412') {
-          Toast('登录过期,请重新登录')
-          this.$router.push("/login")
-        }else {
-          Toast(res.data.status)
-
-        }
       })
     }
   }

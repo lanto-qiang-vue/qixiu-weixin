@@ -159,9 +159,9 @@
         GeolocationControl: null,
 
         maintainType:[
-          {name: '全部', value: ''},
-          {name: '4S店', value: 1},
-          {name: '维修厂', value: 0},
+	        {name: '全部', value: ''},
+	        {name: '4S店', value: 'yes'},
+	        {name: '维修厂', value: 'no'},
         ],
         query:{
           "area": '',
@@ -702,7 +702,13 @@
 			      extData: this.pointList[i]
 		      })
 		      marker.on('click', (e) => {
-			      this.getCompanyDetail(e.target.getExtData())
+			      if (this.$route.query.mapType=='remarkMap'){
+				      this.$router.push({path: '/remarkMatch', query: { corpId: e.target.getExtData().sid }})
+			      }else{
+				      this.getCompanyDetail(e.target.getExtData())
+			      }
+
+
 		      })
 		      this.markers.push(marker)
 	      }
@@ -894,13 +900,13 @@
         }
       },
       tagIsOn( arrName, val ){
-        if (this.query[arrName]===val)  return true
+        if (this.search[arrName]===val)  return true
         else return false
       },
       select( arrName, val ){
-        if(this.query[arrName]!== val){
-          this.query[arrName]= val
-          this.getList( true, true)
+        if(this.search[arrName]!== val){
+          this.search[arrName]= val
+          this.getCompList( true, true)
         }
       },
     }
@@ -921,7 +927,7 @@
     position: relative;
     overflow: hidden;
     height: 100vh;
-	  .amap-toolbar, .amap-touch-toolbar .amap-zoomcontrol, .amap-logo, .amap-geolocation-con{
+	  .amap-toolbar, .amap-touch-toolbar .amap-zoomcontrol, .amap-logo, .amap-geolocation-con, .amap-copyright{
 		  z-index: 10!important;
 	  }
     .company_type_list {

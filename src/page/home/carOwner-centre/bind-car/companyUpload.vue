@@ -14,9 +14,9 @@
 
         <div style="width: 220px; height: 150px; background: #f2f7fd; margin: 20px auto 30px; overflow: hidden; border-radius: 5px; position: relative;">
           <div style="height: 120px; position: relative;">
-            <img id="business_license" @click="flag1 && lookImgs($event)" src="/static/img/carOwner-centre/营业执照@3x.png" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
+            <img id="business_license" v-img :src="businessPic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
           </div>
-          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="uploadBusinessLicense">拍摄正面</div>
+          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;"><upload operate='base64' @done="uploadBusinessLicense"></upload>拍摄正面</div>
         </div>
 
         <div style="display: flex; justify-content: space-between; width: 80%; margin: 0 auto 10px;">
@@ -31,7 +31,7 @@
 
         <div style="width: 220px; height: 150px; background: #f2f7fd; margin: 20px auto 0; overflow: hidden; border-radius: 5px; position: relative;">
           <div style="height: 120px; position: relative;">
-            <img id="drive_license" @click="flag2 && lookImgs($event)" src="/static/img/carOwner-centre/行驶证@3x.png" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
+	          <img id="drive_license" v-img :src="drivePic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
           </div>
           <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="uploadDriveLicense">拍摄正面</div>
         </div>
@@ -149,9 +149,10 @@
 
 <script>
   import { Field, Button, Toast, MessageBox, Popup } from 'mint-ui'
+  import Upload from '@/page/components/compress-upload.vue'
   export default{
     name: "companyUpload",
-
+	  components: {Upload},
     data(){
       return {
         flag1: false,
@@ -167,6 +168,9 @@
         popupVisible1: false,
         popupVisible2: false,
 
+	      businessPic: '/static/img/carOwner-centre/营业执照@3x.png',
+	      drivePic: '/static/img/carOwner-centre/行驶证@3x.png',
+
         vehiclePlateNumber: '',  // 行驶证车牌号码
         ownerName: '',           // 行驶证持有人
         vin: '',                 // 行驶证车架号
@@ -175,128 +179,62 @@
       }
     },
 
-    created(){
-      let self= this
-      this.axios({
-        method: 'post',
-        url: '/app/signature',
-        headers: {'Content-type': 'application/json'},
-        data: JSON.stringify({url: encodeURIComponent(window.location.href.split('#')[0]).toLowerCase()})
-      }).then(res=>{
-        wx.config({
-          debug: false,
-          appId: window.location.origin==='https://weixin.shanghaiqixiu.org' ? self.consts.onlineAppId : self.consts.testAppId,
-          timestamp: res.data.timeStamp,
-          nonceStr: res.data.uuid,
-          signature: res.data.signature,
-          jsApiList: ['chooseImage', 'previewImage', 'getLocalImgData']
-        })
-      })
-    },
+
 
     mounted(){
-      mui('.mui-input-row input').input();
+
     },
 
     methods: {
-      uploadBusinessLicense(){
-        let _this = this
-        wx.ready(function(){
-          wx.chooseImage({
-            count: 1, // 默认9
-            sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-            success: function (resp) {
-              _this.flag1 = true
-              $('#business_license').attr('src', resp.localIds)
-              wx.getLocalImgData({
-                localId: resp.localIds.toString(), // 图片的localID
-                success: function (res) {
-                  _this.identify(res.localData)  // localData是图片的base64数据，可以用img标签显示
-                }
-              });
-            }
-          })
-        })
+      uploadBusinessLicense(base64){
+            this.businessPic= base64
+            this.identify(base64)  // localData是图片的base64数据，可以用img标签显示
       },
 
-      uploadDriveLicense(){
-        let _this = this
-        wx.ready(function(){
-          wx.chooseImage({
-            count: 1, // 默认9
-            sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-            success: function (resp) {
-              _this.flag2 = true
-              $('#drive_license').attr('src', resp.localIds)
-              wx.getLocalImgData({
-                localId: resp.localIds.toString(), // 图片的localID
-                success: function (res) {
-                  _this.identifyDriveLicense(res.localData)  // localData是图片的base64数据，可以用img标签显示
-                }
-              });
-            }
-          })
-        })
+      uploadDriveLicense(base64){
+	        this.drivePic= base64
+	        this.identifyDriveLicense(base64)  // localData是图片的base64数据，可以用img标签显示
       },
 
-      lookImgs(e){
-        wx.previewImage({
-          current: e.target.getAttribute('src'),
-          urls: [e.target.getAttribute('src')] // 需要预览的图片http链接列表
-        });
-      },
 
       identify(baseImg){
         this.axios({
           url: '/scan/newUpload',
           method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
+          data: {
             accuracy: 'normal',
             detect_direction: true,
             detect_risk: 'true',
             image: baseImg.split(',')[1],
             property: 3
-          })
-        }).then(res => {
-          if(res.data.code==='0'){
-            this.companyName = res.data.data.corpName
-            this.name = res.data.data.legalPerson
-            this.businessId = res.data.data.businessId
-            this.showBusinessLicenseInfo = true
-          } else {
-            Toast(res.data.status)
           }
+        }).then(res => {
+            this.companyName = res.data.item.corpName
+            this.name = res.data.item.legalPerson
+            this.businessId = res.data.item.businessId
+            this.showBusinessLicenseInfo = true
         })
       },
 
-      identifyDriveLicense(baseImg){
-        this.axios({
-          url: '/scan/newDriverLicense',
-          method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
-            accuracy: 'normal',
-            detect_direction: true,
-            image: baseImg.split(',')[1],
-          })
-        }).then(res=>{
-          if(res.data.code==='0'){
-            this.vehiclePlateNumber = res.data.data.vehiclePlateNumber
-            this.ownerName = res.data.data.ownerName
-            this.vin = res.data.data.vin
-            this.engineNo = res.data.data.engineNo
-            this.licenseId = res.data.data.id
-            this.showDriveLicenseInfo = true
-          }else{
-            Toast(res.data.status)
-          }
-        })
-      },
+
+	    identifyDriveLicense(baseImg){
+		    this.axios({
+			    url: '/scan/newDriverLicense',
+			    method: 'post',
+			    data: {
+				    accuracy: '',
+				    detect_direction: true,
+				    image: baseImg.split(',')[1],
+			    }
+		    }).then(res=>{
+			    this.showDriveLicenseInfo = true
+			    this.vehiclePlateNumber = res.data.item.vehiclePlateNumber
+			    this.ownerName = res.data.item.ownerName
+			    this.vin = res.data.item.vin
+			    this.engineNo = res.data.item.engineNo
+			    this.licenseId = res.data.item.id
+		    })
+	    },
 
       Bind(){
         let _this = this
@@ -308,22 +246,13 @@
         this.axios({
           url: '/scan/newBind',
           method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
+          data:{
             businessId: this.businessId,
             licenseId: this.licenseId
-          })
-        }).then(res=>{
-          if(res.data.code==='0'){
-            MessageBox.confirm('绑定成功,是否立即查看车辆?').then(action => {
-              _this.$router.push('/carOwner-centre/carList')
-            }, action => {
-             window.location.reload()
-            })
-          }else {
-            Toast(res.data.status)
           }
+        }).then(res=>{
+	        Toast('绑定成功')
+	        this.$router.go(-2)
         })
       },
 

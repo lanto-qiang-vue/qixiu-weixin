@@ -7,7 +7,7 @@
     <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
       <ul>
         <li v-for="(item, index) in list" :key="index">
-          {{getType(item.type)}}{{item.photoUrl?'（有凭据）':''}}<span>{{item.createDate | FormatDate}}</span>
+          {{getType(item.type.toString())}}{{item.photoUrl?'（有凭据）':''}}<span>{{item.createDate | FormatDate}}</span>
         </li>
       </ul>
       <div v-show="allLoaded" style="text-align: center; line-height: 30px; background-color: #f8f8f8; font-size: 14px; color: #999;">已经到底啦...</div>

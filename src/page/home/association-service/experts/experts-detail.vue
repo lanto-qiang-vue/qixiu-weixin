@@ -43,20 +43,11 @@
     },
 
     created(){
-      let param = {
-        systemToken: localStorage.getItem('SYSTEMTOKEN'),
-        expertId: this.$route.query.expertId
-      };
       this.axios({
-        method: 'post',
-        url: '/cdf/queryexpertdetail',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        data: JSON.stringify(param)
-      })
-        .then(response => {
-          this.expertDetail = response.data.data;
+        method: 'get',
+        url: '/expert/detail/'+ this.$route.query.expertId
+      }).then(response => {
+          this.expertDetail = response.data.item;
         })
     },
     methods: {

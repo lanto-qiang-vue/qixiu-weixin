@@ -200,10 +200,14 @@ export const formatMoney =(val, decimals, dec_point, thousands_sep)=> {
  * @param {String} timeStamp 格式字符串,默认值 yyyy-MM-dd
  * @returns {String} 相对时间字符串
  */
-export const formatDate= (value, format) => {
-	if (value) {
+export const formatDate= (value1, format) => {
+	if (value1) {
 		// console.log('转化之前',value);
-		value = new Date(value);
+		let value2= value1.replace(/-/g,'/')
+		let value = new Date(value2);
+		if(value=='Invalid Date'){
+			value= new Date(value1)
+		}
 		// console.log('转化hi后',value);
 		let o = {
 			"M+": value.getMonth() + 1, //month
@@ -214,7 +218,7 @@ export const formatDate= (value, format) => {
 			"q+": Math.floor((value.getMonth() + 3) / 3),  //quarter
 			"S": value.getMilliseconds() //millisecond
 		}
-		if(!format) format='yyyy-MM-dd'
+		if(!format) format='yyyy/MM/dd'
 		if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
 			(value.getFullYear() + "").substr(4 - RegExp.$1.length));
 		for (let k in o)if (new RegExp("(" + k + ")").test(format))
@@ -241,7 +245,7 @@ export const getwxticket= (jsApiList, callback) => {
 }
 
 export const isIos= () => {
-	let u = navigator.userAgent
-	let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
+	// let u = navigator.userAgent
+	let isIOS = !!(/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent))
 	return isIOS
 }

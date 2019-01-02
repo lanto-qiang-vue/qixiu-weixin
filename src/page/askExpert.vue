@@ -5,11 +5,10 @@
         <button @click='chooseCategory($event)' type="button" :data-code='item.code' :class="{'active': item.code==code}" v-for='(item, i) in quetionsCategory' :key="i">{{ item.name }}</button>
       </div>
       <textarea name="" id="" cols="30" rows="5" v-model='text' placeholder="问得好，才能答的好。请描述您的问题，专家门诊会给您最满意的回复！"></textarea>
-      <div class="addPic" @click='addClick'></div>
+      <div class="addPic"><upload @done="addClick"></upload></div>
 
       <div class="imgsWrap mui-content-padded">
-        <img v-for="(item, index) in picURL" :key="index" :src="item" data-preview-src=""
-             data-preview-group="1"/>
+        <img v-for="(item, index) in picURL" :key="index" :src="item" v-img/>
       </div>
 
       <div class="checkbox">
@@ -38,7 +37,9 @@
 
 <script>
   import { Toast, Actionsheet } from 'mint-ui'
+  import Upload from '@/page/components/compress-upload.vue'
   export default {
+	  components: {Upload},
     data(){
       return {
         picURL: [],
@@ -94,26 +95,19 @@
         //     path: '/login'
         //   })
         //   return ;
-        // }
-        console.log('isanonymous',this.$route.query.expertId)
-        let params={
-          accessToken: localStorage.getItem("ACCESSTOKEN"),
-          category: this.code,
-          content: this.text,
-          expertId:this.$route.query.expertId || '',
-          images:this.picURL,
-          isanonymous: this.isanonymous
-        }
-        console.log('params',params)
+
+
         this.axios({
           method: 'post',
-          url: '/QxwCdf/addquestion',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(params)
-        })
-          .then(res => {
+          url: '/question/add',
+          data: {
+	          "anonymous": this.isanonymous,
+	          "category": this.code,
+	          "content": this.text,
+	          "expertId": this.$route.query.expertId || '',
+	          "images": this.picURL
+          }
+        }).then(res => {
             let _this=this
             console.log('res',res)
             if(res.data.code === '0'){
@@ -137,115 +131,10 @@
       openActionsheet(){
         this.sheetVisible=!this.sheetVisible
       },
-      imgPreview(e){
-        //获取文件
-        let file = e.target.files[0];
-
-        let self=this
-        let reader = new FileReader();
-        reader.readAsDataURL(file)
-        reader.onload = function (ev) {
-          let image = new Image();
-          let selffile= this
-          image.onload=function(){
-            let width = image.width;
-            let height = image.height;
-            self.compress(selffile.result,
-              {width: width, height:height, quality: 0.6, type: file.type} ,
-              self.pushImg, file.name)
-          };
-          image.src= ev.target.result;
-
-          // self.compress(this.result, {width: 1000, height:1000, quality: 0.7} , self.pushImg)
-        }
-
-        // let imageType = /^image\//;
-        // //是否是图片
-        // if (!imageType.test(file.type)) {
-        //   alert("请选择图片！");
-        //   return;
-        // }
-        //
-        // let param = new FormData(); //创建form对象
-        // param.append('file',file,file.name);//通过append向form对象添加数据
-        // console.log(param.get('file')); //FormData私有类对象，访问不到，可以通过get判断值是否传进去
-        // let config = {
-        //   headers:{'Content-Type':'multipart/form-data'}
-        // };  //添加请求头
-        // this.axios.post('/image/add/' + localStorage.getItem('ACCESSTOKEN'),param,config)
-        //   .then(response=>{
-        //     if(response.data.code === '0') {
-        //       this.picURL.push(response.data.data.picPath);
-        //     }
-        //   })
-
-        //读取完成
-      },
-      addClick() {
-        document.getElementById('file').click();
-      },
-      compress(path, obj, callback, name){
-        let img = new Image();
-        img.src = path;
-        img.onload = function () {
-          let that = this;
-          // 默认按比例压缩
-          let w = that.width,
-            h = that.height,
-            scale = w / h;
-          w = obj.width || w;
-          h = obj.height || (w / scale);
-          let quality = 0.7;  // 默认图片质量为0.7
-          //生成canvas
-          let canvas = document.createElement('canvas');
-          let ctx = canvas.getContext('2d');
-          // 创建属性节点
-          let anw = document.createAttribute("width");
-          anw.nodeValue = w;
-          let anh = document.createAttribute("height");
-          anh.nodeValue = h;
-          canvas.setAttributeNode(anw);
-          canvas.setAttributeNode(anh);
-          ctx.drawImage(that, 0, 0, w, h);
-          // 图像质量
-          if (obj.quality && obj.quality <= 1 && obj.quality > 0) {
-            quality = obj.quality;
-          }
-          // quality值越小，所绘制出的图像越模糊
-          let base64 = canvas.toDataURL(obj.type|| 'image/png', quality);
-          // console.log(base64)
-          // 返回base64的值
-          callback(base64, name)
-        }
-      },
-      pushImg(base64, name){
-        let self= this
-        let formdata = new FormData();
-        formdata.append('file' , self.base64ToBlob(base64), name);
-        this.axios({
-          url: '/image/add/'+localStorage.getItem('ACCESSTOKEN'),
-          method: 'post',
-          headers: {
-            // 'Content-type': 'application/json'
-          },
-          data: formdata
-        }).then(res => {
-          if(res.data.code==='0'){
-            console.log(res.data)
-            // self.img= res.data.data.picPath
-            self.picURL.push(res.data.data.picPath);
-          } else {
-            Toast(res.data.status)
-          }
-        })
-      },
-      base64ToBlob(dataurl) {
-        let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        return new Blob([u8arr], { type: mime });
+      addClick( res) {
+      	setTimeout(()=>{
+	        this.picURL.push(res.item.path);
+        },1000)
       },
     }
   }
@@ -289,6 +178,7 @@
       border: none;
     }
     .addPic {
+	    position: relative;
       width: 50px;
       height: 50px;
       border: 1px dashed #ccc;

@@ -9,16 +9,16 @@
                      ref="loadmore">
           <ul class="page-loadmore-questionList">
             <li v-for="(item, index) in questionList" class="page-loadmore-questionListitem" :key="index">
-              <div class="block" :data-questionId="item.questionId" @click='goQuestionDetail(item.quesId)'>
+              <div class="block" :data-questionId="item.id" @click='goQuestionDetail(item.id)'>
                 <div class="user">
-                  <img :src="item.questionerPhoto != '' ? item.questionerPhoto : defaultImage"/>
+                  <img :src="item.photo || '/static/img/home/user.png'"/>
                   <div class="userright"><p>{{item.userName ? item.userName : '匿名'}}</p>
-                    <span>{{item.createTime | FormatDate}}</span></div>
+                    <span>{{item.lastAnswerTime | FormatDate}}</span></div>
                   <div style="float: right;" >
-                    <button type="button" class="answer-button" @click.stop="answer(item.quesId)">回答问题</button>
+                    <button type="button" class="answer-button" @click.stop="answer(item.id)">回答问题</button>
                   </div>
                 </div>
-                <p class="question" v-html="item.quesContent"></p>
+                <p class="question" v-html="item.content"></p>
                 <div class="answer">
                   <span class="violet" >{{item.categoryName}}</span>
                 </div>
@@ -72,24 +72,19 @@
     },
     methods: {
       doQuery(){
-        let param = {
-          accessToken: localStorage.getItem('ACCESSTOKEN'),
-          pageSize: 10,
-          pageNo: this.page
-        }
+
         this.axios({
           method: 'post',
-          url: '/cdf/list',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(param)
-        })
-          .then(res => {
+          url: '/question/expert/list',
+          data: {
+	          "pageNo": this.page,
+	          "pageSize": 10
+          }
+        }).then(res => {
             if(res.data.code==='0'){
               console.log('res',res)
-              this.list = res.data.data.dataList;
-              this.listLength = res.data.data.total;
+              this.list = res.data.items;
+              this.listLength = res.data.total;
               let lastValue = this.questionList.length;
               if (lastValue < this.listLength) {
                 for (let i = 0; i < this.list.length; i++) {

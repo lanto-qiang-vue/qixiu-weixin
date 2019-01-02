@@ -3,8 +3,8 @@
       <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
         <ul>
           <li v-for="(item,index) in expertlist" :key="index">
-            <span class="used" @click="askExpert(item.expertId)">向TA提问</span>
-            <div @click='goExpertDetail(item.expertId)'>
+            <span class="used" @click="askExpert(item.id)">向TA提问</span>
+            <div @click='goExpertDetail(item.id)'>
               <div class="zhuanjia">
                 <div class="img_left">
                   <img  :src="item.photo"/>
@@ -14,7 +14,7 @@
               </div>
               <div class="expert_tag">擅长: {{item.goodAt}}</div>
               <div class="tag">
-                <span class="violet" v-for="row in item.professor">{{row}}</span>
+                <span class="violet" v-for="(item2, index) in item.professor.split(',')" :key="index">{{ item2}}</span>
               </div>
               <div class="tag_right">
                 <span>协会专家</span>
@@ -48,25 +48,21 @@
           limit: 10
         };
         this.axios({
-          method: 'post',
-          url: '/cdf/queryexpertlist',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(param)
+          method: 'get',
+          url: '/expert/nostate/list',
         }).then(response => {
           console.log(response);
           if(num===1){
-            this.expertlist=response.data.data.dataList
+            this.expertlist=response.data.items
           } else if(num===2){
-            this.expertlist=response.data.data.dataList
+            this.expertlist=response.data.items
             this.$refs.loadmore.onTopLoaded()
           }
           else{
-            this.expertlist = [...this.expertlist,...response.data.data.dataList];
+            this.expertlist = [...this.expertlist,...response.data.items];
             this.$refs.loadmore.onBottomLoaded()
           }
-          if(this.expertlist.length==response.data.data.total){
+          if(this.expertlist.length==response.data.total){
             this.allLoaded=true
           }
         })
@@ -88,16 +84,7 @@
       },
 
       askExpert(expertId) {
-        let userinfo = JSON.parse(localStorage.getItem("USERINFO"));
-        if(userinfo != null) {
-          this.$router.push({path: '/askExpert', query: {expertId}})
-        } else {
-          Toast('请先登录');
-          this.$router.replace({
-            path: '/login',
-            query: {redirect: this.$router.currentRoute.fullPath}
-          })
-        }
+	      this.$router.push({path: '/askExpert', query: {expertId}})
       }
     }
   }

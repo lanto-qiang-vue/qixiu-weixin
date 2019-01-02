@@ -59,7 +59,7 @@
 		<ul class="content">
 			<li @click="click(item.id, item.pass,  item.status, item.hasComplaint)" v-for="(item, index) in list" :key="index">
 				<div class="head">点评日期：{{item.createDate | FormatDate}} <span>评分：<em>{{item.avgScore}}</em></span></div>
-				<img v-show="!item.pass" src="../../assets/img/remark/无效信息.png"/>
+				<img v-show="item.status.toString()=='1'" src="../../assets/img/remark/无效信息.png"/>
 				<div class="info">评分详情：
 					履约：{{item.keepAppointment}}
 					态度：{{item.attitude}}
@@ -171,27 +171,24 @@
       click(id, pass, status, hasComplaint){
         let self= this
         // if(status!='无效点评')
-        if(pass){
+        if(status.toString()!='1'){
 	         this.$router.push({path:'/remarkDetail', query:{id: id}})
         } else{
-          if(hasComplaint) {
-            this.$router.push({path:'/myComplaint'})
-            return
-          }
-	        if(status== 2){
-		        MessageBox.alert('您已经对该次服务提交全新评价，感谢您的支持，我们将以您提交的最新评价为准', '');
-		        return
-	        }
-          MessageBox({
-            title: '点评无效',
-            message: '很遗憾，系统未查到您的维修记录，本次点评无效。您可点击反馈，向管理部门和维修企业反馈维修记录未能及时正确上传的情况。',
-            showCancelButton: true,
-            confirmButtonText: '反馈'
-          }).then(action => {
-            if(action=='confirm')
-              self.$router.push({path:'/upComplain', query:{id: id}})
-            // console.log(action)
-          })
+			if(hasComplaint) {
+				this.$router.push({path:'/myComplaint'})
+			}else{
+				MessageBox({
+					title: '点评无效',
+					message: '很遗憾，系统未查到您的维修记录，本次点评无效。您可点击反馈，向管理部门和维修企业反馈维修记录未能及时正确上传的情况。',
+					showCancelButton: true,
+					confirmButtonText: '反馈'
+				}).then(action => {
+					if(action=='confirm')
+						self.$router.push({path:'/upComplain', query:{id: id}})
+					// console.log(action)
+				})
+			}
+
         }
 
       },

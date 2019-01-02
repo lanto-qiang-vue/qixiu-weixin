@@ -16,9 +16,10 @@
         <div style="margin: 25px 15px;">
           <div id="front_idcard" style="width: 220px; height: 150px; background: #f2f7fd; margin: 0 auto; overflow: hidden; border-radius: 5px; position: relative;">
             <div style="height: 120px; position: relative;">
-              <img id="IDCARDUP" @click="flag1 && lookImgs($event)" src="/static/img/carOwner-centre/身份证_正面@3x.png" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
+              <img id="IDCARDUP" v-img :src="idPic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
             </div>
-            <div v-if="showUploadBtn" style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="uploadIDCardUp">拍摄正面</div>
+            <div v-if="showUploadBtn" style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;">
+	            <upload operate='base64' @done="uploadIDCardUp"></upload>拍摄正面</div>
           </div>
         </div>
 
@@ -34,9 +35,9 @@
 
         <div style="width: 220px; height: 150px; background: #f2f7fd; margin: 20px auto 0; overflow: hidden; border-radius: 5px; position: relative;">
           <div style="height: 120px; position: relative;">
-            <img id="drive_license" @click="flag2 && lookImgs($event)" src="/static/img/carOwner-centre/行驶证@3x.png" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
+            <img id="drive_license" v-img :src="drivePic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
           </div>
-          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="uploadDriveLicense">拍摄正面</div>
+          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" ><upload operate='base64' @done="uploadDriveLicense"></upload>拍摄正面</div>
         </div>
       </div>
 
@@ -152,10 +153,10 @@
 
 <script>
   import { Field, Button, Toast, MessageBox, Popup } from 'mint-ui'
-  import { imgUrlToBase64, getwxticket, isIos} from '@/util.js'
+  import Upload from '@/page/components/compress-upload.vue'
   export default{
     name: "personUpload",
-
+    components: {Upload},
     data(){
       return {
         flag1: false,
@@ -171,6 +172,9 @@
         popupVisible1: false,
         popupVisible2: false,
 
+	      idPic:'/static/img/carOwner-centre/身份证_正面@3x.png',
+	      drivePic: '/static/img/carOwner-centre/行驶证@3x.png',
+
         vehiclePlateNumber: '',       // 行驶证车牌号码
         ownerName: '',                // 行驶证持有人
         vin: '',                      // 行驶证车架号
@@ -180,92 +184,41 @@
     },
 
 
-    beforeMount(){
-      // mui('.mui-input-row input').input();
-      // this.axios({
-      //   url: '/scan/getCard/' + localStorage.getItem("ACCESSTOKEN"),
-      //   method: 'get'
-      // }).then(res=>{
-      //   if(res.data.code==='0'){
-      //     if(!res.data.data.userId){
-      //       return
-      //     }
-      //     if((res.data.data.frontImage != '') || res.data.data.frontImage){
-      //       $('#IDCARDUP').attr('src', 'data:image/png;base64,'+res.data.data.frontImage)
-      //       this.flag1 = true
-      //       this.showUploadBtn = false
-      //       this.modify = false
-      //       $('#front_idcard').css({'height': 'auto'})
-      //       this.name = res.data.data.reviseOwnerName
-      //       this.IDCardNum = res.data.data.reviseIdCardNo
-      //       this.IDCardID = res.data.data.creditId
-      //       this.showIDCardUpInfo = true
-      //     }
-      //   }
-      // })
-    },
-
 	  mounted(){
-		  getwxticket(['chooseImage', 'previewImage', 'getLocalImgData'])
-
+		  // getwxticket(['chooseImage', 'previewImage', 'getLocalImgData'])
+		  this.axios({
+		    url: '/scan/getCard',
+		    method: 'get'
+		  }).then(res=>{
+		    if(res.data.code==='0'){
+		      if(res.data.item.frontImage){
+			      this.idPic= 'data:image/png;base64,'+res.data.item.frontImage
+		        this.flag1 = true
+		        this.showUploadBtn = false
+		        this.modify = false
+		        this.name = res.data.item.reviseOwnerName
+		        this.IDCardNum = res.data.item.reviseIdCardNo
+		        this.IDCardID = res.data.item.creditId
+		        this.showIDCardUpInfo = true
+			      $('#front_idcard').css({'height': 'auto'})
+		      }
+		    }
+		  })
 	  },
     methods: {
-      uploadIDCardUp(){
-        let _this = this
-        wx.ready(function(){
-          wx.chooseImage({
-            count: 1, // 默认9
-            sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-            success: function (resp) {
-              _this.flag1 = true
-	            for(let key in resp){
-		            $('#id123').append('<p>'+key+ ':'+JSON.stringify(resp[key])+'</p>')
-	            }
-              $('#IDCARDUP').attr('src', resp.localIds)
-	            // $('#id123').text(resp.localIds)
-	            imgUrlToBase64('http://download.image.lanto.com/2018/12/20/1545283573356.png', (base64)=>{
-		            $('#id123').append('<p>base64:'+base64+'</p>')
-		            _this.identifyIDCard(base64)
-	            })
-              // wx.getLocalImgData({
-              //   localId: resp.localIds.toString(), // 图片的localID
-              //   success: function (res) {
-              //     _this.identifyIDCard(res.localData)  // localData是图片的base64数据，可以用img标签显示
-              //   }
-              // });
-            }
-          })
-        })
+      uploadIDCardUp(base64){
+
+      	this.idPic= base64
+		this.identifyIDCard(base64)
+
       },
 
-      uploadDriveLicense(){
-        let _this = this
-        wx.ready(function(){
-          wx.chooseImage({
-            count: 1, // 默认9
-            sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-            success: function (resp) {
-              _this.flag2 = true
-              $('#drive_license').attr('src', resp.localIds)
-              wx.getLocalImgData({
-                localId: resp.localIds.toString(), // 图片的localID
-                success: function (res) {
-                  _this.identifyDriveLicense(res.localData)  // localData是图片的base64数据，可以用img标签显示
-                }
-              });
-            }
-          })
-        })
+      uploadDriveLicense(base64){
+	      this.drivePic= base64
+            this.identifyDriveLicense(base64)  // localData是图片的base64数据，可以用img标签显示
+
       },
 
-      lookImgs(e){
-        wx.previewImage({
-          current: e.target.getAttribute('src'),
-          urls: [e.target.getAttribute('src')] // 需要预览的图片http链接列表
-        });
-      },
 
       identifyIDCard(baseImg){
         this.axios({
@@ -281,9 +234,9 @@
           }
         }).then(res => {
           if(res.data.code==='0'){
-            this.IDCardID = res.data.data.creditId
-            this.name = res.data.data.ownerName
-            this.IDCardNum = res.data.data.idCardNo
+            this.IDCardID = res.data.item.creditId
+            this.name = res.data.item.ownerName
+            this.IDCardNum = res.data.item.idCardNo
             this.showIDCardUpInfo = true
           } else {
             Toast(res.data.status)
@@ -295,24 +248,18 @@
         this.axios({
           url: '/scan/newDriverLicense',
           method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
+          data: {
             accuracy: '',
             detect_direction: true,
             image: baseImg.split(',')[1],
-          })
-        }).then(res=>{
-          if(res.data.code==='0'){
-            this.showDriveLicenseInfo = true
-            this.vehiclePlateNumber = res.data.data.vehiclePlateNumber
-            this.ownerName = res.data.data.ownerName
-            this.vin = res.data.data.vin
-            this.engineNo = res.data.data.engineNo
-            this.licenseId = res.data.data.id
-          }else{
-            Toast(res.data.status)
           }
+        }).then(res=>{
+            this.showDriveLicenseInfo = true
+            this.vehiclePlateNumber = res.data.item.vehiclePlateNumber
+            this.ownerName = res.data.item.ownerName
+            this.vin = res.data.item.vin
+            this.engineNo = res.data.item.engineNo
+            this.licenseId = res.data.item.id
         })
       },
 
@@ -326,22 +273,13 @@
         this.axios({
           url: '/scan/newBind',
           method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
+          data: {
             idCardId: this.IDCardID,
             licenseId: this.licenseId
-          })
-        }).then(res=>{
-          if(res.data.code==='0'){
-            MessageBox.confirm('绑定成功,是否立即查看车辆?').then(action => {
-              _this.$router.push('/carOwner-centre/carList')
-            }, action => {
-              window.location.reload()
-            })
-          }else {
-            Toast(res.data.status)
           }
+        }).then(res=>{
+	        Toast('绑定成功')
+            this.$router.go(-2)
         })
       },
 

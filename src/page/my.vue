@@ -2,25 +2,33 @@
   <div style="overflow: scroll; height: calc(100vh - 50px)">
     <!-- 已登录 -->
     <div class="header" v-if="userInfo">
-      <div class="text-one-cut" style="position: relative; padding-right: 15px; margin-right: 80px;">
-        <b>{{name}}</b>
+      <div class="text-one-cut" >
+        <p>{{name}}</p>
         <u @click="goToSet"></u>
         <span class="telNum">{{ tel }}</span>
       </div>
-      <img ref="headerImg" :src="picURL ? picURL : '../assets/img/my/user.png'" @click="addClick" alt="点击更换头像" style="width: 60px;height: 60px;border-radius: 100%">
+	    <div class="img">
+		    <img ref="headerImg" :src="picURL || '/static/img/home/user.png'"  alt="点击更换头像" style="width: 60px;height: 60px;border-radius: 100%">
+		    <upload @done="changeAvatar"></upload>
+	    </div>
+
     </div>
     <!-- 未登录 -->
     <div class="header" v-else @click="goLogin">
-      <span class="login" >点击登录</span>
-      <span class="fastLogin">1秒登录,体验更多功能</span>
-      <img src="../assets/img/my/user.png" alt="">
+	    <div class="text-one-cut" >
+		    <span class="login" >点击登录</span>
+		    <span class="fastLogin">1秒登录,体验更多功能</span>
+	    </div>
+	    <div class="img">
+		    <img src="/static/img/home/user.png"  alt="点击更换头像" style="width: 60px;height: 60px;border-radius: 100%">
+	    </div>
     </div>
 
     <!--<div class="list" @click="goOperate" v-if="this.jueSe===4">-->
       <!--<img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>运营统计</span> <i></i>-->
     <!--</div>-->
 
-    <div class="list" @click="goCarListManager" v-if="this.jueSe===7">
+    <div class="list" @click="goCarListManager" v-if="hasRole('guanlibumen')">
       <img src="../assets/img/my/health.png" alt=""><span>电子健康档案</span> <i></i>
     </div>
 
@@ -31,13 +39,13 @@
     <div class="list" @click="goMyQuestion">
       <img src="../assets/img/my/my_questions.png" alt=""><span>我的提问</span> <i></i>
     </div>
-    <div class="list" @click="askMeQuestions" v-if="show">
+    <div class="list" @click="askMeQuestions" v-if="hasRole('zhuanjia')">
       <img src="../assets/img/my/my_questions.png" alt=""><span>向我提问</span> <i></i>
     </div>
     <div class="list" @click="goMyOrder">
       <img src="../assets/img/my/order.png" alt=""><span>我的预约服务</span> <i></i>
     </div>
-    <div @click="goMyAppointmentOrder" class="list" v-if="this.jueSe===2">
+    <div @click="goMyAppointmentOrder" class="list" v-if="hasRole('weixiuqiye')">
       <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的预约订单</span> <i></i>
     </div>
     <div class="list" @click="goMyAppointment">
@@ -75,41 +83,42 @@
     <div class="list" @click='goComplaint'>
       <img src="../assets/img/my/report.png" alt=""><span>投诉举报</span> <i></i>
     </div>
-
-    <input type="file" id="file" name="file" accept="image/jpg,image/png,image/bmp" @change="imgPreview($event)" style="display: none"/>
   </div>
 </template>
 
 <script>
   import {MessageBox, Actionsheet, Toast} from 'mint-ui'
-  import avatar from '@/assets/img/my/user.png'
+  import Upload from '@/page/components/compress-upload.vue'
   export default {
     name: 'my',
+	  components: {Upload},
     data () {
       return {
-        show: false,
         name: "",
         tel: '',
         userInfo: localStorage.getItem("USERINFO"),
         jueSe: '',
-        notbind: false
+        notbind: false,
+	      picURL: '',
+	      roles:''
       }
     },
     created(){
       let userinfo = JSON.parse(localStorage.getItem("USERINFO"))
-      if (userinfo != null) {
-        this.name = userinfo.nickname ? userinfo.nickname : userinfo.telphone
-        this.tel = userinfo.telphone.substr(0, 3) + "****" + userinfo.telphone.substr(7)
-        this.picURL = userinfo.photo || avatar
-        this.jueSe=userinfo.userRoleId
-        if(userinfo.userRoleId == 5){
-            this.show = true;
-        }
+      if (userinfo) {
+        this.name = userinfo.nickname ? userinfo.nickname : userinfo.mobileNo
+        this.tel = userinfo.mobileNo.substr(0, 3) + "****" + userinfo.mobileNo.substr(7)
+        this.picURL = userinfo.photo
+        this.roles= JSON.stringify(userinfo.roles)
+
 
         if(localStorage.getItem('UNIONID')!= userinfo.openid) this.notbind=true
       }
     },
     methods: {
+    	hasRole(name){
+			return this.roles.indexOf(name)>=0
+	    },
       goLogin(){
         this.$router.push({
           path: '/login'
@@ -147,7 +156,8 @@
         this.$router.push('/askQuestions')
       },
       goSatisfaction(){
-        this.$router.push('/public-supervision/survey-list')
+	      this.$router.push({path: '/government-service/government-service-list', query:{id: 10281033, name: '满意度调查'}})
+
       },
       goExpertList() {
         this.$router.push('/association-service/experts-list')
@@ -174,134 +184,18 @@
         this.$router.push({path: '/my/operate-manager'})
       },
 
-      imgPreview(e){
-        //获取文件
-        let self=this
-        let file = e.target.files[0];
-        let imageType = /^image\//;
-        //是否是图片
-        if (!imageType.test(file.type)) {
-          Toast("请选择图片！");
-          return;
-        }
-
-        let reader = new FileReader();
-        reader.readAsDataURL(file)
-        reader.onload = function (ev) {
-          let image = new Image();
-          let selffile= this
-          image.onload=function(){
-            let width = image.width;
-            let height = image.height;
-            self.compress(selffile.result,
-              {width: width, height:height, quality: 0.6, type: file.type} ,
-              self.pushImg, file.name)
-          };
-          image.src= ev.target.result;
-          // self.compress(this.result, {width: 1000, height:1000, quality: 0.7} , self.pushImg)
-        }
-
-
-        // if (file.size < 1024 * 1024) {
-        //   let param = new FormData(); //创建form对象
-        //   param.append('file', file, file.name);//通过append向form对象添加数据
-        //   console.log(param.get('file')); //FormData私有类对象，访问不到，可以通过get判断值是否传进去
-        //   let config = {
-        //     headers: {'Content-Type': 'multipart/form-data'}
-        //   };  //添加请求头
-        //   this.axios.post('/image/add/' + localStorage.getItem('ACCESSTOKEN'), param, config)
-        //     .then(response => {
-        //       if (response.data.code === '0') {
-        //         this.picURL = response.data.data.picPath;
-        //         this.changeAvatar(this.picURL);
-        //       }
-        //     })
-        // } else {
-        //   Toast('图片超过1M')
-        // }
-        //读取完成
-      },
-      compress(path, obj, callback, name){
-        let img = new Image();
-        img.src = path;
-        img.onload = function () {
-          let that = this;
-          // 默认按比例压缩
-          let w = that.width,
-            h = that.height,
-            scale = w / h;
-          w = obj.width || w;
-          h = obj.height || (w / scale);
-          let quality = 0.7;  // 默认图片质量为0.7
-          //生成canvas
-          let canvas = document.createElement('canvas');
-          let ctx = canvas.getContext('2d');
-          // 创建属性节点
-          let anw = document.createAttribute("width");
-          anw.nodeValue = w;
-          let anh = document.createAttribute("height");
-          anh.nodeValue = h;
-          canvas.setAttributeNode(anw);
-          canvas.setAttributeNode(anh);
-          ctx.drawImage(that, 0, 0, w, h);
-          // 图像质量
-          if (obj.quality && obj.quality <= 1 && obj.quality > 0) {
-            quality = obj.quality;
-          }
-          // quality值越小，所绘制出的图像越模糊
-          let base64 = canvas.toDataURL(obj.type|| 'image/png', quality);
-          // console.log(base64)
-          // 返回base64的值
-          callback(base64, name)
-        }
-      },
-      pushImg(base64, name){
-        let self= this
-        let formdata = new FormData();
-        formdata.append('file' , self.base64ToBlob(base64), name);
-        this.axios({
-          url: '/image/add/'+localStorage.getItem('ACCESSTOKEN'),
-          method: 'post',
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          data: formdata
-        }).then(res => {
-          if(res.data.code==='0'){
-            self.picURL = res.data.data.picPath;
-            self.changeAvatar(this.picURL);
-          } else {
-            Toast(res.data.status)
-          }
-        })
-      },
-      base64ToBlob(dataurl) {
-        let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        return new Blob([u8arr], { type: mime });
-      },
-      changeAvatar(avatarpath) {
-          let param = {
-            avatarpath: avatarpath,
-            accessToken: localStorage.getItem('ACCESSTOKEN')
-          };
-          this.axios.post('/center/photo', param)
-            .then(response => {
-              if (response.data.code === '0') {
+      changeAvatar(res) {
+          this.axios.post('/user/photo', {
+	          url: res.item.path
+          }).then(response => {
                 Toast("头像更换成功");
                 let userinfo = JSON.parse(localStorage.getItem("USERINFO"))
-                userinfo.photo = avatarpath;
+                userinfo.photo = res.item.path;
                 localStorage.setItem("USERINFO",JSON.stringify(userinfo));
-                this.$refs.headerImg.setAttribute('src',avatarpath)
-              }
+                this.picURL= res.item.path
             })
       },
-      addClick() {
-        document.getElementById('file').click();
-      },
+
       goToSet() {
         this.$router.push({
           path: '/changeNickName',
@@ -341,26 +235,37 @@
     padding: 38px 10px 0;
     position: relative;
     height: 125px;
-    b {
-      font-size: 18px;
-      color: #000;
-    }
-    img {
+	  .text-one-cut{
+		  padding-right: 80px;
+		  width: 100%;
+		  overflow: hidden;
+		  position: relative;
+		  p {
+			  width: 100%;
+			  overflow: hidden;
+			  text-overflow: ellipsis;
+			  font-weight: 600;
+			  font-size: 18px;
+			  color: #000;
+		  }
+		  u {
+			  position: absolute;
+			  right: 84px;
+			  bottom: 4px;
+			  width: 15px;
+			  height: 15px;
+			  background: url(../assets/img/my/edit.png);
+			  background-size: 100% 100%;
+		  }
+	  }
+    .img {
       position: absolute;
       width: 60px;
       right: 20px;
       top: 50%;
       transform: translateY(-50%);
     }
-    u {
-      position: absolute;
-      right: 0;
-      top: 4px;
-      width: 15px;
-      height: 15px;
-      background: url(../assets/img/my/edit.png);
-      background-size: 100% 100%;
-    }
+
     .telNum, .fastLogin {
       margin-top: 10px;
       display: block;

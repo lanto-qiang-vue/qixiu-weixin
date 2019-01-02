@@ -193,7 +193,7 @@
     <div class="news2"  :class="{show: showLeft}">
       <ul>
         <router-link  v-for="(item, index) in news2" :key="index" tag="li"
-             :to="{ path: '/infoDetail', query: {infoId: item.infoId}}">
+             :to="{ path: '/infoDetail', query: {infoId: item.id}}">
           <div class="title">{{item.title}} <span v-if="item.publishTime">{{item.publishTime | FormatDate}}</span></div>
           <p>{{item.content | FormatArticle(item.title)}}</p>
         </router-link>
@@ -202,7 +202,7 @@
     <div class="news3" :class="{show: !showLeft}">
       <ul>
         <router-link  v-for="(item, index) in news3" :key="index" tag="li"
-             :to="{ path: '/infoDetail', query: {infoId: item.infoId}}">
+             :to="{ path: '/infoDetail', query: {infoId: item.id}}">
           <div class="title">{{item.title}} <span v-if="item.publishTime">{{item.publishTime | FormatDate}}</span></div>
           <p>{{item.content | FormatArticle(item.title)}}</p>
         </router-link>
@@ -333,6 +333,9 @@ export default {
     }).then(res => {
       if(res.data.code=='0'){
         self.questionList= res.data.items
+	      // for(let i in self.questionList){
+		   //    self.questionList[i].nickName='1111111122222222233333333333333'
+	      // }
 
         // console.log(res.data.data.dataList.length)
         self.autoroll('cdf1',res.data.items.length, 'questionList', 3000)
@@ -732,6 +735,8 @@ export default {
                 height: 30px;
                 line-height: 30px;
                 color: #808080;
+	              overflow: hidden;
+	              text-overflow: ellipsis;
               }
             }
             >p{
@@ -744,6 +749,8 @@ export default {
                 position: absolute;
                 line-height: 20px;
                 white-space: nowrap;
+	              overflow: hidden;
+	              text-overflow: ellipsis;
               }
               span{
                 display: -webkit-box;

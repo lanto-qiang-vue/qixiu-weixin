@@ -113,7 +113,7 @@ export default {
     },
 
     getData(e){
-	    if (e.keyCode == '13') {
+	    if (e &&e.keyCode == '13') {
 		    e.target.blur()
 		    this.pageNo=1
 		    if (this.vehicleplatenumber.trim() == '') {

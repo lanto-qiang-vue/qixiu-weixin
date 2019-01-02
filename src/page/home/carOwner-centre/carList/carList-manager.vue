@@ -77,7 +77,7 @@ export default {
     },
 
     getData(e){
-	    if (e.keyCode == '13') {
+	    if (e &&e.keyCode == '13') {
 		    // e.target.blur()
 		    if (this.vehicleplatenumber.trim() == '') {
 			    Toast('请输入车牌号')
