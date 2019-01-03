@@ -381,7 +381,7 @@
           };
           if(this.$route.query.repairId){
             param.repairId= this.$route.query.repairId
-            param.vehicleNumber= this.$route.query.vehicleplatenumber
+            param.vehicleNum= this.$route.query.vehicleplatenumber
             delete param.weixinId
             delete param.unionid
           }
