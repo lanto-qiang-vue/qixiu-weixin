@@ -378,6 +378,7 @@ export default {
     $('#float-survey .close').click(function () {
       $('#float-survey').hide()
     })
+	  this.scrollTop()
 
     let self=this
     $('.cdf-quick').bind('touchstart',function(e){
@@ -463,6 +464,7 @@ export default {
       this.autoroll('snews2', this.news2.length-2, false, 3000)
       this.autoroll('snews3', this.news3.length-2, false, 3000)
     }
+	  this.scrollTop()
 
   },
 
@@ -472,6 +474,7 @@ export default {
     // window.clearInterval(this.cdf1.timer)
     // console.log('deactivated',this.cdf1.timer)
   },
+
 
   beforeRouteLeave (to, from, next) {
     // alert(2)
@@ -483,6 +486,9 @@ export default {
 
 
   methods: {
+  	scrollTop(){
+	    if($('body').scrollTop()!= 0 ) $('body').scrollTop(0)
+    },
     noscroll(evt) {
       if(!evt._isScroller) {
         if (!this.translateY) event.preventDefault();
