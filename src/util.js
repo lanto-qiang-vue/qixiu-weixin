@@ -249,3 +249,12 @@ export const isIos= () => {
 	let isIOS = !!(/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent))
 	return isIOS
 }
+
+export const isWeixn=()=>{
+	let ua = navigator.userAgent.toLowerCase();
+	if(ua.match(/MicroMessenger/i)=="micromessenger") {
+		return true;
+	} else {
+		return false;
+	}
+}

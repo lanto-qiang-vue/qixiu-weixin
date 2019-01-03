@@ -1,7 +1,8 @@
 import axios from 'axios'
 import router from './router'
-import store from './store'
+// import store from './store'
 import { Toast, Indicator, Popup } from 'mint-ui'
+import { isWeixn} from './util'
 
 // axios 配置
 axios.defaults.timeout = 60000;
@@ -38,12 +39,12 @@ axios.interceptors.response.use(
     Indicator.close()
     switch (response.data.code){
 	    case '0': break
-      case '130410':
-      case '130411':
-      case '130412':
-      case '130405':
-      case '130406':
-      case '130408':
+      case '401':
+      case '2000':
+      case '100':
+
+	      localStorage.removeItem("ACCESSTOKEN")
+	      localStorage.removeItem("USERINFO")
 
         weixinLogin()
 
@@ -94,41 +95,27 @@ axios.interceptors.response.use(
 
 
 function weixinLogin() {
-  if(consts.isWeixn()){
+  if(isWeixn()){
     Toast('登录过期,正在自动重新登录!')
 
     axios({
-      url: '/user/useraccount/register/login',
+      url: '/user/useraccount/login',
       method: 'post',
-      headers: {'Content-type': 'application/json'},
-      data: JSON.stringify({
-        account: localStorage.getItem('UNIONID')+','+localStorage.getItem('QXWOPENID'),
-        loginMethod: 'wx',
-        systemToken: localStorage.getItem('SYSTEMTOKEN')
-      })
+      data: {
+		  openid: localStorage.getItem('UNIONID')+','+localStorage.getItem('QXWOPENID'),
+		  loginMethod: "微信",
+		  workOn: window.location.origin === 'https://weixin.shanghaiqixiu.org' ? 'pPro' : 'pDev',
+		  system: "wechatqixiu"
+	  }
     }).then(res=>{
       console.log(res.data.code)
       if(res.data.code === "0"){
-        // Toast("授权登录成功")
-        localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
-        localStorage.setItem("USERINFO",JSON.stringify(res.data.data));
-        // if(this.$route.query.redirect){
-        //   this.$router.replace({
-        //     path: this.$route.query.redirect
-        //   })
-        // }else{
-        //   self.$router.push({path: '/index'})
-        // }
-        // location.reload()
+	      localStorage.setItem("ACCESSTOKEN", res.data.item.accessToken);
+	      localStorage.setItem("USERINFO", JSON.stringify(res.data.item));
 
         router.replace({ path: '/'})
       }else if(res.data.code === "141010"){
-      //   Toast('请绑定手机号')
-      //   // this.popupVisible = true
-      //   router.replace({
-      //     path: '/login',
-      //     query: {redirect: router.currentRoute.fullPath, bind: 'needbind'}
-      //   })
+
         setTimeout(function () {
           Toast('此微信未绑定手机号，请手动登录')
         },1000)

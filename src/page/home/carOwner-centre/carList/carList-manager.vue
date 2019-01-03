@@ -103,9 +103,6 @@ export default {
         }else {
           this.carList = res.data.data
         }
-        if (this.carList == null || this.carList.length == 0) {
-          Toast('暂无数据')
-        }
         if(arguments.length==1){
           this.$refs.loadmore.onTopLoaded()
         }

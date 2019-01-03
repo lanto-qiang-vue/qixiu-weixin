@@ -26,7 +26,11 @@
                   </p>
                 </div>
               </div>
-	            <mt-button type="danger" size="small" class="remove" @click="deleteVehicle(item.vehicleId)">解绑</mt-button>
+	            <div class="remove">
+		            <mt-button type="danger" size="small" class="but" @click.stop.prevent="deleteVehicle(item.vehicleId)">解绑</mt-button>
+		            <mt-button type="danger" size="small" class="but" v-if="item.binds && item.binds.length" @click.stop.prevent="removeAuthorize(item.binds)">解除授权</mt-button>
+	            </div>
+
             </li>
           </ul>
         </mt-loadmore>
@@ -293,7 +297,7 @@ export default {
       }
     }
     .info {
-      padding: 10px 20px;
+      padding: 10px 0;
       color: #676767;
       margin: 0;
       p {
@@ -328,7 +332,12 @@ export default {
 		  position: absolute;
 		  right: 10px;
 		  bottom: 10px;
+		  .but{
+			  float: right;
+			  margin-left: 5px;
+		  }
 	  }
+
   }
 }
 </style>
