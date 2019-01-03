@@ -257,6 +257,9 @@
           font-size: 14px;
           border-bottom: 1px solid #efeff4;
           padding-bottom: 15px;
+	        img{
+		        max-width: 100%;
+	        }
         }
       }
     }
