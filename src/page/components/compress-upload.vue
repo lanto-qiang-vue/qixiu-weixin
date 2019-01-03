@@ -95,6 +95,7 @@ export default {
 	top: 0;
 
 	input{
+		display: none;
 		opacity: 0;
 		position: absolute;
 		left: 100%;

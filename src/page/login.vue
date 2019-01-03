@@ -42,7 +42,7 @@
           <div style="margin-top: 150px; padding: 0 40px;">
             <div class="mui-input-group">
               <div class="mui-input-row">
-                <mt-field :state="state2" type="tel" :attr="{ maxlength: 11 }" placeholder="请输入手机号" v-model="userName"></mt-field>
+                <mt-field :state="state2" type="text" placeholder="请输入账号" v-model="userName"></mt-field>
               </div>
               <div class="mui-input-row hahaha">
                 <input type="password" style="font-size: 16px;" class="mui-input-password" v-model="passWord" placeholder="请输入密码">
@@ -143,7 +143,7 @@
       },
 
       tel(newVal, oldVal){
-        let reg = /^1[3|4|5|7|8][0-9]{9}$/
+        let reg = /^1[3|4|5|7|8|9][0-9]{9}$/
         if (reg.test(newVal)) {
           this.state1 = 'success'
         } else if(newVal.trim()==='') {
@@ -154,11 +154,8 @@
       },
 
       userName(newVal, oldVal){
-        let reg = /^1[3|4|5|7|8][0-9]{9}$/
-        if (reg.test(newVal)) {
+        if (newVal.trim()) {
           this.state2 = 'success'
-        } else if(newVal.trim()==='') {
-          this.state2 = 'warning'
         } else {
           this.state2 = 'error'
         }
@@ -382,11 +379,11 @@
       },
 
       getCaptcha() {
-        let reg = /^1[3|4|5|7|8][0-9]{9}$/
+        let reg = /^1[3|4|5|7|8|9][0-9]{9}$/
         let _this = this
-        if(this.phone === ''){
+        if(this.tel === ''){
           return Toast('手机号不能为空')
-        }else if(!reg.test(this.phone)){
+        }else if(!reg.test(this.tel)){
           return Toast('手机号格式有误')
         }
         this.axios({
@@ -394,7 +391,7 @@
           url: '/message/sms/sendsmscaptcha',
           data: {
 	          businessType: "10",
-	          mobileNo: this.phone,
+	          mobileNo: this.tel,
           }
         }).then(res=>{
           if(res.data.code === "0"){

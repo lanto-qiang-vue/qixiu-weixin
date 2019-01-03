@@ -1,5 +1,5 @@
 <template>
-<div style="height: 100vh;overflow: auto">
+<div style="height: 100vh;overflow: auto;">
   <mt-header title="匹配车辆" style="position: fixed;top: 0;width: 100%;z-index: 1"><mt-button icon="back" slot="left" @click="$router.go(-1)"></mt-button></mt-header>
   <img class="compImg" :src="companyDetail.pic||'/static/img/shqxwbig.png'">
   <div class="content" >
@@ -133,6 +133,7 @@
       cardno(val){
         this.cardno= this.cardno.toUpperCase()
         this.checkval()
+
       },
       tel(val){
         this.checkval()
@@ -265,6 +266,7 @@
         // }
         // this.remarkvisible=true
         this.$router.push({path: '/remarkMatch', query: { corpId: this.$route.query.corpId, show: 'yes' }})
+	      if($('body').scrollTop()!= 0 ) $('body').scrollTop(0)
       },
       chooseLevel(e){
         let imgs = e.target.parentNode.children

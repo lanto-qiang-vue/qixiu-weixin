@@ -4,7 +4,6 @@
       <label style="position: absolute; left: 0; top: 50%; transform: translateY(-60%); color: rgb(66, 133, 244); font-size: 17px;">手机号</label>
       <input type="number" v-model="phone" class="mui-input-clear" placeholder="输入手机号">
     </div>
-    <pic_verification style="margin-bottom: 25px;"></pic_verification>
     <div style="position: relative;">
       <div style="position: relative; padding-left: 50px; margin-bottom: 15px; border-bottom: 1px solid #eee;">
         <label style="position: absolute; left: 0; top: 50%; transform: translateY(-60%); color: rgb(66, 133, 244); font-size: 17px;">验证码</label>
@@ -13,13 +12,20 @@
         <p v-else class="reGet" style="color: #4285f4; cursor: pointer; width: auto; position: absolute; right: 8px; top: 0;">{{getCodeButton}}</p>
       </div>
     </div>
-    <button @click="goNext">下一步</button>
+	  <div style="position: relative; padding-left: 50px; margin-bottom: 15px; border-bottom: 1px solid #eee;">
+		  <label style="position: absolute; left: 0; top: 50%; transform: translateY(-60%); color: rgb(66, 133, 244); font-size: 17px;">密码</label>
+		  <input type="number" v-model="pass" class="mui-input-clear" placeholder="输入密码">
+	  </div>
+	  <div style="position: relative; padding-left: 50px; margin-bottom: 15px; border-bottom: 1px solid #eee;">
+		  <label style="position: absolute; left: 0; top: 50%; transform: translateY(-60%); color: rgb(66, 133, 244); font-size: 17px;">确认密码</label>
+		  <input type="number" v-model="confirmPass" class="mui-input-clear" placeholder="确认密码">
+	  </div>
+    <button @click="goNext">重置密码</button>
   </div>
 </template>
 
 <script>
   import {Toast} from "mint-ui"
-  import pic_verification from '../components/picVerification.vue'
   export default {
     data(){
       return {
@@ -27,35 +33,22 @@
         captcha: '',
         tel: '',
         phone: '',
+        confirmPass:'',
         getCodeButton:"获取验证码",
         count: 0,
         timer: null,
         flag: true
       }
     },
-    components: {
-      pic_verification
-    },
     methods: {
       getCaptcha(){
         if(this.phone.trim()==='') {
           return Toast("手机号不能为空")
-        }else if(this.$store.state.picVerification.YZM===''){
-          return Tosat("验证码不能为空")
         }
         this.axios({
           method: 'post',
-          url: '/message/sms/sendsmscaptcha',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: {
-            "businessType": "02",
-            "mobile": this.phone,
-            "cid": this.$store.state.picVerification.imageToken,
-            "code": this.$store.state.picVerification.YZM,
-            "systemToken": localStorage.getItem('SYSTEMTOKEN')
-          }
+          url: '/user/pass/reset/'+ this.phone,
+          data: {}
         }).then(response => {
           console.log(response);
           if (response.data.code === "0") {
@@ -79,8 +72,6 @@
                 }
               }, 1000)
             }
-          } else {
-            Toast(response.data.status);
           }
         })
       },
@@ -95,24 +86,17 @@
         }
         this.axios({
           method: 'post',
-          url: '/user/telPhone/checkSystemToken',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(params)
-        })
-          .then(res => {
+          url: '/user/pass/reset',
+          data:{
+	          "confirmPass": this.confirmPass,
+	          "mobileNo": this.phone,
+	          "pass": this.pass,
+	          "smsCode": this.captcha
+          }
+        }).then(res => {
             console.log(res);
             if(res.data.code == '0'){
-              this.$router.push({
-                path: '/resetPassword',
-                query: {
-                  randCode: this.captcha.trim(),
-                  phone: this.phone
-                }
-              })
-            }else {
-              Toast('短信验证码错误，请重新输入');
+             this.$router.go(-1)
             }
           })
       }
