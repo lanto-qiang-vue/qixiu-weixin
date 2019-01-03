@@ -175,7 +175,10 @@
 	         this.$router.push({path:'/remarkDetail', query:{id: id}})
         } else{
 			if(hasComplaint) {
-				this.$router.push({path:'/myComplaint'})
+				// this.$router.push({path:'/myComplaint'})
+				this.$router.push({path:'/remarkDetail', query:{id: id,
+						// complaint: 'yes'
+				}})
 			}else{
 				MessageBox({
 					title: '点评无效',

@@ -40,29 +40,17 @@ export default {
 
       this.axios({
         method: 'post',
-        url: '/user/password/changeForget',
-        headers: {
-            'Content-type': 'application/json'
-        },
+        url: '/user/update/password',
         data: {
-        //   accessToken: localStorage.getItem("ACCESSTOKEN"),
-        //   userpassword: this.surePassword.trim()
-        // }{
-          "accessToken": localStorage.getItem("ACCESSTOKEN"),
-          "confirmpassword": this.surePassword,
-          "newpassword": this.newPassword,
-          "oldpassword": this.oldPassword,
-          "userId": 0
+	        "confirmPassword": this.surePassword,
+	        "newPassword": this.newPassword,
+	        "oldPassword": this.oldPassword
         }
       }).then(res=>{
-        console.log(res);
-        if(res.data.code==="130213"){
+        if(res.data.code==="0"){
           Toast("修改成功")
 
           this.$router.go(-2)
-        }else {
-          Toast(res.data.status)
-
         }
       })
     }

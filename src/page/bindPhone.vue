@@ -10,9 +10,6 @@
         <input type="number" class="mui-input-clear" v-model="phoneNum" maxlength="11" placeholder="输入新手机号">
       </div>
     </div>
-    <div>
-      <pic_verification style="margin-top: 15px;"></pic_verification>
-    </div>
     <div class="captcha">
       <div class="mui-input-row ">
         <label style="float: right; color: #4285f4; padding:0; text-align: right;cursor: pointer;" v-if="flag" @click="getCaptcha">{{ getCodeButton }}</label>
@@ -31,7 +28,6 @@
 
 <script>
 import { Toast } from "mint-ui"
-import pic_verification from '../components/picVerification.vue'
 export default {
   name: "bindPhone",
   data(){
@@ -46,28 +42,17 @@ export default {
       flag: true,
     }
   },
-  components: {
-    pic_verification
-  },
   methods:{
     getCaptcha(){
       if(this.phoneNum.trim()===''){
         return Toast("手机号码不能为空")
-      }else if(this.$store.state.picVerification.YZM===''){
-        return Toast("请输入图形验证码")
       }
       this.axios({
         method: 'post',
         url: '/message/sms/sendsmscaptcha',
-        headers: {
-          'Content-type': 'application/json'
-        },
         data:{
-          "businessType": "03",
-          "mobile":this.phoneNum,
-          "cid": this.$store.state.picVerification.imageToken,
-          "code": this.$store.state.picVerification.YZM,
-          "systemToken": localStorage.getItem('SYSTEMTOKEN')
+	        "businessType":"10",
+	        "mobileNo": this.phoneNum,
         }
       }).then(response => {
         console.log(response)
@@ -106,36 +91,22 @@ export default {
       }else if (this.userPass.trim()===''){
         return Toast("密码不能为空")
       }
-      let params={
-        accessToken: localStorage.getItem("ACCESSTOKEN"),
-        newTelphone: this.phoneNum,
-        randCode: this.captcha,
-        userPass: this.userPass,
-        userId:userInfo && userInfo.userId
-      }
-      console.log('params',params)
       this.axios({
         method: 'post',
-        url: '/user/telPhone/changeTelPhone',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        data: JSON.stringify(params)
-      })
-        .then(res => {
-          if(res.data.code == '1300215'){
+        url: '/user/update/mobileno',
+        data: {
+	        "newTelPhone": this.phoneNum,
+	        "randCode": this.captcha,
+	        "userPass": this.userPass
+        }
+      }).then(res => {
+          if(res.data.code == '0'){
 
             Toast("修改手机号码成功,请用新手机号登录")
               this.$router.push({
                 path: '/login'
               })
-          }else if(res.data.code != ''){
-              var msg = res.data.status;
-            Toast(msg)
-          } else {
-            Toast("修改手机号码失败")
           }
-
         })
     }
   }

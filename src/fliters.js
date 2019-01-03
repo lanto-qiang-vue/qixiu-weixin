@@ -20,6 +20,22 @@ Vue.filter("FormatService", function (servicetype, serviceContent) {
   return newArr.join("，")
 })
 
+// 反馈类型
+Vue.filter("FormatComplaintType", function (val) {
+	let str=''
+	switch (val.toString()){
+		case '0':{
+			str= '维修记录未上传'
+			break
+		}
+		case '1':{
+			str= '维修记录不正确'
+			break
+		}
+	}
+	return str
+})
+
 Vue.filter("FormatArticle", function (value, title) {
   // console.log(value)
   return (value.replace(/\ +/g,"").replace(/[ ]/g,"").replace(/[\r\n]/g,"").replace(/&nbsp;/ig, "")|| title)
