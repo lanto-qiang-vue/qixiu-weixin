@@ -16,6 +16,7 @@
 
 <script>
   import { Header } from 'mint-ui';
+  import {getwxticket} from '@/util.js'
   export default {
     name: 'info',
     data () {
@@ -33,7 +34,7 @@
         // this.share()
       }).catch(function (error) {
       })
-
+	    getwxticket(['onMenuShareTimeline', 'onMenuShareAppMessage'])
     },
     methods: {
       goBack(){this.$router.go(-1)},
@@ -47,21 +48,6 @@
         let shareImg= imgarr? imgarr[0].match(/\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i )[1]: ''
         // console.log(news[j].headimg)
 
-        this.axios({
-          method: 'post',
-          url: '/app/signature',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify({url: encodeURIComponent(window.location.href.split('#')[0])})
-        }).then(res=>{
-          wx.config({
-            debug: false,
-            appId: window.location.origin==='https://weixin.shanghaiqixiu.org' ? self.consts.onlineAppId : self.consts.testAppId,
-            timestamp: res.data.timeStamp,
-            nonceStr: res.data.uuid,
-            signature: res.data.signature,
-            jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
-          })
-        })
 
 
         // console.log()

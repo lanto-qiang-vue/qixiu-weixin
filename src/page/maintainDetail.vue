@@ -29,7 +29,7 @@
       <img :src="all.pic||'/static/img/shqxwbig.png'"/>
       <!--<img @click="small();$emit('back')" class="back" src="../assets/img/maintain/back.png" />-->
     </div>
-    <div class="head">累计评论（{{comment.totalElements+1}}条）
+    <div class="head">累计评论（{{(comment.totalElements||0)+1}}条）
       <router-link tag="a" :to="{path: '/maintainRemark', query: {id: maintainDetail.sid, joint: all.joint} }">
         <img src="../assets/img/maintain/箭头.png"/>
       </router-link>
