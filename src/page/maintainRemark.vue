@@ -32,7 +32,7 @@
             价格 {{item.price}}
           </div>
           <ol v-if="item.tags">
-            <li v-for="(tag, index) in item.tags.split(';')" :key="index">{{tag}}</li>
+            <li v-for="(tag, index) in item.tags" :key="index">{{tag}}</li>
           </ol>
         </div>
       </li>

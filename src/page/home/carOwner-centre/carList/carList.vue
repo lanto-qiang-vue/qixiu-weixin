@@ -2,7 +2,7 @@
   <div id="carList">
     <div class='search'>
       <form action="javascript:return true;">
-        <input type="search" placeholder="搜索车牌号码" class="mui-input-clear" v-model='vehicleplatenumber' @keydown="key($event)" style="padding-left: 35px; text-indent: 0;">
+        <input type="search" placeholder="搜索车牌号码" class="mui-input-clear" v-model='vehicleplatenumber' @keydown="getData($event)" style="padding-left: 35px; text-indent: 0;">
       </form>
     </div>
       <div class="carList">
@@ -28,7 +28,7 @@
               </div>
 	            <div class="remove">
 		            <mt-button type="danger" size="small" class="but" @click.stop.prevent="deleteVehicle(item.vehicleId)">解绑</mt-button>
-		            <mt-button type="danger" size="small" class="but" v-if="item.binds && item.binds.length" @click.stop.prevent="removeAuthorize(item.binds)">解除授权</mt-button>
+		            <mt-button type="danger" size="small" class="but" v-if="item.self &&item.binds && item.binds.length" @click.stop.prevent="removeAuthorize(item.binds, item.vehicleplatenumber)">解除授权</mt-button>
 	            </div>
 
             </li>
@@ -93,7 +93,8 @@ export default {
       popupVisible: false,
       checkedWho: '',
       authorizers: [],
-      authorizers1: []
+      authorizers1: [],
+	    removeAuthNo: ''
     }
   },
 
@@ -176,13 +177,14 @@ export default {
       })
     },
 
-    removeAuthorize(data){
+    removeAuthorize(data, vehi){
       this.popupVisible = true
       this.authorizers1=data
       this.authorizers=[]
       data.map(item=>{
         this.authorizers.push("解除授权账号:"+item.mobile)
       })
+	    this.removeAuthNo= vehi
     },
 
     cancel(){
@@ -192,28 +194,24 @@ export default {
     confirm(){
       let _this = this
       this.popupVisible=!this.popupVisible
-      function getBinduserid(){
+      let userId= ''
         for(let i = 0; i < _this.authorizers1.length; i++){
           if(_this.authorizers1[i].mobile == _this.checkedWho.split(':')[1]){
-            return _this.authorizers1[i].binduserid
+	          userId=  _this.authorizers1[i].binduserid
           }
         }
-      }
+
       this.axios({
         method: 'post',
         url: '/scan/relieve',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        data: JSON.stringify({
-          accessToken: localStorage.getItem('ACCESSTOKEN'),
-          binduserid: getBinduserid(),
-          vehicleNumber: document.querySelector('.mui-table-view-cell.mui-selected span').innerHTML
-        })
+        data: {
+		    "userId": userId,
+		    "vehicleNumber": this.removeAuthNo
+	    }
       }).then(res=>{
         if(res.data.code==='0'){
           Toast('取消授权成功')
-          window.location.reload()
+	        this.getData()
         }else {
           Toast(res.data.status)
         }

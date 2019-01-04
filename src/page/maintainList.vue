@@ -325,7 +325,7 @@
       getName(type){
 		    if(!this.search[type]) return ''
 		    for (let i in this[type]){
-		      if(this.search[type]== this[type][i].value){
+		      if(this.search[type]== (this[type][i].value || this[type][i].code)){
 		        return this[type][i].name
           }
         }

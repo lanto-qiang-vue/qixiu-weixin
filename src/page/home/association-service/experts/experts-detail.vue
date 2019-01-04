@@ -60,8 +60,8 @@
 
 <style lang='less'>
   #expertDetail {
-    height: calc(100vh);
-    overflow: scroll;
+    /*height: calc(100vh);*/
+    /*overflow: scroll;*/
     .block {
       width: 100%;
       overflow: hidden;

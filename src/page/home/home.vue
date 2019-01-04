@@ -1,12 +1,12 @@
 <template>
 <div id="home">
-<div id="float-survey">
-  <a href="http://dh3t.cn/ys6RSb" onclick="window.location.href='http://dh3t.cn/ys6RSb'">
-    <img src="/static/img/temp/laba.png"/>
-    <span>【上海市汽车维修行业顾客满意度调查】点击参与</span>
-  </a>
-  <img class="close" src="/static/img/temp/close.png"/>
-</div>
+<!--<div id="float-survey">-->
+  <!--<a href="http://dh3t.cn/ys6RSb" onclick="window.location.href='http://dh3t.cn/ys6RSb'">-->
+    <!--<img src="/static/img/temp/laba.png"/>-->
+    <!--<span>【上海市汽车维修行业顾客满意度调查】点击参与</span>-->
+  <!--</a>-->
+  <!--<img class="close" src="/static/img/temp/close.png"/>-->
+<!--</div>-->
 
   <div class="banner">
     <div class='dummy'></div>
@@ -375,9 +375,9 @@ export default {
   },
   mounted(){
     //temp
-    $('#float-survey .close').click(function () {
-      $('#float-survey').hide()
-    })
+    // $('#float-survey .close').click(function () {
+    //   $('#float-survey').hide()
+    // })
 	  this.scrollTop()
 
     let self=this
@@ -1183,34 +1183,34 @@ export default {
   }
 </style>
 
-<style>
-#float-survey {
-  height: 40px;
-  line-height: 40px;
-  background-color: #fefced;
-  color: #f66218;
-  font-size: 12px;
-  position: relative;
-}
-#float-survey a{
-  display: inline-block;
-  color: #f66218;
-  width: 100%;
-}
-#float-survey span{
-  vertical-align: middle;
-}
-#float-survey img{
-  width: 16px;
-  vertical-align: middle;
-  margin-left: 5px;
-}
-#float-survey .close{
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 14px 6px;
-  width: 12px;
-  box-sizing: content-box;
-}
-</style>
+<!--<style>-->
+<!--#float-survey {-->
+  <!--height: 40px;-->
+  <!--line-height: 40px;-->
+  <!--background-color: #fefced;-->
+  <!--color: #f66218;-->
+  <!--font-size: 12px;-->
+  <!--position: relative;-->
+<!--}-->
+<!--#float-survey a{-->
+  <!--display: inline-block;-->
+  <!--color: #f66218;-->
+  <!--width: 100%;-->
+<!--}-->
+<!--#float-survey span{-->
+  <!--vertical-align: middle;-->
+<!--}-->
+<!--#float-survey img{-->
+  <!--width: 16px;-->
+  <!--vertical-align: middle;-->
+  <!--margin-left: 5px;-->
+<!--}-->
+<!--#float-survey .close{-->
+  <!--position: absolute;-->
+  <!--top: 0;-->
+  <!--right: 0;-->
+  <!--padding: 14px 6px;-->
+  <!--width: 12px;-->
+  <!--box-sizing: content-box;-->
+<!--}-->
+<!--</style>-->

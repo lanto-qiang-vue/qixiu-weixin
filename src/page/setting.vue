@@ -12,7 +12,7 @@
         </li>
         <li class="mui-table-view-cell" @click="goChangePhoneNum">
             <a class="mui-navigate-right">修改手机号码</a>
-            <span>{{ num }}</span>
+            <span>{{ typeof(isLogin) == 'string'?num: '' }}</span>
         </li>
     </ul>
     <ul class="mui-table-view">

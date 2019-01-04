@@ -26,15 +26,16 @@
       }
     },
     created() {
+	    getwxticket(['onMenuShareTimeline', 'onMenuShareAppMessage'])
       this.axios({
         method: 'post',
         url: '/infopublic/detail/' + this.$route.query.infoId,
       }).then(res => {
         this.infoDetail = res.data.item;
-        // this.share()
+        this.share()
       }).catch(function (error) {
       })
-	    getwxticket(['onMenuShareTimeline', 'onMenuShareAppMessage'])
+
     },
     methods: {
       goBack(){this.$router.go(-1)},
@@ -43,6 +44,7 @@
         let link= window.location.href
         let titles= this.infoDetail.title
 
+	      console.log(titles)
         let imgarr= this.infoDetail.content.match( /<img\b.*?(?:\>|\/>)/gi)
         // console.log(news[j].content)
         let shareImg= imgarr? imgarr[0].match(/\bsrc\b\s*=\s*[\'\"]?([^\'\"]*)[\'\"]?/i )[1]: ''

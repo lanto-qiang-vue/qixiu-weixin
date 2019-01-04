@@ -71,7 +71,7 @@
             <div id="captcha" style="width: 120px; height: 45px; line-height: 45px; text-align: center; color: #42b5f4;" @click="flag && getCaptcha()">获取验证码</div>
           </mt-field>
         </div>
-        <mt-button type="primary" style="position: absolute; left: 0; bottom: 0; width: 100vw; border-radius: 0;" @click="login('code')">提交</mt-button>
+        <mt-button type="primary" style="position: absolute; left: 0; bottom: 0; width: 100vw; border-radius: 0;" @click="login('bind')">提交</mt-button>
       </div>
     </mt-popup>
   </div>
@@ -276,6 +276,21 @@
 		      case 'weixin':{
 			      data.loginMethod= "微信"
 			      data.workOn= window.location.origin === 'https://weixin.shanghaiqixiu.org' ? 'pPro' : 'pDev'
+			      break
+		      }
+		      case 'bind':{
+			      if(this.state1 != 'success'){
+				      return Toast("手机号输入有误")
+			      } else if(this.code.trim() === '') {
+				      return Toast('验证码不能为空')
+			      } else if(this.code.trim().length < 6) {
+				      return Toast('验证码为6位数字')
+			      }
+			      data.captureCode= this.code,
+			      data.mobile= this.tel
+			      data.loginMethod= "微信"
+			      data.workOn= window.location.origin === 'https://weixin.shanghaiqixiu.org' ? 'pPro' : 'pDev'
+			      break
 		      }
 	      }
 

@@ -60,6 +60,13 @@
 				}
 			}
 		},
+		mounted(){
+			$('body').on('blur', 'input, textarea', ()=>{
+				console.log('blur')
+				if($('body').scrollTop()!= 0 ) $('body').scrollTop(0)
+			})
+
+		},
 		methods:{
 			isWeixn(){
 				let ua = navigator.userAgent.toLowerCase();
