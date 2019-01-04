@@ -47,10 +47,13 @@ export default {
         }
     },
     created(){
-
+	    let token= localStorage.getItem('ACCESSTOKEN')
+	    let openid= localStorage.getItem('QXWOPENID')
+	    let url= '/comment/maintain/'+ this.$route.query.id
+	    if(!token && openid) url+= ('?openId='+ openid)
       this.axios({
         method: 'get',
-        url: '/comment/maintain/'+ this.$route.query.id,
+        url: url,
       }).then(res => {
 		this.info= res.data
 	      if(res.data.complaintId){
