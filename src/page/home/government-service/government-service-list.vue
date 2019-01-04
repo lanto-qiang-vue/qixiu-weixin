@@ -11,9 +11,9 @@
       <div @click="goOut(item.id)" class="msg" v-for="(item, index) in infoPublicList">
         <p>{{item.title}}</p>
         <span>{{item.category.name}}-{{ item.publishTime | FormatDate}}</span>
-        <div>
-          <img :src="item.photo"/>
-        </div>
+        <!--<div>-->
+          <!--<img :src="item.photo"/>-->
+        <!--</div>-->
       </div>
 
         <div v-show="allLoaded" style="text-align: center; line-height: 30px; background-color: #f8f8f8; font-size: 14px; color: #999;">已经到底啦...</div>

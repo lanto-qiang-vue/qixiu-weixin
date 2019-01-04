@@ -95,7 +95,7 @@ axios.interceptors.response.use(
 
 
 function weixinLogin() {
-  if(isWeixn()){
+  if(isWeixn() &&localStorage.getItem('UNIONID')){
     Toast('登录过期,正在自动重新登录!')
 
     axios({
