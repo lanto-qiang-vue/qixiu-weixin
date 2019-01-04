@@ -59,7 +59,7 @@
 		<ul class="content">
 			<li @click="click(item.id, item.pass,  item.status, item.hasComplaint)" v-for="(item, index) in list" :key="index">
 				<div class="head">点评日期：{{item.createDate | FormatDate}} <span>评分：<em>{{item.avgScore}}</em></span></div>
-				<img v-show="item.status.toString()=='1'" src="../../assets/img/remark/无效信息.png"/>
+				<img v-show="item.status &&item.status.toString()=='1'" src="../../assets/img/remark/无效信息.png"/>
 				<div class="info">评分详情：
 					履约：{{item.keepAppointment}}
 					态度：{{item.attitude}}
