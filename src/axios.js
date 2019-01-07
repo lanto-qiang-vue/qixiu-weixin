@@ -70,26 +70,33 @@ axios.interceptors.response.use(
   	// for(let key in error){
   	// 	console.log(key)
     // }
-	 //  console.log('error.response', error.response.data.error)
+	 //  console.log('error.response', error.response)
 	  Indicator.close()
 	  // Toast({
 		//   message: error.response.data.error,
 		//   position: 'bottom',
 		//   duration: 2000
 	  // });
-    if(error.message == 'timeout of 10000ms exceeded'){
-      Toast({
-        message: '请求超时',
-        position: 'bottom',
-        duration: 2000
-      });
-    }else{
-	    Toast({
-		    message: '系统异常',
-		    position: 'bottom',
-		    duration: 2000
-	    });
-    }
+	if(error.response.status==400){
+	let msg= (error.response.data&& error.response.data.msg)? error.response.data.msg: '系统异常'
+		Toast({
+		message: msg,
+		// position: 'bottom',
+		duration: 2000
+	});
+	} else if(error.message == 'timeout of 10000ms exceeded'){
+		Toast({
+			message: '请求超时',
+			position: 'bottom',
+			duration: 2000
+		});
+	}else{
+		Toast({
+			message: '系统异常',
+			position: 'bottom',
+			duration: 2000
+		});
+	}
     return Promise.reject(error)
   });
 
