@@ -1,11 +1,11 @@
 <template>
-<div class="box">
-        <div v-show="showComment|| showComplaint &&flag1 &&flag2" class="button_wrap">
+<div class="box" >
+        <div v-show="(showComment|| showComplaint &&flag1 &&flag2) && showButton" class="button_wrap">
           <mt-button v-show="showComment" :class="{half: showComplaint}" @click="goRemark" type="primary" size="large">我要评价</mt-button>
           <mt-button v-show="showComplaint" :class="{half: showComment}" @click="goComplaint" type="primary" size="large">我要反馈</mt-button>
 	        <span class="other"></span>
         </div>
-        <div  :class="{bottom: showComment|| showComplaint &&flag1 &&flag2}">
+        <div  :class="{bottom: (showComment|| showComplaint &&flag1 &&flag2) &&showButton}">
           <div class="title">
             <img src="../assets/img/record/repairLog.png">
             <span>维修记录</span>
@@ -106,7 +106,7 @@
             <span>维修反馈</span>
           </div>
           <ul class="repairItem">
-            <li v-show="showComplaint" style="text-align: center">如果维修记录不正确，可向我们反馈</li>
+            <li v-show="showComplaint" style="text-align: center">暂无反馈</li>
             <li v-show="!showComplaint" class="complaint">
               {{getType(complaint.type)}}{{complaint.hasEvidence?'（有凭据）':''}}
               <span>{{complaint.createDate | FormatDate}}</span>
@@ -138,7 +138,14 @@ export default {
         flag2:false,
       }
    },
+	computed:{
+   	    showButton(){
+   	    	// console.log(this.$route)
+	        return this.$route.path== '/vehicleDetail-carOwner'
+        }
+	},
   mounted(){
+	  // console.log(this.$route)
      // console.log(this.$router.replaceState)
     let self= this
 

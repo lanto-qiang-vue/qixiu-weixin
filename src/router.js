@@ -80,7 +80,8 @@ export default new Router({
 
 		{path: '/carOwner-centre/carList', name: 'carList', component: resolve => require(['@/page/home/carOwner-centre/carList/carList'], resolve), meta: {requiresAuth: true}},
 		// {path: '/carOwner-centre/newCarList', name: 'newCarList', component: resolve => require(['@/page/home/carOwner-centre/carList/newCarList'], resolve), meta: {requiresAuth: true, keepAlive: true}},//新版维修记录
-		{path: '/carOwner-centre/carList-manager', name: 'carListManager', component: resolve => require(['@/page/home/carOwner-centre/carList/carList-manager'], resolve), meta: {requiresAuth: true}},
+		{path: '/carOwner-centre/carList-manager', name: 'carListManager', component: resolve => require(['@/page/home/carOwner-centre/carList/company-list'], resolve), meta: {requiresAuth: true}},
+		{path: '/record-list-manager', name: 'record-list-manager', component: resolve => require(['@/page/home/carOwner-centre/carList/record-list-manager'], resolve), meta: {requiresAuth: true}},
 		{path: '/government-service/government-service-list', name: 'governmentServiceList', component: resolve => require(['@/page/home/government-service/government-service-list'], resolve)},
 		{path: '/association-service/experts-detail', name: 'expertsDetail', component: resolve => require(['@/page/home/association-service/experts/experts-detail'], resolve), meta: {index: 40}},
 		{path: '/carOwner-centre/resume-manage', name: 'resumeManage', component: resolve => require(['@/page/home/carOwner-centre/resume-manage/resume-manage'], resolve), meta: {requiresAuth: true}},
@@ -109,7 +110,7 @@ export default new Router({
 		{path: '/login', name: 'login', component: resolve => require(['@/page/login'], resolve), meta: {index: 30}},
 		{path: '/register', name: 'register', component: resolve => require(['@/page/register'], resolve)},
 		{path: '/recordlist', name: 'recordlist', component: resolve => require(['@/page/recordList'], resolve), meta: {requiresAuth: true}},
-		{path: '/vehicleDetail', name: 'vehicleDetail', component: resolve => require(['@/page/vehicleDetail'], resolve), meta: {requiresAuth: true}},
+		{path: '/vehicleDetail', name: 'vehicleDetail', component: resolve => require(['@/page/vehicleDetail-carOwner'], resolve), meta: {requiresAuth: true}},
 		{path: '/vehicleDetail-carOwner', name: 'vehicleDetailCarOwner', component: resolve => require(['@/page/vehicleDetail-carOwner'], resolve), meta: {requiresAuth: true}},
 		{path: '/repairSearchList', name: 'repairSearchList', component: resolve => require(['@/page/repairSearchList'], resolve), meta: {requiresAuth: true}},
 		{path: '/setting', name: 'setting', component: resolve => require(['@/page/setting'], resolve), index: 30},
