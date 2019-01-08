@@ -5,7 +5,7 @@
         <input type="search" placeholder="查询企业名称" class="mui-input-clear" v-model='name' @keydown="getData($event,false, true)" style="padding-left: 35px; text-indent: 0;">
       </form>
     </div>
-    <div style="margin-top: 40px">
+    <div style="margin-top: 51px">
       <mt-loadmore  :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
         <ul>
           <li @click="goRecordList( item.companyName)"  class="block" v-for='(item, index) in carList' :key='index'>
@@ -64,13 +64,10 @@ export default {
 		    this.req(flag)
 	    }
 	    if (e &&e.keyCode == '13') {
-		    // e.target.blur()
-		    if (this.name.trim() == '') {
-			    Toast('请输入企业名称')
-			    return
-		    }
+
 		    if(clear){
 			    this.pageNo= 1
+			    this.carList= []
 		    }
 		    this.req(flag)
 	    }
