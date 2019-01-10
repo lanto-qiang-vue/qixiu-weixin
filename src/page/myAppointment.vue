@@ -17,7 +17,7 @@
                   <div class="lf fl"></div>
                   <!--<div @click.stop="deleteAppointment(item.id)" class="rht" style="float: right; color: #f00; padding: 2px 5px; border: 1px solid #f00; background: rgba(200,10,10,.1); border-radius: 3px;">删除</div>-->
                   <div class="ce">
-                    <h4>{{ item.company.name }}</h4>
+                    <h4 v-if="item.company">{{ item.company.name }}</h4>
                     <p style="color: #999;">{{ item.modifyTime | FormatDate }}</p>
                   </div>
                 </div>

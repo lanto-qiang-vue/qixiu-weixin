@@ -127,10 +127,11 @@ function weixinLogin() {
           Toast('此微信未绑定手机号，请手动登录')
         },1000)
 
-        // router.replace({ path: '/'})
+        router.replace({ path: '/'})
       }else {
         setTimeout(function () {
           Toast(res.data.status)
+	        router.replace({ path: '/login'})
         },1000)
       }
     })

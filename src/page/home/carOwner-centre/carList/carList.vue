@@ -139,9 +139,6 @@ export default {
 		    }else {
 			    this.carList = res.data.items
 		    }
-		    if (this.carList == null || this.carList.length == 0) {
-			    Toast('您还未绑定车辆')
-		    }
 		    if(arguments.length==1){
 			    this.$refs.loadmore.onTopLoaded()
 		    }
