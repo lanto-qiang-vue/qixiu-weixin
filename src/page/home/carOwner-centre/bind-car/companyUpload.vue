@@ -33,7 +33,8 @@
           <div style="height: 120px; position: relative;">
 	          <img id="drive_license" v-img :src="drivePic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
           </div>
-          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="uploadDriveLicense">拍摄正面</div>
+          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;">
+	          <upload operate='base64' @done="uploadDriveLicense"></upload>拍摄正面</div>
         </div>
       </div>
 
