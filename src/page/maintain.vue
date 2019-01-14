@@ -443,8 +443,11 @@
 			    if(clearList){
 				    this.list= res.data.content
 				    // 最近的点
-				    this.search.lng = parseFloat(res.data.content[0].lon);
-				    this.search.lat = parseFloat(res.data.content[0].lat);
+				    if(res.data.content.length){
+					    this.search.lng = parseFloat(res.data.content[0].lon);
+					    this.search.lat = parseFloat(res.data.content[0].lat);
+				    }
+
 			    }else{
 				    this.list= this.list.concat(res.data.content)
 			    }
@@ -638,8 +641,11 @@
           if(clearList){
             this.compList= datas
             // 最近的点
-            this.query.lon = parseFloat(datas[0].lon);
-            this.query.lat = parseFloat(datas[0].lat);
+	          if(datas.length){
+		          this.query.lon = parseFloat(datas[0].lon);
+		          this.query.lat = parseFloat(datas[0].lat);
+	          }
+
           }else{
             this.compList= this.compList.concat(datas)
           }

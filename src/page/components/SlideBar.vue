@@ -64,7 +64,7 @@
       	let name= this.moveLocation[this.showBody]
 	      for (let i in name){
       		if(name[i].now){
-		        this.resize(name[i].height, 10)
+		        this.resize(name[i].height, 0)
 	        }
 	      }
 
@@ -182,7 +182,7 @@
 			let name= this.moveLocation[this.showBody]
 			for (let i in name){
 				if(name[i].now){
-					this.resize(name[i].height, 10)
+					this.resize(name[i].height, 0)
 				}
 			}
 		},
