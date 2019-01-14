@@ -183,7 +183,7 @@ export default {
 
     },
     calcHeight(height){
-      let lh= parseInt(height - document.querySelector("#compDetail .info").offsetHeight)
+      let lh= parseInt(height - (document.querySelector("#compDetail .info")?document.querySelector("#compDetail .info").offsetHeight: 0))
       this.listHeight= (lh<0 ? 0 : lh)
     },
     closeDetail(){
