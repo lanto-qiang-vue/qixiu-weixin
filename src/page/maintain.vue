@@ -245,7 +245,7 @@
     mounted(){
 		this.init()
 
-
+	    this.setShowBody()
       // let that = this
       // this.Map = new BMap.Map("container")
       //
@@ -318,10 +318,7 @@
     },
     activated(){
       let self=this
-      // if(this.companyDetailAll.companyId){
-      //   mui('.mui-popover').popover('show', document.getElementById("popover"))
-      // }
-
+	    this.setShowBody()
       setTimeout(function () {
         self.renderMap()
         // self.bodyNoScoll()
@@ -911,6 +908,17 @@
           this.getCompList( true, true)
         }
       },
+	    setShowBody(){
+		    switch (this.$route.name){
+			    case 'remark-map':{
+				    this.$store.commit('setSlideShowBody', 'maintainList')
+				    break;
+			    }
+			    default :{
+
+			    }
+		    }
+	    }
     }
   }
 </script>

@@ -59,28 +59,16 @@
 	    // }
     },
     watch:{
-			'$route'(route){
-				let height= 50
-				// console.log('route', route)
-				switch (route.name){
-					case 'remark-map':{
-						$('.footer').hide()
-						height=0;
-						break;
-					}
-					default :{
-						height= 50
-						$('.footer').show()
-					}
-				}
-				this.footerHeight= height
-				this.resize(this.moveLocation[this.showBody][this.location].height, 10)
-			},
-      // showBody(){
-      //   let docHeight= $(document).height()- 50
-      //   let touchBarHeight= $('.touch-bar').outerHeight(true) //bar高度（20）
-      //   $('.slide-bar').css({transform: 'translateY('+ (docHeight- this.setBodyHeight- touchBarHeight) + 'px)'})
-      // },
+
+      showBody(){
+      	let name= this.moveLocation[this.showBody]
+	      for (let i in name){
+      		if(name[i].now){
+		        this.resize(name[i].height, 10)
+	        }
+	      }
+
+      },
       // setBodyHeight(val, oldVal){
       //   // console.log('setBodyHeight', val)
       //   if(this.show){
@@ -116,6 +104,9 @@
     },
     mounted(){
       this.location= this.toLocation
+
+	    this.needHideFooter()
+
       this.resize(this.moveLocation[this.showBody][this.location].height, 10)
       // this.$emit('toLocation', this.location)
       let self=this
@@ -186,6 +177,15 @@
         self.resize(docHeight- self.minTop -touchBarHeight)
       }
     },
+		activated(){
+			this.needHideFooter()
+			let name= this.moveLocation[this.showBody]
+			for (let i in name){
+				if(name[i].now){
+					this.resize(name[i].height, 10)
+				}
+			}
+		},
     deactivated(){
       document.body.removeEventListener('touchend', this.bodyScrollTop,false)
     },
@@ -224,7 +224,7 @@
         }, timeout);
         if(!noToMove){
 
-          // console.log('translateSlide', $(this.$refs.slide))
+          console.log('docHeight- calcHeight- touchBarHeight', docHeight- calcHeight- touchBarHeight)
           $(this.$refs.slide).css({transform: 'translateY('+ (docHeight- calcHeight- touchBarHeight) + 'px)'})
           // self.$store.commit('reSetSlideBodyHeight', calcHeight)
         }
@@ -282,9 +282,29 @@
             this.location= index
           }
         }
-      }
-    }
-	}
+      },
+	    needHideFooter(){
+			    let height= 50
+			    // console.log('route', route)
+			    switch (this.$route.name){
+				    case 'remark-map':{
+					    $('.footer').hide()
+					    height=0;
+					    break;
+				    }
+				    default :{
+					    height= 50
+					    $('.footer').show()
+				    }
+			    }
+			    // console.log('height', height)
+			    this.footerHeight= height
+			    // this.resize(this.moveLocation[this.showBody][this.location].height, 10)
+
+	    }
+    },
+
+}
 </script>
 
 <style scoped lang='less'>
