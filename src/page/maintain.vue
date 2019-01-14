@@ -702,13 +702,15 @@
 			      extData: this.pointList[i]
 		      })
 		      marker.on('click', (e) => {
-			      if (this.$route.query.mapType=='remarkMap'){
-				      this.$router.push({path: '/remarkMatch', query: { corpId: e.target.getExtData().sid }})
-			      }else{
-				      this.getCompanyDetail(e.target.getExtData())
+			      switch (this.$route.name){
+				      case 'remark-map':{
+					      this.$router.push({path: '/remarkMatch', query: { corpId: e.target.getExtData().sid }})
+					      break;
+				      }
+				      default :{
+					      this.getCompanyDetail(e.target.getExtData())
+				      }
 			      }
-
-
 		      })
 		      this.markers.push(marker)
 	      }

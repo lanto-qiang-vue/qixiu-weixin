@@ -61,12 +61,17 @@
     watch:{
 			'$route'(route){
 				let height= 50
-				if (route.query.mapType=='remarkMap'){
-					$('.footer').hide()
-					height=0
-				}else{
-					height= 50
-					$('.footer').show()
+				// console.log('route', route)
+				switch (route.name){
+					case 'remark-map':{
+						$('.footer').hide()
+						height=0;
+						break;
+					}
+					default :{
+						height= 50
+						$('.footer').show()
+					}
 				}
 				this.footerHeight= height
 				this.resize(this.moveLocation[this.showBody][this.location].height, 10)

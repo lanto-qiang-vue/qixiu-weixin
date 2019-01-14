@@ -33,7 +33,7 @@
               <img src="../../assets/img/home/查选维修.png"/>
               <p>查选维修</p>
             </router-link>
-            <router-link tag="li" to="/maintain?mapType=remarkMap">
+            <router-link tag="li" to="/remarkMap">
               <img src="../../assets/img/home/维修点评.png"/>
               <p>维修点评</p>
             </router-link>

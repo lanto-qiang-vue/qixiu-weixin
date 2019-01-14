@@ -272,15 +272,16 @@
         this.$store.commit('setMaintainListHistory', false)
       },
       goDetail(item){
-		    // console.log(item)
-        // this.$store.commit('setMaintainListHistory', false)
-	      if (this.$route.query.mapType=='remarkMap'){
-		      this.$router.push({path: '/remarkMatch', query: { corpId: item.sid }})
-	      }else{
-		      this.$emit('goMap', item)
-		      this.$store.commit('setMaintainDetail', item)
-		      // this.$store.commit('setMaintainListHistory', item)
-		      this.$store.commit('setSlideShowBody', 'maintainDetail')
+	      switch (this.$route.name){
+		      case 'remark-map':{
+			      this.$router.push({path: '/remarkMatch', query: { corpId: item.sid }})
+			      break;
+		      }
+		      default :{
+			      this.$emit('goMap', item)
+			      this.$store.commit('setMaintainDetail', item)
+			      this.$store.commit('setSlideShowBody', 'maintainDetail')
+		      }
 	      }
 
       },
