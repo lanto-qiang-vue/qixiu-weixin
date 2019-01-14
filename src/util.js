@@ -203,11 +203,17 @@ export const formatMoney =(val, decimals, dec_point, thousands_sep)=> {
 export const formatDate= (value1, format) => {
 	if (value1) {
 		// console.log('转化之前',value);
-		let value2= value1.replace(/-/g,'/')
-		let value = new Date(value2);
-		if(value=='Invalid Date'){
+		let value= null
+		if( typeof value1== 'string'){
+			let value2= value1.replace(/-/g,'/')
+			value = new Date(value2);
+			if(value=='Invalid Date'){
+				value= new Date(value1)
+			}
+		}else{
 			value= new Date(value1)
 		}
+
 		// console.log('转化hi后',value);
 		let o = {
 			"M+": value.getMonth() + 1, //month
