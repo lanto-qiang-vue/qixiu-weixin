@@ -24,7 +24,7 @@
               </div>
               <div class="mui-input-row second_input">
                 <mt-field placeholder="输入验证码" :attr="{ maxlength: 6 }" type="tel" v-model="code">
-                  <div style="width: 100px; height: 45px; color: #4285f4; line-height: 45px; text-align: center;" @click="flag && getCode($event)">获取验证码</div>
+                  <div style="width: 100px; height: 45px; color: #4285f4; line-height: 45px; text-align: center;" @click="flag && getCaptcha($event)">获取验证码</div>
                 </mt-field>
               </div>
             </form>
@@ -204,10 +204,10 @@
           this.axios({
             method: 'post',
             url: '/message/sms/sendsmscaptcha',
-            data: JSON.stringify({
+            data: {
               businessType: "10",
 	            mobileNo: this.tel,
-            })
+            }
           }).then(res=>{
             if(res.data.code === '0'){
               Toast('验证码发送成功,请及时查收!')

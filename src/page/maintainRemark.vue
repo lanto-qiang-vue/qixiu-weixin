@@ -16,7 +16,7 @@
         </div>
       </li>
       <li :to="{path:'/remarkDetail', query:{id: item.id}}" tag="li" v-for="(item, index) in list" :key="index">
-        <div class="left"><img v-if="item.photo" :src="item.photo"/></div>
+        <div class="left"><img v-if="item.photo" :src="item.photo.replace(/http/g, 'https')"/></div>
         <div class="right">
           <div class="name">车友：{{item.vehicleNum}} <span>{{item.createTime | FormatDate}}</span></div>
           <div class="avg">
