@@ -220,7 +220,8 @@
     },
     methods:{
 		  calcHeight(height){
-        let lh= parseInt(height - document.querySelector(".search-input").offsetHeight -
+        let lh= parseInt(height -
+	        (document.querySelector(".search-input")?document.querySelector(".search-input").offsetHeight:0) -
           (document.querySelector(".show")?document.querySelector(".show").offsetHeight: 0))
         this.listHeight= (lh<0 ? 0 : lh)
       },
