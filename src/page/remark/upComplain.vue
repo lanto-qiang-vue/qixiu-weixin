@@ -1,5 +1,5 @@
 <template>
-<div style="height: 100vh;overflow: auto;">
+<div>
   <mt-header title="反馈凭证" style="position: fixed;top: 0;width: 100%;z-index: 100"><mt-button icon="back" slot="left" @click="$router.go(-1)"></mt-button></mt-header>
   <div class="above">
     <div class="title"><i></i>请上传维修凭证（必填）<i></i></div>
@@ -8,9 +8,7 @@
       <!--<div class="pic">-->
         <img v-show="!!img" :src="img" data-preview-src="" data-preview-group="1"/>
       </div>
-      <p>拍摄/上传照片
-        <upload @done="getPic"></upload>
-      </p>
+      <p @click="$refs.toupload.clickBox()">拍摄/上传照片</p>
 
     </div>
   </div>
@@ -26,6 +24,7 @@
     </div>
   </div>
   <div :class="{on: true, submit:true}" @click="submit">提交</div>
+	<upload @done="getPic" ref="toupload"></upload>
 </div>
 </template>
 

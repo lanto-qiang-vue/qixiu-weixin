@@ -1,7 +1,6 @@
-//图片压缩上传按钮
+<!--//图片压缩上传按钮-->
 <template>
-    <!--<input ref="file" @change="getImg()" type="file" :accept="accept" :capture="isios? false: 'camera'">-->
-	<div class="compress-upload" @click="clickBox()">
+	<div class="compress-upload">
 		<input ref="file"  @change="getImg('file')" type="file" accept="image/*" capture="camera">
 		<input ref="file2"  @change="getImg('file2')" type="file" accept="image/*">
 		<mt-actionsheet style="z-index: 1"
@@ -9,7 +8,6 @@
 				v-model="sheetVisible">
 		</mt-actionsheet>
 	</div>
-
 </template>
 
 <script>
@@ -70,6 +68,7 @@ export default {
 	        }else{
 		        let formdata = new FormData();
 		        formdata.append('file' , base64ToBlob(base64), name);
+		        console.log(base64ToBlob(base64))
 		        this.axios({
 			        method: 'post',
 			        url: '/file/image/add',
@@ -89,8 +88,8 @@ export default {
 <style scoped lang="less">
 .compress-upload{
 	position: absolute;
-	height: 100%;
-	width: 100%;
+	height: 0;
+	width: 0;
 	left: 0;
 	top: 0;
 
@@ -103,6 +102,5 @@ export default {
 		width: 0;
 		height: 0;
 	}
-	/*overflow: hidden;*/
 }
 </style>

@@ -1,15 +1,16 @@
 <template>
   <div style="overflow: scroll; height: calc(100vh - 50px)">
     <!-- 已登录 -->
+	  <upload @done="changeAvatar" ref="upload"></upload>
     <div class="header" v-if="userInfo">
       <div class="text-one-cut" >
         <p>{{name}}</p>
         <u @click="goToSet"></u>
         <span class="telNum">{{ tel }}</span>
       </div>
-	    <div class="img">
+	    <div class="img" @click="toUpload">
 		    <img ref="headerImg" :src="picURL || '/static/img/home/user.png'"  alt="点击更换头像" style="width: 60px;height: 60px;border-radius: 100%">
-		    <upload @done="changeAvatar"></upload>
+
 	    </div>
 
     </div>
@@ -203,7 +204,10 @@
             num: this.tel
           }
         })
-      }
+      },
+	    toUpload(){
+    		this.$refs.upload.clickBox()
+	    }
     }
   }
 </script>

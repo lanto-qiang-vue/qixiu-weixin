@@ -5,7 +5,7 @@
         <button @click='chooseCategory($event)' type="button" :data-code='item.code' :class="{'active': item.code==code}" v-for='(item, i) in quetionsCategory' :key="i">{{ item.name }}</button>
       </div>
       <textarea name="" id="" cols="30" rows="5" v-model='text' placeholder="问得好，才能答的好。请描述您的问题，专家门诊会给您最满意的回复！"></textarea>
-      <div class="addPic"><upload @done="addClick"></upload></div>
+      <div class="addPic" @click="$refs.uploadpic.clickBox()"></div>
 
       <div class="imgsWrap mui-content-padded">
         <img v-for="(item, index) in picURL" :key="index" :src="item" v-img/>
@@ -32,6 +32,8 @@
     <button @click='sendProblem($event)' data-loading-text='提交中...' type="button" data-loading-icon="mui-spinner mui-spinner-custom" class="mui-btn sendProblem mui-btn-primary">发布问题</button>
 
     <input type="file" id="file" name="file" @change="imgPreview($event)" style="display: none"/>
+
+	  <upload @done="addClick" ref="uploadpic"></upload>
   </div>
 </template>
 

@@ -16,7 +16,8 @@
           <div style="height: 120px; position: relative;">
             <img id="business_license" v-img :src="businessPic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
           </div>
-          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;"><upload operate='base64' @done="uploadBusinessLicense"></upload>拍摄正面</div>
+          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="$refs.yyzzupload.clickBox()">拍摄正面</div>
+	        <upload operate='base64' @done="uploadBusinessLicense" ref="yyzzupload"></upload>
         </div>
 
         <div style="display: flex; justify-content: space-between; width: 80%; margin: 0 auto 10px;">
@@ -33,8 +34,8 @@
           <div style="height: 120px; position: relative;">
 	          <img id="drive_license" v-img :src="drivePic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
           </div>
-          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;">
-	          <upload operate='base64' @done="uploadDriveLicense"></upload>拍摄正面</div>
+          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="$refs.driveupload.clickBox()">拍摄正面</div>
+	        <upload operate='base64' @done="uploadDriveLicense" ref="driveupload"></upload>
         </div>
       </div>
 
