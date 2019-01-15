@@ -51,7 +51,7 @@
       <img src="../../assets/img/remark/chartico.png"/>
     </div>
     <div class="remarkbody">
-      <div class="head">{{companyDetail.name}}<em @click="$router.go(-2)">修改</em></div>
+      <div class="head">{{companyDetail.name|| $route.query.compName}}<em @click="$router.go(-2)">修改</em></div>
       <ul class="remarkstar">
         <li :data-index='index' v-for='(item, index) in satisfaction' :key='index'>
           <div class="left">{{ item.title }}</div>
@@ -150,13 +150,16 @@
 		  // console.log(this.$route)
 		  // console.log(this.$router)
       if(this.$route.query.show=='yes') this.remarkvisible=true
-      this.axios({
-	      method: 'get',
-	      baseURL: '/repairproxy',
-	      url: '/micro/search/company/repair/'+this.$route.query.corpId ,
-      }).then(res => {
-          this.companyDetail = res.data
-      })
+	    if(this.$route.query.corpId){
+		    this.axios({
+			    method: 'get',
+			    baseURL: '/repairproxy',
+			    url: '/micro/search/company/repair/'+this.$route.query.corpId ,
+		    }).then(res => {
+			    this.companyDetail = res.data
+		    })
+	    }
+
       // this.checklogin()
     },
     methods:{
