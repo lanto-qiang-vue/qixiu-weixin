@@ -246,73 +246,6 @@
 		this.init()
 
 	    this.setShowBody()
-      // let that = this
-      // this.Map = new BMap.Map("container")
-      //
-      // let point = new BMap.Point(that.query.lon, that.query.lat)           // 创建中心坐标
-      // that.Map.centerAndZoom(point, 14)                 // 初始化地图，设置中心点坐标和地图级别
-      // that.Map.addControl(new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_LEFT}))         //添加放大缩小控件
-      //
-      // that.GeolocationControl= new BMap.GeolocationControl({
-      //   anchor: BMAP_ANCHOR_TOP_RIGHT,
-      //   offset: new BMap.Size(10, 10),
-      //   locationIcon: new BMap.Icon("/static/img/user.png", new BMap.Size(0,0), {offset: new BMap.Size(0, 0)})
-      // })
-      // that.Map.addControl(that.GeolocationControl);
-      //
-      // that.GeolocationControl.addEventListener('locationSuccess', function (point) {
-      //   // console.log(point)
-      //   that.query.lon = point.point.lng
-      //   that.query.lat = point.point.lat
-      //
-      //   // that.sendAjax(false, false)
-      //   that.getList(true, true)
-      //
-      // })
-      //
-      // let dragx=0,dragy=0
-      // this.Map.addEventListener("dragstart", function(e) {
-      //   // console.log('dragstart',e.offsetX, e.offsetY)
-      //   dragx=e.offsetX
-      //   dragy=e.offsetY
-      // })
-      // this.Map.addEventListener("dragend", function(e) {
-      //   // console.log(e)
-      //   let drageDistance= that.Map.getDistance(new BMap.Point(e.point.lng, e.point.lat),
-      //     new BMap.Point(that.query.lon, that.query.lat)
-      //   )
-      //   that.clickMarkerClusterer()
-      //   // console.log(new BMap.Point(that.currentPoint.pointX, that.currentPoint.pointY))
-      //   // console.log(drageDistance)
-      //   if(Math.abs(e.offsetX- dragx)<50 && Math.abs(e.offsetY-dragy)<50 && drageDistance< 2000) return
-      //   that.query.lon = that.Map.getCenter().lng;
-      //   that.query.lat = that.Map.getCenter().lat;
-      //   // that.sendAjax(false, false)
-      //   that.getList(false, true)
-      //   that.showDetail=false
-      // })
-      //
-      // this.Map.addEventListener("touchstart", function(e) {
-      //   // console.log(e)
-      //   if(!e.bb && that.showDetail) {
-      //     that.showDetail=false
-      //     that.clickMarkerClusterer()
-      //   }
-      //   that.showSmallList=false
-      //
-      //   that.maintainListBlur= Math.random()
-      // })
-      // this.Map.addEventListener("zoomend", function(e) {
-      //   console.log('zoomend')
-      //   setTimeout(function () {
-      //     // that.renderMap()
-      //     that.clickMarkerClusterer()
-      //   },500)
-      // })
-      // // this.bodyNoScoll()
-      //
-      // this.getLocation();
-
 
 
     },
@@ -381,6 +314,8 @@
 				    this.map.addControl(this.geolocation);
 				    this.geolocation.getCurrentPosition();
 				    AMap.event.addListener(this.geolocation, 'complete', (result)=>{
+				    	// console.log('result', result)
+					    this.map.clearMap()
 					    this.map.setCenter(result.position)
 					    this.map.add(new AMap.Marker(result.position))
 					    this.search.lng= result.position.lng
@@ -388,6 +323,8 @@
 					    this.getCompList()
 				    });//返回定位信息
 				    AMap.event.addListener(this.geolocation, 'error', (err)=>{
+					    this.map.clearMap()
+				    	// console.log('err', err)
 					    this.getCity()
 				    });      //返回定位出错信息
 
@@ -548,81 +485,11 @@
           evt.preventDefault();
         }
       },
-      closePopupVisible2(){
-        this.popupVisible2 = !this.popupVisible2
-      },
-      getPhoneType(){
-        let sUserAgent = window.navigator.userAgent.toLowerCase()
-        let type = {
-          isIphone: sUserAgent.match(/iphone os/i) == "iphone os",
-          isAndriod: sUserAgent.match(/android/i) == "android",
-          isIpad: sUserAgent.match(/ipad/i) == "ipad"
-        }
-        return type
-      },
 
-      showPopVisible(){
-        if(this.searchCompanyType==='164'){
-          this.popupVisible=!this.popupVisible
-        }else {
-          Toast('仅筛选维修企业')
-        }
-      },
-
-
-      changeCompanyType(){
-        this.showDetail=false
-        this.companyTypeVisible=true
-        this.companycategory=''
-        this.corpAreaEq=''
-        this.corpName=''
-        this.magorBrandsLk=''
-        this.starLevel=''
-      },
-
-      chooseCompanyType(type, name){
-        this.searchCompanyName=name
-        this.companyTypeVisible=false
-        this.searchCompanyType=type
-        this.repairName=''
-        // this.sendAjax(true, false)
-      },
 
       openMap(){
         this.sheetVisible = !this.sheetVisible
       },
-
-      // getLocation() {  // 获取当前手机地理位置
-      //   let that = this;
-      //   let geolocation = new BMap.Geolocation();  // 开启SDK辅助定位
-      //   geolocation.getCurrentPosition(function(r){
-      //     if(this.getStatus() == BMAP_STATUS_SUCCESS){
-      //       that.query.lon = r.point.lng;
-      //       that.query.lat = r.point.lat;
-      //       let point = new BMap.Point(that.query.lon, that.query.lat)
-      //       let marker = new BMap.Marker(point);    // 创建标注
-      //       let myIcon = new BMap.Icon(that.userinfo.photo?that.userinfo.photo:"/static/img/user.png", new BMap.Size(50,50), {offset: new BMap.Size(0, 0)});
-      //       that.Map.addOverlay(marker,{icon: myIcon});
-      //       marker.setAnimation(BMAP_ANIMATION_BOUNCE);
-      //       that.Map.panTo(r.point)
-      //
-      //       let compname= that.$route.query.compname
-      //       if(compname){
-      //         that.toQuery()
-      //       }else{
-      //         // that.sendAjax()
-      //         that.getList(true, true)
-      //       }
-      //
-      //
-      //     }
-      //     else {
-      //       Toast('当前地理位置获取失败')
-      //       // that.sendAjax(true, false)
-      //     }
-      //   },{enableHighAccuracy: true})
-      //   // this.GeolocationControl.location()
-      // },
 
 
       getList( clearPoint, clearList){
