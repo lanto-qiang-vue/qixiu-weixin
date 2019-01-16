@@ -1,5 +1,11 @@
 <template>
-<div class="maintainList" v-show="maintainListShow">
+<div class="map-list">
+	<ul class="maintain-type">
+		<li v-for="(item, index) in maintainType" :class="{on : tagIsOn('is4s', item.value)}"
+		    @click="select('is4s', item.value)" :key="index">{{item.name}}</li>
+	</ul>
+<slide-bar v-show="show=='maintainList'" :minHeight="45" :toLocation="toLocation" @bodyHeight="height= $event;calcHeight">
+<div class="maintainList">
   <div class="search-input">
     <div class="left" :class="{on: !isFocus&& !search.q}">
       <input v-model="search.q" type="search" placeholder=' 搜索：企业名、地址、品牌、服务内容'
@@ -63,7 +69,7 @@
       </ul>
       <ul class="com-list">
         <div class="head"><span>智能推荐</span></div>
-        <li v-for="(item, index) in data" :key="index" @click="goDetail(item)">
+        <li v-for="(item, index) in list" :key="index" @click="goDetail(item)">
           <div class="picWrap">
             <img src="/static/img/shqxw.jpg" />
             <img class="tag" :src="item.is4s?'/static/img/maintain/tag-4s.png':'/static/img/maintain/tag-normal.png'"/>
@@ -92,22 +98,37 @@
   </div>
 
 </div>
+</slide-bar>
+</div>
 </template>
 
 <script>
-	export default {
-		name: "maintain-list",
-    props: ['data', 'blur', 'total', 'is4s', 'height', 'location', 'clickTouchBar'],
+import SlideBar from '@/page/components/SlideBar'
+export default {
+	name: "maintain-list",
+	components: { SlideBar},
+	props: [ 'blur', 'location'],
     data(){
-		  return{
-        maintainListShow: true,
-        isFocus: false,
+		return{
+			toLocation: 0,
+			height: 0,
+            isFocus: false,
 		    search:{
-          q:'',
-          area: '',
-          sort: '',
-          hot: ''
-        },
+			    type: '164',
+			    q: '',
+			    sort:'',
+			    area: '',
+			    is4s: '',
+			    hot: '',
+			},
+			total: 0,
+			limit: 10,
+			page: 1,
+			maintainType:[
+				{name: '全部', value: ''},
+				{name: '4S店', value: 'yes'},
+				{name: '维修厂', value: 'no'},
+			],
         area: [{name: '全部', value: ''}],
         sort:[
           {name: '默认', value: ''},
@@ -129,7 +150,8 @@
           {name: '汽车美容', value: '汽车美容'},
         ],
         showBlock: '',
-        compList:[],
+        list:[],
+			pointList:[],
         listHeight: 0,
         timer: null,
         allLoaded: false,
@@ -159,46 +181,12 @@
       },
       location(val){
         // if(val!=2) this.showBlock = ''
-      },
-      clickTouchBar(){
-        this.$refs.searchInput.focus()
+	      console.log('location', val)
       },
       height(val){
         // console.log('bodyHeightList', val)
         if (this.show=='maintainList') this.calcHeight(val)
-        // if (val> $(document).height()*.6 && !document.querySelector(".show")) {
-        //   // this.showBlock= 'button'
-        //   // setTimeout(()=>{
-        //   //   this.calcHeight(val)
-        //   // },500)
-        // }else{
-        //   this.showBlock = ''
-        //   setTimeout(()=>{
-        //     this.calcHeight(val)
-        //   },500)
-        // }
-      },
-      // show(val){
-      //   if(val=== 'maintainList'){
-      //   //   // this.compList= this.data
-      //   //   this.switchBlock('button')
-      //   //   this.maintainListShow= true
-      //   //   // this.$store.commit('setSlideBodyHeight', 300)
-      //   //   this.$store.commit('reSetSlideBodyHeight', 300)
-      //     this.$store.commit('setSlideMinHeight', 45)
-      //   //   // $(".maintainList .roll").scrollTop(0)
-      //   // }else{
-      //   //   this.maintainListShow= false
-      //   }
-      // },
-      data(datas){
-        // console.log('changedata')
-        if(this.clearList) $(".maintainList .roll").scrollTop(0)
-        else this.$refs.loadMore.onBottomLoaded()
-        if (datas.length>= this.total){
-          this.allLoaded= true
-        }else this.allLoaded= false
-        this.calcHeight(this.height)
+
       },
       is4s(){
         this.clearList= true
@@ -210,7 +198,7 @@
     },
     mounted(){
 		this.getArea()
-      this.calcHeight(this.height)
+      // this.calcHeight(this.height)
       $(".roll").bind('touchmove',function(e){
         e.stopPropagation();
       })
@@ -219,6 +207,23 @@
 		  // this.calcHeight(this.height)
     },
     methods:{
+	    calcQuery(limit){
+		    let is164= this.search.type== 164
+		    let query='?fl=type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,openHours,rating'+
+			    '&q='+ this.search.q +
+			    '&page='+ (this.page-1) +','+ (limit ||this.limit)
+		    if(is164) query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
+		    if(this.location.lng) query+=('&point='+this.location.lat+','+this.location.lng)
+		    let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
+		    if(this.search.area && is164) fq+= '+AND+areaKey:'+ this.search.area
+		    if(this.search.is4s && is164){
+			    is4s= (this.search.is4s=='yes' ? 'kw:4s': '-kw:4s')
+			    fq+= '+AND+' + is4s
+		    }
+		    query += fq
+
+		    return query
+	    },
 		  calcHeight(height){
         let lh= parseInt(height -
 	        (document.querySelector(".search-input")?document.querySelector(".search-input").offsetHeight:0) -
@@ -249,8 +254,52 @@
       toQuery(clearList){
 		    // console.log(clearList)
         this.clearList= clearList|| false
-        this.$emit('query', this.search, this.clearList);
+        // this.$emit('query', this.search, this.clearList);
+        this.getCompList(clearList, clearList)
       },
+	    getCompList(clearPoint, clearList){
+		    if(clearList) this.page=1
+		    else this.page++
+		    let query= this.calcQuery()
+		    this.axios({
+			    baseURL: '/repairproxy',
+			    url: '/micro/search/company'+ query,
+			    method: 'get',
+		    }).then( (res) => {
+			    let datas= res.data.content
+			    if(clearList){
+				    this.list= res.data.content
+			    }else{
+				    this.list= this.list.concat(res.data.content)
+			    }
+			    if(clearPoint){
+				    this.pointList= []
+			    }
+			    let hasPoint= false
+			    for (let i in datas) {
+				    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
+				    hasPoint= false
+				    for(let j in this.pointList){
+					    if(this.pointList[j].sid== datas[i].sid){
+						    hasPoint= true
+						    break
+					    }
+				    }
+				    if(!hasPoint) this.pointList.push(datas[i])
+			    }
+
+			    // this.calcPointList(res.data.content)
+			    this.total= res.data.totalElements
+
+			    if(clearList) $(".maintainList .roll").scrollTop(0)
+			    if(this.page!=1) this.$refs.loadMore.onBottomLoaded()
+			    if (this.list.length>= this.total){
+				    this.allLoaded= true
+			    }else this.allLoaded= false
+			    // this.renderMap()
+			    this.$emit('renderMap', this.pointList);
+		    })
+	    },
 	    getArea(){
 		    this.axios.get('/area/query').then( (res) => {
 			    this.area.push(...res.data.items)
@@ -262,7 +311,7 @@
         }
       },
       cancel(){
-        this.$emit('toLocation', 0);
+        this.toLocation=0
         this.search.q='';
         this.search.area= ''
         this.search.sort= ''
@@ -294,7 +343,7 @@
         //   this.$store.commit('reSetSlideBodyHeight', $(document).height())
         // },200)
 
-        this.$emit('toLocation', 2)
+        this.toLocation=2
         setTimeout(()=>{
           this.calcHeight(this.height)
           $("body").scrollTop(0)
@@ -339,6 +388,27 @@
 <style scoped lang='less'>
   @blue-color: #008bff;
   @bottom-border-color: #f2f2f2;
+  .maintain-type{
+	  width: 100%;
+	  height: 30px;
+	  line-height: 30px;
+	  font-size: 14px;
+	  border-bottom: 1px solid #f0f0f0;
+	  position: fixed;
+	  top: 0;
+	  left: 0;
+	  background-color: white;
+	  li{
+		  width: 33%;
+		  height: 100%;
+		  text-align: center;
+		  color:  #9d9d9d;
+		  display: inline-block;
+	  }
+	  li.on{
+		  color: black;
+	  }
+  }
 .maintainList>ul *{
   transition: all .5s;
 }

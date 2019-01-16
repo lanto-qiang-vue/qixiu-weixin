@@ -1,9 +1,9 @@
 <template>
 <div class="slide-bar" ref="slide">
   <!--<div class="real-touch-bar"></div>-->
-  <div class="touch-bar" @click="clickTouchBar= Math.random()"><i></i></div>
+  <div class="touch-bar" ><i></i></div>
   <div class="slide-body">
-    <slot :height="bodyHeight" :location="location" :clickTouchBar="clickTouchBar"></slot>
+    <slot></slot>
   </div>
 </div>
 </template>
@@ -11,12 +11,11 @@
 <script>
 	export default {
 		name: "slide-bar",
-    props: ['show', 'toLocation', 'minHeight', 'init'],
+    props: [  'minHeight', 'init', 'toLocation'],
     data(){
 		  return {
         timer: null,
         first: true,
-        clickTouchBar: 0,
         moveLocation: {
           'maintainList':[
             {now: false, height: 1},
@@ -36,27 +35,11 @@
       }
     },
     computed: {
-      // slideState(){
-      //   return this.$store.state.slideState
-      // },
-      // setBodyHeight(){
-      //   return this.$store.state.slideState.setBodyHeight
-      // },
+
       showBody(){
         return this.$store.state.app.slideState.showBody
       },
-	    // footerHeight(){
-      	// console.log('footerHeight')
-      	//     let height= 50
-      	//     if (this.$route.query.mapType=='remarkMap'){
-      	//     	$('.footer').hide()
-	    //         height=0
-         //    }else{
-	    //         height= 50
-	    //         $('.footer').show()
-         //    }
-         //    return height
-	    // }
+
     },
     watch:{
 
@@ -69,33 +52,13 @@
 	      }
 
       },
-      // setBodyHeight(val, oldVal){
-      //   // console.log('setBodyHeight', val)
-      //   if(this.show){
-      //     // this.translateSlide(val)
-      //     // this.resize(val, 0)
-      //     let upOrDown= val- oldVal> 0? 'down': 'up'
-      //     this.autoMove(100, upOrDown, val)
-      //   }
-      // },
-      // show(val){
-      //   if(val){
-      //     let translateY= parseInt($(this.$refs.slide).css('transform').split(',')[5])
-      //     this.resize($(document).height()- 50- $('.touch-bar').outerHeight(true)- translateY, 100)
-      //   }
-      // }
+
       toLocation(val){
-        console.log('slide-bar.toLocation', val)
+        // console.log('slide-bar.toLocation', val)
         this.location= val
       },
       location(val){
-        console.log('slide-bar.location', val)
-        for (let i in this.moveLocation[this.showBody]){
-          this.moveLocation[this.showBody][parseInt(i)].now= false
-        }
-        this.moveLocation[this.showBody][val].now= true
-        this.resize(this.moveLocation[this.showBody][val].height, 10)
-        this.$emit('toLocation', val)
+        this.changeLocation(val)
       },
       init(){
         this.resize(this.moveLocation[this.showBody][this.location].height, 10)
@@ -103,7 +66,7 @@
       }
     },
     mounted(){
-      this.location= this.toLocation
+      // this.location= this.toLocation
 
 	    this.needHideFooter()
 
@@ -122,7 +85,7 @@
       // $(dom).css({transform: 'translateY('+ (docHeight- this.setBodyHeight - touchBarHeight) + 'px)'})
       // $(dom).css({transform: 'translateY('+ this.slideState.minTop+ 'px);'})
       dom.bind('touchstart',function(startE){
-        console.log('touchstart')
+        // console.log('touchstart')
       // dom.children('.real-touch-bar').bind('touchstart',function(startE){
         startY= startE.originalEvent.targetTouches[0].pageY;
         domY = parseInt(dom.css('transform').split(',')[5])
@@ -130,7 +93,7 @@
         moveY=0
         document.body.addEventListener('touchmove',self.noscroll,{ passive: false });
         $(document).bind('touchmove',function(e){
-          console.log('touchmove')
+          // console.log('touchmove')
           if(e.originalEvent.targetTouches[0].pageY>startY) isMove= 'down'
           if(e.originalEvent.targetTouches[0].pageY<startY) isMove= 'up'
 
@@ -161,7 +124,7 @@
         endY= endE.originalEvent.changedTouches[0].pageY
         // console.log('move', endY- startY)
         if(isMove){
-          console.log('isMove',isMove)
+          // console.log('isMove',isMove)
           self.autoMove(endY- startY, isMove, docHeight- parseInt(dom.css('transform').split(',')[5])- touchBarHeight)
           // self.resize(docHeight- self.slideState.minTop -touchBarHeight, 0)
           // self.resize(1, 0)
@@ -193,7 +156,7 @@
       document.body.removeEventListener('touchend', this.bodyScrollTop,false)
     },
     methods:{
-		  bodyScrollTop(){
+	  bodyScrollTop(){
         if($('body').scrollTop()!= 0 ) $('body').scrollTop(0)
       },
       noscroll(evt) {
@@ -201,8 +164,17 @@
           if (!this.translateY) event.preventDefault();
         }
       },
+	    changeLocation(val){
+		    // console.log('slide-bar.location', val)
+		    for (let i in this.moveLocation[this.showBody]){
+			    this.moveLocation[this.showBody][parseInt(i)].now= false
+		    }
+		    this.moveLocation[this.showBody][val].now= true
+		    this.resize(this.moveLocation[this.showBody][val].height, 10)
+		    this.$emit('toLocation', val)
+	    },
       resize(height, time, noToMove){
-        // console.log('resize', height)
+        // console.log('resize.height,this.minHeight', height, this.minHeight)
         let self= this
         let timeout= (time=== undefined? 500: time)
         let docHeight= $(document).height()- this.footerHeight
@@ -220,30 +192,16 @@
           // self.bodyHeight= height
           // self.$store.commit('setSlideBodyHeight', calcHeight)
           self.bodyHeight= calcHeight
+	        self.$emit('bodyHeight', calcHeight);
           // self.$store.commit('reSetSlideBodyHeight', height)
         }, timeout);
         if(!noToMove){
 
-          console.log('docHeight- calcHeight- touchBarHeight', docHeight- calcHeight- touchBarHeight)
+          // console.log('docHeight- calcHeight- touchBarHeight', docHeight, calcHeight, touchBarHeight)
           $(this.$refs.slide).css({transform: 'translateY('+ (docHeight- calcHeight- touchBarHeight) + 'px)'})
           // self.$store.commit('reSetSlideBodyHeight', calcHeight)
         }
       },
-      // translateSlide(val){
-      //   let docHeight= $(document).height()- 50
-      //   let touchBarHeight= $('.touch-bar').outerHeight(true) //bar高度（20）
-      //   let bodyHeight= val
-      //   if(bodyHeight> docHeight- this.slideState.minTop-touchBarHeight){
-      //     bodyHeight= docHeight- this.slideState.minTop-touchBarHeight
-      //     // this.first= false
-      //   }
-      //   if(bodyHeight< this.slideState.minHeight)
-      //     bodyHeight= this.slideState.minHeight
-      //   // console.log('translateSlide', $(this.$refs.slide))
-      //   $(this.$refs.slide).css({transform: 'translateY('+ (docHeight- bodyHeight- touchBarHeight) + 'px)'})
-      //   // $('.slide-bar').css({transform: 'translateY('+ (docHeight- bodyHeight- touchBarHeight) + 'px)'})
-      //   this.resize(bodyHeight, 0, true)
-      // },
 
       /**
        * @param {moveNumber} 滑动距离
@@ -272,13 +230,13 @@
           if (upOrDown=='up') {
             arr[index+1].now= true
             this.resize(arr[index+1].height, 10)
-            // this.$emit('toLocation', index+1)
+            this.$emit('toLocation', index+1)
             this.location= index+1
           }
           else {
             arr[index].now= true
             this.resize(arr[index].height, 10)
-            // this.$emit('toLocation', index)
+            this.$emit('toLocation', index)
             this.location= index
           }
         }

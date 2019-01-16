@@ -1,9 +1,10 @@
 <template>
-<!--<div id="compDetail">-->
-<div id="compDetail" v-show="maintainDetailShow">
+<div id="compDetail">
+	<slide-bar v-show="show=='maintainDetail'" :minHeight="minHeight" :toLocation="toMaintainDetailLocation" @bodyHeight="height= $event;calcHeight" ref="slideBar" @toLocation="toMaintainDetailLocation= $event">
+<div>
 <img class="close" @click="closeDetail" src="../assets/img/maintain/关闭.png" />
 <div class="info" >
-  <div class="head">{{all.name}}<span :class="{rest: !isOpenTime(all.openHours)}">{{isOpenTime(all.openHours)?'营业中': '休息中'}}</span></div>
+  <div class="head">{{all.name}}<span :class="{rest: !isOpenTime}">{{isOpenTime?'营业中': '休息中'}}</span></div>
   <div class="text address">{{all.addr}}</div>
   <div class="avg">
     <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(all.rating)||0" :key="'yellow'+index">
@@ -87,15 +88,28 @@
 </div>
 
 </div>
+	</slide-bar>
+	<maintain-bottom  @openMap="sheetVisible=true;companyDetail=$event" @toLocation="toMaintainDetailLocation= $event"
+	:location="toMaintainDetailLocation"></maintain-bottom>
+	<mt-actionsheet
+			style="z-index: 16"
+			:actions="actions"
+			v-model="sheetVisible">
+	</mt-actionsheet>
+</div>
 </template>
 
 <script>
 import { Toast } from 'mint-ui'
+import SlideBar from '@/page/components/SlideBar'
+import maintainBottom from '@/page/maintainBottom'
 export default {
   name: "mantain-detail",
+	components:{SlideBar, maintainBottom},
   // props: ['id','distance', 'random', 'searchCompanyType', 'showDetail', 'height'],
-  props: ['height'],
+  // props: ['height'],
   data() {
+	  let _this  = this
     return {
       all: {},
 
@@ -103,8 +117,28 @@ export default {
 
       comment:{},
 
+	    actions: [{
+		    name: '高德地图',
+		    method(){
+			    let name= _this.companyDetail.name
+			    window.location.href = `http://uri.amap.com/marker?position=${_this.all.lon},${_this.all.lat}&name=${name}&src=上海汽修平台&coordinate=wgs84&callnative=1`
+		    }
+	    },
+		    {
+			    name: '百度地图',
+			    method(){
+				    let name= _this.all.name
+				    let address= _this.all.addr
+				    // window.location.href = `http://api.map.baidu.com/marker?location=${_this.all.lat},${_this.all.lon}&title=${name}&content=${address}&output=html&src=上海汽修平台`
+				    window.location.href = `http://api.map.baidu.com/geocoder?address=${address}&output=html&src=上海汽修平台`
+			    }
+		    }],
+	    sheetVisible: false,
       maintainDetailShow: false,
-      listHeight: 300
+	    height: 300,
+      listHeight: 300,
+	    minHeight: 0,
+	    toMaintainDetailLocation: 0,
     }
   },
   computed: {
@@ -115,6 +149,23 @@ export default {
     maintainDetail(){
       return this.$store.state.app.maintainDetail
     },
+	  isOpenTime(){
+		  console.log('isOpenTime')
+		  let sTime=0, eTime=0, now=0;
+		  if(!this.all.openHours) return true
+		  let timeStrs= this.all.openHours.replace(/~/g,'-')
+		  timeStrs= timeStrs.replace(/ /g,'')
+		  timeStrs= timeStrs.replace(/：/g,':')
+		  timeStrs= timeStrs.replace(/;/g,':')
+		  console.log(timeStrs)
+		  if(timeStrs.indexOf('-')<0 ||timeStrs.indexOf(':')<0) return true
+		  sTime= parseInt(timeStrs.split('-')[0].split(':')[0])*60+ parseInt(timeStrs.split('-')[0].split(':')[1])
+		  eTime= parseInt(timeStrs.split('-')[1].split(':')[0])*60+ parseInt(timeStrs.split('-')[1].split(':')[1])
+		  now= (new Date()).getHours()* 60+ (new Date()).getMinutes()
+		  // console.log(sTime, eTime, now)
+		  if(sTime <= now && now<= eTime) return true
+		  else return false
+	  },
   },
   watch: {
     maintainDetail(){
@@ -126,7 +177,7 @@ export default {
   },
 
   mounted(){
-    let self= this
+    console.log('maintainDetail.mounted')
     if(this.show=== 'maintainDetail') this.getData()
     $(".list").bind('touchmove',function(e){
       // if($(this).scrollTop()<=1) $(this).scrollTop(2)
@@ -159,11 +210,18 @@ export default {
 			    // console.log('$("#compDetail .info").outerHeight()',$("#compDetail .info").outerHeight())
 			    // self.$store.commit('reSetSlideBodyHeight', $("#compDetail .info").outerHeight())
 			    // self.$store.commit('setSlideMinHeight', $("#compDetail .info").outerHeight())
+			    this.toMaintainDetailLocation= 0
+			    this.minHeight= $("#compDetail .info").outerHeight()
+			    // this.$emit('minHeight', $("#compDetail .info").outerHeight())
+			    setTimeout( ()=> {
+				    this.$refs.slideBar.changeLocation(this.toMaintainDetailLocation)
+				    $("#compDetail .list").scrollTop(0)
+			    },0)
 
-			    this.$emit('minHeight', $("#compDetail .info").outerHeight())
+			    // this.toMaintainDetailLocation=0
 			    this.$emit('toLocation', 0)
 			    this.$emit('init')
-		    },0)
+		    },5)
 
 	    })
 
@@ -204,22 +262,7 @@ export default {
         case 4: return "空壳"; break;
       }
     },
-    isOpenTime(timeStr){
-      let sTime=0, eTime=0, now=0;
-      if(!timeStr) return true
-      let timeStrs= timeStr.replace(/~/g,'-')
-      timeStrs= timeStrs.replace(/ /g,'')
-      timeStrs= timeStrs.replace(/：/g,':')
-      timeStrs= timeStrs.replace(/;/g,':')
-      console.log(timeStrs)
-      if(timeStrs.indexOf('-')<0 ||timeStrs.indexOf(':')<0) return true
-      sTime= parseInt(timeStrs.split('-')[0].split(':')[0])*60+ parseInt(timeStrs.split('-')[0].split(':')[1])
-      eTime= parseInt(timeStrs.split('-')[1].split(':')[0])*60+ parseInt(timeStrs.split('-')[1].split(':')[1])
-      now= (new Date()).getHours()* 60+ (new Date()).getMinutes()
-      // console.log(sTime, eTime, now)
-      if(sTime <= now && now<= eTime) return true
-      else return false
-    },
+
     hide( content) {
       return content.substr(0,2)+"****"+content.substr(content.length-1,1)
     },
@@ -242,12 +285,12 @@ export default {
   z-index: 20;
   background-color: white;
   transition: all 0.3s;
-  position: relative;
+  /*position: relative;*/
   /*padding: 0 15px;*/
   .close{
     position: absolute;
-    top: -10px;
-    right: 15px;
+    top: 6px;
+    right: 6px;
     width: 26px;
     z-index: 1;
   }

@@ -1,83 +1,36 @@
 <template>
   <div id="allmap" >
-    <!--<mt-popup v-model="companyTypeVisible" style="border-radius: 10px; overflow: hidden;">-->
-      <!--<ul class="mui-table-view company_type_list">-->
-        <!--<li class="mui-table-view-cell" @click="chooseCompanyType('164', '维修企业')">维修企业</li>-->
-        <!--<li class="mui-table-view-cell" @click="chooseCompanyType('166', '综合检测站')">综合检测站</li>-->
-        <!--<li class="mui-table-view-cell" @click="chooseCompanyType('213', '施救牵引企业')">施救牵引企业</li>-->
-        <!--<li class="mui-table-view-cell" @click="chooseCompanyType('214', '危运车辆维修')">危运车辆维修</li>-->
-        <!--<li class="mui-table-view-cell" @click="chooseCompanyType('215', '新能源汽车维修')">新能源汽车维修</li>-->
-      <!--</ul>-->
-    <!--</mt-popup>-->
-    <!--<mt-header title="维修服务">-->
-      <!--<span slot="right" @click="changeCompanyType">{{ searchCompanyName }}</span>-->
-    <!--</mt-header>-->
-    <ul class="maintain-type">
-      <li v-for="(item, index) in maintainType" :class="{on : tagIsOn('is4s', item.value)}"
-          @click="select('is4s', item.value)"
-      >{{item.name}}</li>
-    </ul>
 
     <div class='search'>
-      <!--顶部筛选搜索框开始-->
-      <!--<div class="search_wrap">-->
-        <!--<span @click='showPopVisible' :class="{on: (type||level||area||brand)?true:false}">筛选</span>-->
-        <!--&lt;!&ndash;<form action="javascript:return true;">&ndash;&gt;-->
-        <!--<input id='search_repaire' class="mui-input-clear" type="search" v-model.trim='repairName' placeholder="搜索维修站点" @keydown="key($event)">-->
-        <!--&lt;!&ndash;</form>&ndash;&gt;-->
-        <!--<div class="to_search" @click="key('search')">搜索</div>-->
-      <!--</div>-->
-      <!--顶部筛选搜索框结束-->
+
       <div class="fixGuide">
         <img src="/static/img/maintain/location.png"/>
         <div class="fixGuideClick" @click="goLatePoint"></div>
       </div>
-      <!-- 地图容器开始 -->
-      <div id="container">
-      </div>
-      <!-- 地图容器结束 -->
+
+      <div id="container"></div>
+
     </div>
 
-    <slide-bar @maintainListBlur="maintainListBlur=Math.random()" v-show="show=='maintainList'" :show="show=='maintainList'"
-               @toLocation="toMaintainListLocation= $event" :toLocation="toMaintainListLocation" :minHeight="45" >
-      <maintain-list :data="list" :blur="maintainListBlur" :total="total" :is4s="query.is4s"
-                     slot-scope="maintainList" :height="maintainList.height" :location="maintainList.location"
-                     @toLocation="toMaintainListLocation= $event" :clickTouchBar="maintainList.clickTouchBar"
-                     @query="queryByList" @goMap="goMap($event)"></maintain-list>
-    </slide-bar>
 
-    <slide-bar v-show="show=='maintainDetail'" :show="show=='maintainDetail'" :minHeight="maintainDetailMinHeight"
-               @toLocation="toMaintainDetailLocation= $event" :toLocation="toMaintainDetailLocation" :init="initSlide">
-      <comp_detail slot-scope="maintainDetail" :height="maintainDetail.height" @toLocation="toMaintainDetailLocation= $event"
-                   @minHeight="maintainDetailMinHeight= $event" @init="initSlide= Math.random()"></comp_detail>
-    </slide-bar>
-
-    <maintain-bottom  @openMap="sheetVisible=true;companyDetail=$event" @toLocation="toMaintainDetailLocation= $event"
-                      :location="toMaintainDetailLocation"></maintain-bottom>
+	<maintain-list ref="maintainList" :location="location" @renderMap="pointList=$event; renderMap()"></maintain-list>
+	<maintain-detail ref="maintainDetail" ></maintain-detail>
 
 
-
-    <mt-actionsheet
-      style="z-index: 16"
-      :actions="actions"
-      v-model="sheetVisible">
-    </mt-actionsheet>
 
   </div>
 </template>
 
 <script>
   import { Toast,  Actionsheet, Indicator } from 'mint-ui'
-  import comp_detail from './maintainDetail.vue'
-  import SlideBar from './components/SlideBar'
-  import maintainList from './maintainList'
-  import maintainBottom from './maintainBottom'
+  import maintainDetail from '@/page/maintainDetail.vue'
+  import maintainList from '@/page/maintainList'
   export default {
     name: 'maintain',
+	  components: {maintainDetail,  maintainList},
     data() {
       let _this  = this
       return {
-        companyTypeVisible: false,
         searchCompanyType: '164',    // 企业类型
         searchCompanyName: '维修企业',
         points: [],
@@ -158,11 +111,7 @@
 
         GeolocationControl: null,
 
-        maintainType:[
-	        {name: '全部', value: ''},
-	        {name: '4S店', value: 'yes'},
-	        {name: '维修厂', value: 'no'},
-        ],
+
         query:{
           "area": '',
           "is4s": '',
@@ -198,6 +147,11 @@
 
 	      indicator: null,
 
+	      location:{
+		      lng: '121.480236',
+		      lat: '31.236301'
+	      },
+
         showList: false,
         maintainListBlur: false,
         // maintainListLocation: 0,
@@ -208,38 +162,11 @@
         initSlide: null
       }
     },
-    components: {comp_detail, SlideBar, maintainList, maintainBottom},
+
     computed: {
       show(){
         return this.$store.state.app.slideState.showBody
       },
-    },
-    created(){
-      if(this.$route.query.type){
-        if(this.$route.query.type==="166"){
-          this.searchCompanyName="综合检测站"
-          this.searchCompanyType='166'
-        }else if(this.$route.query.type==="213"){
-          this.searchCompanyName="施救牵引企业"
-          this.searchCompanyType='213'
-        }else if(this.$route.query.type==="214"){
-          this.searchCompanyName="危运车辆维修企业"
-          this.searchCompanyType='214'
-        }else if(this.$route.query.type==="215"){
-          this.searchCompanyName="新能源汽车维修"
-          this.searchCompanyType='215'
-        }else if(this.$route.query.type==="164"){
-          this.searchCompanyName="维修企业"
-          this.searchCompanyType='164'
-        }
-      }else {
-        this.searchCompanyName="维修企业"
-        this.searchCompanyType='164'
-      }
-      if(localStorage.getItem("USERINFO")){
-        this.userinfo = JSON.parse(localStorage.getItem("USERINFO"))
-      }
-
     },
 
     mounted(){
@@ -272,7 +199,7 @@
 		    });
 		    this.map= new AMap.Map('container',{
 			    center: new AMap.LngLat(this.search.lng, this.search.lat),
-			    zoom: 10,
+			    zoom: 14,
 		    });
 		    // 同时引入工具条插件，比例尺插件和鹰眼插件
 		    AMap.plugin(['AMap.ToolBar',], () => {
@@ -280,7 +207,7 @@
 			    this.map.addControl(new AMap.ToolBar({
 				    locate: false,
 				    position: 'LT',
-				    offset: new AMap.Pixel(0,25)
+				    offset: new AMap.Pixel(0,55)
 			    }));
 		    });
 
@@ -292,8 +219,8 @@
 
 		    this.map.on('dragend', () => {
 			    let center= this.map.getCenter()
-			    this.search.lng= center.lng
-			    this.search.lat= center.lat
+			    this.location.lng= center.lng
+			    this.location.lat= center.lat
 			    this.getCompList(false, true)
 		    });
 
@@ -308,7 +235,7 @@
 			    AMap.plugin('AMap.Geolocation', () => {
 				    this.geolocation = new AMap.Geolocation({
 					    buttonPosition: 'RT',
-					    buttonOffset: new AMap.Pixel(10,10),
+					    buttonOffset: new AMap.Pixel(10,40),
 					    timeout: 2000,
 				    });
 				    this.map.addControl(this.geolocation);
@@ -320,7 +247,7 @@
 					    this.map.add(new AMap.Marker(result.position))
 					    this.search.lng= result.position.lng
 					    this.search.lat= result.position.lat
-					    this.getCompList()
+					    this.getCompList(true, true)
 				    });//返回定位信息
 				    AMap.event.addListener(this.geolocation, 'error', (err)=>{
 					    this.map.clearMap()
@@ -345,7 +272,7 @@
 						    // console.log('this.map.add(new AMap.Marker( center))')
 						    this.search.lng= center.lng
 						    this.search.lat= center.lat
-						    this.getCompList()
+						    this.getCompList(true, true)
 						    // this.initPiontList()
 					    })
 				    }else{
@@ -354,7 +281,7 @@
 					    this.map.add(new AMap.Marker( {
 						    position: center
 					    }))
-					    this.getCompList()
+					    this.getCompList(true, true)
 				    }
 			    })
 		    });
@@ -368,51 +295,52 @@
         }
       },
 	    getCompList(clearPoint, clearList){
-		    if(clearList) this.page=1
-		    else this.page++
-		    let query= this.calcQuery()
-		    this.axios({
-			    baseURL: '/repairproxy',
-			    url: '/micro/search/company'+ query,
-			    method: 'get',
-		    }).then( (res) => {
-		    	let datas= res.data.content
-			    if(clearList){
-				    this.list= res.data.content
-				    // 最近的点
-				    if(res.data.content.length){
-					    this.search.lng = parseFloat(res.data.content[0].lon);
-					    this.search.lat = parseFloat(res.data.content[0].lat);
-				    }
-
-			    }else{
-				    this.list= this.list.concat(res.data.content)
-			    }
-			    if(clearPoint){
-				    this.pointList= []
-				    for( let i in datas){
-					    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
-					    this.pointList.push(datas[i])
-				    }
-			    }else{
-				    let hasPoint= false
-				    for (let i in datas) {
-					    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
-					    hasPoint= false
-					    for(let j in this.pointList){
-						    if(this.pointList[j].sid== datas[i].sid){
-							    hasPoint= true
-							    break
-						    }
-					    }
-					    if(!hasPoint) this.pointList.push(datas[i])
-				    }
-			    }
-
-			    // this.calcPointList(res.data.content)
-			    this.total= res.data.totalElements
-			    this.renderMap()
-		    })
+    		this.$refs.maintainList.getCompList(clearPoint, clearList)
+		    // if(clearList) this.page=1
+		    // else this.page++
+		    // let query= this.calcQuery()
+		    // this.axios({
+			 //    baseURL: '/repairproxy',
+			 //    url: '/micro/search/company'+ query,
+			 //    method: 'get',
+		    // }).then( (res) => {
+		    // 	let datas= res.data.content
+			 //    if(clearList){
+				//     this.list= res.data.content
+				//     // 最近的点
+				//     if(res.data.content.length){
+				// 	    this.search.lng = parseFloat(res.data.content[0].lon);
+				// 	    this.search.lat = parseFloat(res.data.content[0].lat);
+				//     }
+		    //
+			 //    }else{
+				//     this.list= this.list.concat(res.data.content)
+			 //    }
+			 //    if(clearPoint){
+				//     this.pointList= []
+				//     for( let i in datas){
+				// 	    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
+				// 	    this.pointList.push(datas[i])
+				//     }
+			 //    }else{
+				//     let hasPoint= false
+				//     for (let i in datas) {
+				// 	    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
+				// 	    hasPoint= false
+				// 	    for(let j in this.pointList){
+				// 		    if(this.pointList[j].sid== datas[i].sid){
+				// 			    hasPoint= true
+				// 			    break
+				// 		    }
+				// 	    }
+				// 	    if(!hasPoint) this.pointList.push(datas[i])
+				//     }
+			 //    }
+		    //
+			 //    // this.calcPointList(res.data.content)
+			 //    this.total= res.data.totalElements
+			 //    this.renderMap()
+		    // })
 	    },
 	    calcQuery(limit){
 		    let is164= this.search.type== 164
@@ -431,32 +359,7 @@
 
 		    return query
 	    },
-	    // initPiontList(){
-		 //    let query= this.calcQuery(20)
-		 //    this.axios({
-			//     baseURL: '/repair',
-			//     url: '/micro/search/company'+ query,
-			//     method: 'get',
-		 //    }).then( (res) => {
-			//     this.calcPointList(res.data.content)
-		 //    })
-	    // },
-	    // calcPointList(list){
-		 //    let hasPoint= false
-		 //    let points= this.pointList
-		 //    for(let i in list){
-			//     if(list[i].kw.indexOf('4s')>=0) list[i].is4s= true
-			//     hasPoint= false
-			//     for(let j in points){
-			// 	    if(points[j].sid == list[i].sid){
-			// 		    hasPoint= true
-			// 		    break
-			// 	    }
-			//     }
-			//     if(!hasPoint) this.pointList.push(list[i])
-		 //    }
-		 //    this.renderMap()
-	    // },
+
 
       bodyNoScoll(){
         let overscroll = function(el) {
@@ -597,51 +500,6 @@
 	      });
 
 
-        // if(this.markerClusterer){
-        //   this.markerClusterer.clearMarkers()
-        // }
-        // let that = this
-        // let pt = null
-        //
-        // let iconNormal = new BMap.Icon("/static/img/maintain/icon-normal.png", new BMap.Size(52, 52),
-        //   {imageOffset: new BMap.Size(11, 11), imageSize: new BMap.Size(30, 30)});
-        // let icon4s = new BMap.Icon("/static/img/maintain/icon-4s.png", new BMap.Size(52, 52),
-        //   {imageOffset: new BMap.Size(11, 11), imageSize: new BMap.Size(30, 30)});
-        // let markers = []
-        // for (let i = 0; i < that.points.length; i++) {
-        //   pt = new BMap.Point(that.points[i].lon, that.points[i].lat)
-        //   let marker = new BMap.Marker(pt, { icon: that.points[i].is4s? icon4s: iconNormal })
-        //   // marker.corpId = that.points[i].corpId
-        //   // marker.distance = that.points[i].distance
-        //   marker.compDetail = that.points[i]
-        //   markers.push(marker)
-        // }
-        //
-        //
-        // // 点击维修企业图标查看详细信息
-        // for (let i = 0; i < markers.length; i++) {
-        //   markers[i].addEventListener('click', function(e) {
-        //     // console.log('getCompanyDetail',this.compDetail)
-        //
-        //     that.getCompanyDetail(this.compDetail)
-        //
-        //   })
-        // }
-        //
-        // this.markerClusterer = new BMapLib.MarkerClusterer(that.Map, {
-        //   markers: markers,
-        //   girdSize: 200,
-        //   styles: [{
-        //     url: '/static/img/position-num.png',
-        //     // maxZoom: 10,
-        //     size: new BMap.Size(40, 40),
-        //     // offset: new BMap.Size(5, 5),
-        //     // imageSize: new BMap.Size(34, 34),
-        //     textColor: '#fff',
-        //     textSize: 14
-        //   }]
-        // })
-        // this.clickMarkerClusterer()
       },
 
       clickMarkerClusterer(){
@@ -672,16 +530,11 @@
       goLatePoint(){
 	      this.map.panTo(new AMap.LngLat(this.search.lng, this.search.lat))
 
-
       },
 
 
       getCompanyDetail(item) {
-        // let that=this
-        // that.corpId = id
-        // that.distance = distance
-        // this.random= Math.random()
-        // this.showDetail=true
+
 
         this.$store.commit('setMaintainDetail', item)
         this.$store.commit('setMaintainListHistory', item)
@@ -704,26 +557,7 @@
       },
 
       goMap(item){
-        // console.log(item)
-        // let point= [{
-        //   lng: item.lng,
-        //   lat: item.lat,
-        //   corpId: item.corpId,
-        //   distance: item.distance
-        // }]
-        // this.corpId = item.corpId
-        // this.distance = item.distance
-        // this.getCompanyDetail(item)
-        // this.showDetail=true
 
-        // this.points = point
-        // this.currentPoint.pointX = item.lng
-        // this.currentPoint.pointY = item.lat
-        // this.showSmallList=false
-        // this.isShowCropList=false
-        // this.renderMap();
-        // console.log(this.points);
-        // console.log(this.currentPoint);
 
         this.search.lng= item.lon
         this.search.lat= item.lat
@@ -829,27 +663,11 @@
         border: none;
       }
     }
-    .maintain-type{
-      width: 100%;
-      height: 30px;
-      line-height: 30px;
-      font-size: 14px;
-      border-bottom: 1px solid #f0f0f0;
-      li{
-        width: 33%;
-        height: 100%;
-        text-align: center;
-        color:  #9d9d9d;
-        display: inline-block;
-      }
-      li.on{
-        color: black;
-      }
-    }
+
     .search {
       position: relative;
       overflow: hidden;
-      height: calc(100% - 80px);
+      height: calc(100% - 50px);
       .search_wrap {
         width: 100%;
         height: 46px;
