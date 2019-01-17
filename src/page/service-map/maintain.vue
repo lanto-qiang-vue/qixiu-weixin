@@ -4,14 +4,13 @@
     <div class='search'>
 
       <div class="fixGuide">
-        <img src="/static/img/maintain/location.png"/>
-        <div class="fixGuideClick" @click="goLatePoint"></div>
+        <img src="/static/img/maintain/center-location.png"/>
+        <div class="fixGuideClick" @click="goLatePoint">{{centerName}}</div>
       </div>
 
       <div id="container"></div>
 
     </div>
-
 
 	<maintain-list ref="maintainList" :location="location" @renderMap="pointList=$event; renderMap()"></maintain-list>
 	<maintain-detail ref="maintainDetail" ></maintain-detail>
@@ -23,121 +22,14 @@
 
 <script>
   import { Toast,  Actionsheet, Indicator } from 'mint-ui'
-  import maintainDetail from '@/page/maintainDetail.vue'
-  import maintainList from '@/page/maintainList'
+  import maintainDetail from '@/page/service-map/maintainDetail.vue'
+  import maintainList from '@/page/service-map/maintainList'
   export default {
     name: 'maintain',
 	  components: {maintainDetail,  maintainList},
     data() {
-      let _this  = this
       return {
-        searchCompanyType: '164',    // 企业类型
-        searchCompanyName: '维修企业',
-        points: [],
-        currentPoint: {             // 手机定位的位置
-          pointX: 121.480236,
-          pointY: 31.236301,
-        },
-        nearPoint:{},
-        sheetVisible: false,
-        actions: [{
-          name: '高德地图',
-          method(){
-            let name= _this.companyDetail.name
-            window.location.href = `http://uri.amap.com/marker?position=${_this.companyDetail.lon},${_this.companyDetail.lat}&name=${name}&src=上海汽修平台&coordinate=wgs84&callnative=1`
-          }
-        },
-        {
-          name: '百度地图',
-          method(){
-            let name= _this.companyDetail.name
-            let address= _this.companyDetail.addr
-            window.location.href = `http://api.map.baidu.com/marker?location=${_this.companyDetail.lat},${_this.companyDetail.lon}&title=${name}&content=${address}&output=html&src=上海汽修平台`
-          }
-        }],
 
-        userinfo: {},
-        popupVisible: false,   // 筛选框显示隐藏
-        repairName: '',   // 搜索框维修企业名称
-        compList: [],  // 搜索维修站点列表
-        showSmallList: false,
-        isShowCropList: false,
-        value: '',
-        companyType: [
-          {
-            name: '全部',
-            value: ''
-          },
-          {
-            name: '一类维修企业',
-            value: '43'
-          },
-          {
-            name: '二类维修企业',
-            value: '44'
-          },
-          {
-            name: '三类维修企业',
-            value: '45'
-          },
-          {
-            name: '摩托车维修厂',
-            value: '46'
-          },
-          {
-            name: '汽车快修厂',
-            value: '47'
-          }
-        ],
-        type: '',    // 企业类型的标志
-
-        level: '',   // 星级评分标志
-
-        carBrand: [],
-        brand: '',
-        allLoaded: false,
-        companyDetail: {},  // 企业详情
-        companyDetailAll: {},
-        corpId: null,    // 企业ID
-        distance: 0,    // 企业ID
-        score: 0,   // 企业综合评分
-        yellowStars: 0,  // 黄星
-        grayStars: 5,     // 灰星
-        isShowBrandList: false,
-        isShowAllList: true,
-        ShowBottomButton: true,
-        showDetail: false,
-        random: 0,
-
-        GeolocationControl: null,
-
-
-        query:{
-          "area": '',
-          "is4s": '',
-          "lon": 121.480236,
-          "lat": 31.236301,
-          "page": 1,
-          "limit": 20,
-          "q": "",
-          "sort": ""
-        },
-
-	      search:{
-		      type: '164',
-		      q: '',
-		      sort:'',
-		      area: '',
-		      is4s: '',
-		      hot: '',
-		      lng: '121.480236',
-		      lat: '31.236301'
-	      },
-	      total: 0,
-	      limit: 10,
-	      page: 1,
-
-	      list:[],
 	      pointList: [],
 
 	      map: null,
@@ -145,21 +37,12 @@
 	      markerClusterer: null,
 	      markers: null,
 
-	      indicator: null,
 
 	      location:{
 		      lng: '121.480236',
 		      lat: '31.236301'
 	      },
 
-        showList: false,
-        maintainListBlur: false,
-        // maintainListLocation: 0,
-        toMaintainListLocation: 1,
-        // maintainDetailLocation: 0,
-        toMaintainDetailLocation: 0,
-        maintainDetailMinHeight: 0,
-        initSlide: null
       }
     },
 
@@ -167,6 +50,19 @@
       show(){
         return this.$store.state.app.slideState.showBody
       },
+	    centerName(){
+		    let name= '164'
+		    switch (this.$route.name){
+			    case 'school-map':{
+				    name= '查找最近驾校'
+				    break
+			    }
+			    default :{
+				    name= '查找最近维修点'
+			    }
+		    }
+		    return name
+	    },
     },
 
     mounted(){
@@ -198,7 +94,7 @@
 			    spinnerType: 'snake'
 		    });
 		    this.map= new AMap.Map('container',{
-			    center: new AMap.LngLat(this.search.lng, this.search.lat),
+			    center: new AMap.LngLat(this.location.lng, this.location.lat),
 			    zoom: 14,
 		    });
 		    // 同时引入工具条插件，比例尺插件和鹰眼插件
@@ -224,9 +120,7 @@
 			    this.getCompList(false, true)
 		    });
 
-		    for(let key in this.$route.query){
-			    this.search[key]= this.$route.query[key]
-		    }
+
 		    // console.log(this.$route.query)
 		    // this.getArea()
 	    },
@@ -245,8 +139,8 @@
 					    this.map.clearMap()
 					    this.map.setCenter(result.position)
 					    this.map.add(new AMap.Marker(result.position))
-					    this.search.lng= result.position.lng
-					    this.search.lat= result.position.lat
+					    this.location.lng= result.position.lng
+					    this.location.lat= result.position.lat
 					    this.getCompList(true, true)
 				    });//返回定位信息
 				    AMap.event.addListener(this.geolocation, 'error', (err)=>{
@@ -270,13 +164,13 @@
 						    // console.log('this.map.getCenter()', center)
 						    this.map.add(new AMap.Marker( center))
 						    // console.log('this.map.add(new AMap.Marker( center))')
-						    this.search.lng= center.lng
-						    this.search.lat= center.lat
+						    this.location.lng= center.lng
+						    this.location.lat= center.lat
 						    this.getCompList(true, true)
 						    // this.initPiontList()
 					    })
 				    }else{
-				    	let center= new AMap.LngLat(this.search.lng, this.search.lat)
+				    	let center= new AMap.LngLat(this.location.lng, this.location.lat)
 					    this.map.panTo(center)
 					    this.map.add(new AMap.Marker( {
 						    position: center
@@ -286,79 +180,12 @@
 			    })
 		    });
 	    },
-      toQuery(){
-        let compname= this.$route.query.compname
-        if(compname){
-          this.query.q= compname
-          // this.key('search')
-          this.getList(false, true)
-        }
-      },
+
 	    getCompList(clearPoint, clearList){
     		this.$refs.maintainList.getCompList(clearPoint, clearList)
-		    // if(clearList) this.page=1
-		    // else this.page++
-		    // let query= this.calcQuery()
-		    // this.axios({
-			 //    baseURL: '/repairproxy',
-			 //    url: '/micro/search/company'+ query,
-			 //    method: 'get',
-		    // }).then( (res) => {
-		    // 	let datas= res.data.content
-			 //    if(clearList){
-				//     this.list= res.data.content
-				//     // 最近的点
-				//     if(res.data.content.length){
-				// 	    this.search.lng = parseFloat(res.data.content[0].lon);
-				// 	    this.search.lat = parseFloat(res.data.content[0].lat);
-				//     }
-		    //
-			 //    }else{
-				//     this.list= this.list.concat(res.data.content)
-			 //    }
-			 //    if(clearPoint){
-				//     this.pointList= []
-				//     for( let i in datas){
-				// 	    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
-				// 	    this.pointList.push(datas[i])
-				//     }
-			 //    }else{
-				//     let hasPoint= false
-				//     for (let i in datas) {
-				// 	    if(datas[i].kw.indexOf('4s')>=0) datas[i].is4s= true
-				// 	    hasPoint= false
-				// 	    for(let j in this.pointList){
-				// 		    if(this.pointList[j].sid== datas[i].sid){
-				// 			    hasPoint= true
-				// 			    break
-				// 		    }
-				// 	    }
-				// 	    if(!hasPoint) this.pointList.push(datas[i])
-				//     }
-			 //    }
-		    //
-			 //    // this.calcPointList(res.data.content)
-			 //    this.total= res.data.totalElements
-			 //    this.renderMap()
-		    // })
-	    },
-	    calcQuery(limit){
-		    let is164= this.search.type== 164
-		    let query='?fl=type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,openHours,rating'+
-			    '&q='+ this.search.q +
-			    '&page='+ (this.page-1) +','+ (limit ||this.limit)
-		    if(is164) query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
-		    if(this.search.lng) query+=('&point='+this.search.lat+','+this.search.lng)
-		    let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
-		    if(this.search.area && is164) fq+= '+AND+areaKey:'+ this.search.area
-		    if(this.search.is4s && is164){
-			    is4s= (this.search.is4s=='yes' ? 'kw:4s': '-kw:4s')
-			    fq+= '+AND+' + is4s
-		    }
-		    query += fq
 
-		    return query
 	    },
+
 
 
       bodyNoScoll(){
@@ -390,64 +217,6 @@
       },
 
 
-      openMap(){
-        this.sheetVisible = !this.sheetVisible
-      },
-
-
-      getList( clearPoint, clearList){
-        if(clearList) this.query.page=1
-        else this.query.page++
-        this.axios({
-          method: 'post',
-          url: '/maintain/v2/getRangeCorps',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          data: JSON.stringify(this.query)
-        }).then(res => {
-          let datas = res.data.data;
-          this.total= res.data.totalCount
-          if(clearList){
-            this.compList= datas
-            // 最近的点
-	          if(datas.length){
-		          this.query.lon = parseFloat(datas[0].lon);
-		          this.query.lat = parseFloat(datas[0].lat);
-	          }
-
-          }else{
-            this.compList= this.compList.concat(datas)
-          }
-          if(clearPoint){
-            this.points= []
-            for( let i in datas){
-              this.points.push(datas[i])
-            }
-          }else{
-            let hasPoint= false
-            for (let i in datas) {
-              hasPoint= false
-              for(let j in this.points){
-                if(this.points[j].sid== datas[i].sid){
-                  hasPoint= true
-                  break
-                }
-              }
-              if(!hasPoint) this.points.push(datas[i])
-            }
-          }
-          this.renderMap()
-        })
-      },
-
-      queryByList(query, clearList){
-        this.search.q= query.q
-        this.search.area= query.area
-        this.search.sort= query.sort
-        this.getCompList(clearList, clearList)
-      },
-
       renderMap(){
 	      if(this.markerClusterer ) {
 		      this.markerClusterer.clearMarkers();
@@ -468,7 +237,7 @@
 	      });
 	      this.markers= []
 	      for (let i in this.pointList){
-		      let lngLat= new AMap.LngLat(this.pointList[i].lon|| this.search.lng, this.pointList[i].lat|| this.search.lat)
+		      let lngLat= new AMap.LngLat(this.pointList[i].lon|| this.location.lng, this.pointList[i].lat|| this.location.lat)
 		      let marker= new AMap.Marker({
 			      icon: this.pointList[i].is4s? icon4s: iconNormal,
 			      position: lngLat,
@@ -502,33 +271,10 @@
 
       },
 
-      clickMarkerClusterer(){
-
-        let self= this
-        let overlays= this.Map.getOverlays()
-        for (let i in overlays){
-          if(overlays[i].constructor.name =='TextIconOverlay'){
-            overlays[i].V.addEventListener('touchstart', function(e) {
-              console.log('clickMarkerClusterer', overlays[i])
-              // self.Map.zoomIn()
-              self.Map.panTo(overlays[i]._position)
-              self.query.lon = overlays[i]._position.lng;
-              self.query.lat = overlays[i]._position.lat;
-              // self.sendAjax()
-              setTimeout(function () {
-                self.Map.zoomIn()
-                self.clickMarkerClusterer()
-                // setTimeout(function () {
-                //   self.renderMap()
-                // },200)
-              }, 300)
-            })
-          }
-        }
-      },
 
       goLatePoint(){
-	      this.map.panTo(new AMap.LngLat(this.search.lng, this.search.lat))
+    		if(this.pointList.length)
+	      this.map.panTo(new AMap.LngLat(this.pointList[0].lng, this.pointList[0].lat))
 
       },
 
@@ -543,78 +289,17 @@
 
       },  // 获取企业详情信息
 
-      key(e) {
-        if ( e.keyCode == 13 || e=='search') {
-          $('#search_repaire').blur()
-          // if(this.repairName.trim())
-            // this.sendAjax(true, true)
-        }
-      },   // 搜索维修站点
-
-      loadBottom(){
-        this.page++
-        // this.sendAjax(false, true, true)
-      },
-
       goMap(item){
 
 
-        this.search.lng= item.lon
-        this.search.lat= item.lat
-	      this.map.panTo(new AMap.LngLat(this.search.lng, this.search.lat))
+        this.location.lng= item.lon
+        this.location.lat= item.lat
+	      this.map.panTo(new AMap.LngLat(this.location.lng, this.location.lat))
 
 
       },
 
-      closeFilter() {  // 关闭筛选框
-        this.popupVisible = !this.popupVisible
-      },  // 侧边点击关闭筛选框
-      getCompanyType(e, v) {
-        this.type = v
-        this.addclass(e)
-      },  // 获得企业类型
-      getStarLevel(e, v) {      // 获取星级评分
-        this.level = v
-        this.addclass(e)
-      },  // 获得星级评分
-      getArea(e, v) {              // 获取区域范围
-        this.area = v
-        this.addclass(e)
-      },  // 获得区域
 
-
-      complete(){
-        this.isShowBrandList = false;
-        this.isShowAllList = true;
-        this.ShowBottomButton = true;
-      },    // 关闭车辆品牌(完成)
-      addclass(e) {
-        let ele = e.target
-        let brothers = ele.parentNode.children
-        for (let i = 0; i < brothers.length; i++) {
-          brothers[i].className = ''
-        }
-        ele.className = 'active'
-      },  // 添加类
-
-      businessStatus(status){
-        switch (status){
-          case 1: return '营业';
-          case 2: return '停业';
-          case 3: return '注销';
-          case 4: return '空壳';
-        }
-      },
-      tagIsOn( arrName, val ){
-        if (this.search[arrName]===val)  return true
-        else return false
-      },
-      select( arrName, val ){
-        if(this.search[arrName]!== val){
-          this.search[arrName]= val
-          this.getCompList( true, true)
-        }
-      },
 	    setShowBody(){
 		    switch (this.$route.name){
 			    case 'remark-map':{
@@ -680,7 +365,7 @@
           height: 46px;
           width: 65px;
           line-height: 46px;
-          background: url(../assets/img/record/findfix.png) no-repeat;
+          background: url(~@/assets/img/record/findfix.png) no-repeat;
           background-position: left 55%;
           background-size: 16px 16px;
           background-color: #fff;
@@ -696,7 +381,7 @@
           100% {color: blue }
         }
         input {
-          background: url(../assets/img/record/search.png) no-repeat 10px 7px;
+          background: url(~@/assets/img/record/search.png) no-repeat 10px 7px;
           font-size: 14px;
           background-color: #eee;
           background-size: 18px 18px;
@@ -742,9 +427,14 @@
         .fixGuideClick{
           width: 100px;
           height: 24px;
+	        line-height: 24px;
           position: absolute;
           left: -50px;
           top: -66px;
+	        font-size: 12px;
+	        color: white;
+	        font-weight: 300;
+	        text-align: center;
         }
       }
 
@@ -774,7 +464,7 @@
         width: 35px;
         height: 35px;
         transform: translateX(-50%);
-        background: url(../assets/img/maintain/close.png) no-repeat;
+        background: url(~@/assets/img/maintain/close.png) no-repeat;
         background-size: contain;
       }
       >#top {
@@ -827,7 +517,7 @@
             em {
               width: 15px;
               height: 15px;
-              background: url(../assets/img/maintain/address.png) no-repeat;
+              background: url(~@/assets/img/maintain/address.png) no-repeat;
               background-size: contain;
               position: absolute;
               top: 2px;
@@ -850,7 +540,7 @@
               border: none;
               width: 15px;
               height: 15px;
-              background: url(../assets/img/maintain/mile.png) no-repeat;
+              background: url(~@/assets/img/maintain/mile.png) no-repeat;
               background-size: contain;
               top: -15px;
               left: 50%;

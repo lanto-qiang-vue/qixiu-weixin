@@ -25,50 +25,51 @@
       <mt-swipe :auto="0" @change="iconBlockChange">
         <mt-swipe-item>
           <ul class="tab1" >
+	          <router-link tag="li" to="/maintain">
+		          <img src="../../assets/img/home/查选维修.png"/>
+		          <p>查选维修</p>
+	          </router-link>
             <li @click="goYYFW">
               <img src="../../assets/img/home/预约服务.png"/>
               <p>预约服务</p>
             </li>
-            <router-link tag="li" to="/maintain">
-              <img src="../../assets/img/home/查选维修.png"/>
-              <p>查选维修</p>
-            </router-link>
+
             <router-link tag="li" to="/remarkMap">
               <img src="../../assets/img/home/维修点评.png"/>
               <p>维修点评</p>
             </router-link>
-            <!--<li>-->
-              <!--<img src="../../assets/img/home/一键救援.png"/>-->
-              <!--<p>一键救援</p>-->
-            <!--</li>-->
-            <!--<li>-->
-              <!--<img src="../../assets/img/home/学车找我.png"/>-->
-              <!--<p>学车找我</p>-->
-            <!--</li>-->
-            <!--<li>-->
-              <!--<img src="../../assets/img/home/违章查询.png"/>-->
-              <!--<p>违章查询</p>-->
-            <!--</li>-->
-            <li @click="goJKDA">
-              <img src="../../assets/img/home/维修记录.png"/>
-              <p>维修记录</p>
-            </li>
+	          <li @click="goJKDA">
+		          <img src="../../assets/img/home/维修记录.png"/>
+		          <p>维修记录</p>
+	          </li>
+            <!--<router-link  tag="li" to="/remarkMap">-->
+              <!--<img src="../../assets/img/home/救援找我.png"/>-->
+              <!--<p>救援找我</p>-->
+            <!--</router-link>-->
+            <router-link tag="li" to="/school-map">
+              <img src="../../assets/img/home/学车找我.png"/>
+              <p>学车找我</p>
+            </router-link>
+
+	          <router-link tag="li" to="/government-service">
+		          <img src="../../assets/img/home/政务服务.png"/>
+		          <p>政务服务</p>
+	          </router-link>
+	          <router-link tag="li" to="/repair-company">
+		          <img src="../../assets/img/home/汽修企业.png"/>
+		          <p>汽修企业</p>
+	          </router-link>
+
           </ul>
         </mt-swipe-item>
         <mt-swipe-item>
-          <ul class="tab2" >
+          <!--<ul class="tab2" >-->
+          <ul class="tab1" >
             <!--<router-link tag="li" to="/carOwner-centre">-->
               <!--<img src="../../assets/img/home/车主中心.png"/>-->
               <!--<p>车主中心</p>-->
             <!--</router-link>-->
-            <router-link tag="li" to="/government-service">
-              <img src="../../assets/img/home/政府服务.png"/>
-              <p>政府服务</p>
-            </router-link>
-            <router-link tag="li" to="/repair-company">
-              <img src="../../assets/img/home/汽修企业.png"/>
-              <p>汽修企业</p>
-            </router-link>
+
 
             <router-link tag="li" to="/association-service">
               <img src="../../assets/img/home/协会服务.png"/>
@@ -642,7 +643,7 @@ export default {
         margin-top: 65%;
       }
       .dummy.on{
-        margin-top: 40%;
+        margin-top: 64%;
       }
       .content{
         position:absolute;
@@ -656,6 +657,8 @@ export default {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
+	        height: 195px;
+	        width: 100%;
           li{
             width: 25%;
             float: left;

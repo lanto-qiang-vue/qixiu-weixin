@@ -1,8 +1,12 @@
 <template>
 <div class="map-list">
-	<ul class="maintain-type">
+	<ul class="maintain-type" v-if="mapType=='164'">
 		<li v-for="(item, index) in maintainType" :class="{on : tagIsOn('is4s', item.value)}"
 		    @click="select('is4s', item.value)" :key="index">{{item.name}}</li>
+	</ul>
+	<ul class="maintain-type" v-if="mapType=='300'">
+		<li v-for="(item, index) in schoolPoint" :class="{on : tagIsOn('schoolPoint', item.value)}"
+		    @click="select('schoolPoint', item.value)" :key="index">{{item.name}}</li>
 	</ul>
 <slide-bar v-show="show=='maintainList'" :minHeight="45" :toLocation="toLocation" @bodyHeight="height= $event;calcHeight">
 <div class="maintainList">
@@ -11,41 +15,70 @@
       <input v-model="search.q" type="search" placeholder=' 搜索：企业名、地址、品牌、服务内容'
              @focus="focus" @blur="isFocus=false" @keydown="key($event)" ref="searchInput"/>
       <div class="query"  @click="toQuery(true)"></div>
-      <img class="close" v-show="search.q" @click="search.q='';toQuery(true)" src="../assets/img/maintain/关闭.png" />
+      <img class="close" v-show="search.q" @click="search.q='';toQuery(true)" src="~@/assets/img/maintain/关闭.png" />
     </div>
     <span @click="cancel" v-show="isFocus || search.q">取消</span>
   </div>
-  <div class="button" :class="{show: showBlock=='button'}">
-    <div class="area-button"  @click="switchBlock('area-block')"><img src="../assets/img/maintain/区域.png" />
-      <p>{{getName('area')|| '区域'}}</p></div>
-    <div class="sort-button"  @click="switchBlock( 'sort-block')"><img src="../assets/img/maintain/排序.png" />
-      <p>{{getName('sort')|| '排序'}}</p></div>
-    <div class="hot-button"  @click="switchBlock( 'hot-block')"><img src="../assets/img/maintain/热搜.png" />
-      <p>{{getName('hot')|| '热搜'}}</p></div>
-  </div>
-  <ul class="area-block" :class="{show: showBlock=='area-block'}">
-    <div class="close" @click="switchBlock( 'button')"></div>
-    <li v-for="(item, index) in area" :key="index" @click="select('area', item.code)"
-        :class="{on : tagIsOn('area', item.code)}">{{item.name}}</li>
-  </ul>
-  <ul class="sort-block" :class="{show: showBlock=='sort-block'}">
-    <div class="close"  @click="switchBlock('button')"></div>
-    <li v-for="(item, index) in sort" :key="index" @click="select('sort', item.value)"
-        :class="{on : tagIsOn('sort', item.value)}">{{item.name}}</li>
-  </ul>
-  <ul class="hot-block" :class="{show: showBlock=='hot-block'}">
-    <div class="close"  @click="switchBlock('button')"></div>
-    <li v-for="(item, index) in hot" :key="index" @click="select('hot', item.value)"
-        :class="{on : tagIsOn('hot', item.value)}">{{item.name}}</li>
-  </ul>
+	<div v-if="mapType=='164'">
+		<div class="button" :class="{show: showBlock=='button'}">
+			<div class="area-button"  @click="switchBlock('area-block')"><img src="~@/assets/img/maintain/区域.png" />
+				<p>{{getName('area')|| '区域'}}</p></div>
+			<div class="sort-button"  @click="switchBlock( 'sort-block')"><img src="~@/assets/img/maintain/排序.png" />
+				<p>{{getName('sort')|| '排序'}}</p></div>
+			<div class="hot-button"  @click="switchBlock( 'hot-block')"><img src="~@/assets/img/maintain/热搜.png" />
+				<p>{{getName('hot')|| '热搜'}}</p></div>
+		</div>
+		<ul class="area-block" :class="{show: showBlock=='area-block'}">
+			<div class="close" @click="switchBlock( 'button')"></div>
+			<li v-for="(item, index) in area" :key="index" @click="select('area', item.code)"
+			    :class="{on : tagIsOn('area', item.code)}">{{item.name}}</li>
+		</ul>
+		<ul class="sort-block" :class="{show: showBlock=='sort-block'}">
+			<div class="close"  @click="switchBlock('button')"></div>
+			<li v-for="(item, index) in sort" :key="index" @click="select('sort', item.value)"
+			    :class="{on : tagIsOn('sort', item.value)}">{{item.name}}</li>
+		</ul>
+		<ul class="hot-block" :class="{show: showBlock=='hot-block'}">
+			<div class="close"  @click="switchBlock('button')"></div>
+			<li v-for="(item, index) in hot" :key="index" @click="select('hot', item.value)"
+			    :class="{on : tagIsOn('hot', item.value)}">{{item.name}}</li>
+		</ul>
+	</div>
+	<div v-if="mapType=='300'">
+		<div class="button" :class="{show: showBlock=='button'}">
+			<div class="area-button"  @click="switchBlock('area-block')"><img src="~@/assets/img/maintain/区域.png" />
+				<p>{{getName('area')|| '区域'}}</p></div>
+			<div class="sort-button"  @click="switchBlock( 'sort-block')"><img src="~@/assets/img/maintain/排序.png" />
+				<p>{{getName('sort')|| '排序'}}</p></div>
+			<div class="hot-button"  @click="switchBlock( 'biz-block')"><img src="~@/assets/img/maintain/驾照.png" />
+				<p>{{getName('biz')|| '驾照'}}</p></div>
+		</div>
+		<ul class="area-block" :class="{show: showBlock=='area-block'}">
+			<div class="close" @click="switchBlock( 'button')"></div>
+			<li v-for="(item, index) in area" :key="index" @click="select('area', item.code)"
+			    :class="{on : tagIsOn('area', item.code)}">{{item.name}}</li>
+		</ul>
+		<ul class="sort-block" :class="{show: showBlock=='sort-block'}">
+			<div class="close"  @click="switchBlock('button')"></div>
+			<li v-for="(item, index) in sortSchool" :key="index" @click="select('sort', item.value)"
+			    :class="{on : tagIsOn('sort', item.value)}">{{item.name}}</li>
+		</ul>
+		<ul class="hot-block" :class="{show: showBlock=='biz-block'}">
+			<div class="close"  @click="switchBlock('button')"></div>
+			<li v-for="(item, index) in biz" :key="index" @click="select('biz', item.value)"
+			    :class="{on : tagIsOn('biz', item.value)}">{{item.name}}</li>
+		</ul>
+	</div>
+
   <div class="roll" :style="{height: listHeight+'px'}">
     <mt-loadmore :bottom-method="toQuery" :bottom-all-loaded="allLoaded" :autoFill="false"
                  bottomPullText="加载更多"   ref="loadMore">
+    <div v-if="mapType=='164'">
       <ul class="history" v-show="maintainListHistory.length">
-        <div class="head"><span>最近搜索</span><img @click="clearHistory" src="../assets/img/maintain/del.png"/></div>
+        <div class="head"><span>最近搜索</span><img @click="clearHistory" src="~@/assets/img/maintain/del.png"/></div>
         <li v-for="(item, index) in maintainListHistory" :key="index" @click="goDetail(item)">
           <div class="picWrap">
-            <img src="/static/img/shqxw.jpg" />
+            <img :src="item.pic ||'/static/img/shqxw.jpg'" />
             <img class="tag" :src="item.is4s?'/static/img/maintain/tag-4s.png':'/static/img/maintain/tag-normal.png'"/>
           </div>
           <div class="info">
@@ -55,8 +88,8 @@
               <!--(<span>{{ item.creditLevel }}</span>)-->
             </p>
             <div class=stars>
-              <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.rating)||0" :key="'yellow'+index">
-              <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.rating))||0" :key="'gray'+index">
+              <img src="~@/assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.rating)||0" :key="'yellow'+index">
+              <img src="~@/assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.rating))||0" :key="'gray'+index">
               <span v-show="item.rating">{{ item.rating }}分</span>
               <span v-show="!item.rating">暂无评分</span>
             </div>
@@ -71,7 +104,7 @@
         <div class="head"><span>智能推荐</span></div>
         <li v-for="(item, index) in list" :key="index" @click="goDetail(item)">
           <div class="picWrap">
-            <img src="/static/img/shqxw.jpg" />
+            <img :src="item.pic ||'/static/img/shqxw.jpg'" />
             <img class="tag" :src="item.is4s?'/static/img/maintain/tag-4s.png':'/static/img/maintain/tag-normal.png'"/>
           </div>
           <div class="info">
@@ -81,8 +114,8 @@
               <!--(<span>{{ item.creditLevel }}</span>)-->
             </p>
             <div class=stars>
-              <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.rating)||0" :key="'yellow'+index">
-              <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.rating))||0" :key="'gray'+index">
+              <img src="~@/assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.rating)||0" :key="'yellow'+index">
+              <img src="~@/assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.rating))||0" :key="'gray'+index">
               <span v-show="item.rating">{{ item.rating }}分</span>
               <span v-show="!item.rating">暂无评分</span>
             </div>
@@ -93,6 +126,30 @@
           </div>
         </li>
       </ul>
+    </div>
+	    <div v-if="mapType=='300'">
+		    <ul class="com-list">
+			    <!--<div class="head"><span>智能推荐</span></div>-->
+			    <li v-for="(item, index) in list" :key="index" @click="goDetail(item)">
+				    <div class="picWrap">
+					    <img :src="item.pic ||'/static/img/shqxw.jpg'" />
+					    <!--<img class="tag" :src="item.is4s?'/static/img/maintain/tag-4s.png':'/static/img/maintain/tag-normal.png'"/>-->
+				    </div>
+				    <div class="info">
+					    <!--<span>{{businessStatus(item.status)}}</span>-->
+					    <span class="orange">{{item.grade=='N' ?'未评级' :item.grade}}</span>
+					    <p>{{ item.name }}</p>
+					    <div class="item">培训驾照类型：{{item.bizScope}}</div>
+					    <div class="item">训练基地：{{item.tag}}</div>
+					    <div class="address">
+						    <span class="miles">{{ item.distance.toFixed(1) }}km</span>
+						    <span class="address_area">{{ item.addr }}</span>
+					    </div>
+
+				    </div>
+			    </li>
+		    </ul>
+	    </div>
       <div v-show="allLoaded" style="text-align: center; line-height: 30px; background-color: #f8f8f8; font-size: 14px; color: #999;">已经到底啦...</div>
     </mt-loadmore>
   </div>
@@ -103,7 +160,8 @@
 </template>
 
 <script>
-import SlideBar from '@/page/components/SlideBar'
+import SlideBar from '@/page/service-map/SlideBar'
+import { Indicator} from 'mint-ui'
 export default {
 	name: "maintain-list",
 	components: { SlideBar},
@@ -120,6 +178,9 @@ export default {
 			    area: '',
 			    is4s: '',
 			    hot: '',
+			    base: '',
+			    biz: 'C1',
+			    schoolPoint: ''
 			},
 			total: 0,
 			limit: 10,
@@ -136,6 +197,11 @@ export default {
           {name: '好评优先', value: 'rating desc,distance asc'},
           // {name: '距离优先', value: 'distance'},
         ],
+			sortSchool: [
+				{name: '默认', value: ''},
+				{name: '距离优先', value: 'distance'},
+				{name: '评级优先', value: 'rating desc,distance asc'},
+			],
         hot:[
           {name: '默认', value: ''},
           {name: '宝马', value: '宝马'},
@@ -149,13 +215,37 @@ export default {
           {name: '发动机', value: '发动机'},
           {name: '汽车美容', value: '汽车美容'},
         ],
+			biz:[
+				{name: '全部', value: ''},
+				{name: 'A1', value: 'A1'},
+				{name: 'A2', value: 'A2'},
+				{name: 'A3', value: 'A3'},
+				{name: 'B1', value: 'B1'},
+				{name: 'B2', value: 'B2'},
+				{name: 'C1', value: 'C1'},
+				{name: 'C2', value: 'C2'},
+				// {name: 'C3', value: 'C3'},
+				// {name: 'C4', value: 'C4'},
+				{name: 'D', value: 'D'},
+				{name: 'E', value: 'E'},
+				{name: 'F', value: 'F'},
+				// {name: 'M', value: 'M'},
+				// {name: 'N', value: 'N'},
+				// {name: 'P', value: 'P'},
+			],
+			schoolPoint:[
+				{name: '全部', value: ''},
+				{name: '驾校报名', value: '300'},
+				{name: '学车基地', value: '301'},
+			],
         showBlock: '',
         list:[],
 			pointList:[],
         listHeight: 0,
         timer: null,
         allLoaded: false,
-        clearList: true
+        clearList: true,
+			loading: true
       }
     },
     computed: {
@@ -165,10 +255,27 @@ export default {
       show(){
         return this.$store.state.app.slideState.showBody
       },
+	    mapType(){
+      	    let type= '164'
+		    switch (this.$route.name){
+			    case 'school-map':{
+				    type= '300'
+				    break
+			    }
+			    default :{
+				    type= '164'
+			    }
+		    }
+		    this.search.type= type
+			return type
+	    },
       maintainListHistory(){
         // console.log('maintainListHistory')
         return this.$store.state.app.maintainListHistory
       },
+	    getSchoolPoint(){
+      	    return this.search.schoolPoint
+	    }
     },
     watch:{
       q(val){
@@ -198,24 +305,33 @@ export default {
     },
     mounted(){
 		this.getArea()
+	    this.getQuery()
       // this.calcHeight(this.height)
       $(".roll").bind('touchmove',function(e){
         e.stopPropagation();
       })
     },
     activated(){
-		  // this.calcHeight(this.height)
+		  this.getQuery()
     },
     methods:{
+		getQuery(){
+			for(let key in this.$route.query){
+				this.search[key]= this.$route.query[key]
+			}
+		},
 	    calcQuery(limit){
-		    let is164= this.search.type== 164
-		    let query='?fl=type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,openHours,rating'+
+		    let is164= this.search.type== '164'
+		    let is300= this.search.type== '300'
+		    let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,rating'+
 			    '&q='+ this.search.q +
 			    '&page='+ (this.page-1) +','+ (limit ||this.limit)
-		    if(is164) query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
+		    query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
 		    if(this.location.lng) query+=('&point='+this.location.lat+','+this.location.lng)
 		    let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
-		    if(this.search.area && is164) fq+= '+AND+areaKey:'+ this.search.area
+		    if(is300 && this.search.biz) fq+= ('+AND+kw:'+  this.search.biz)
+		    if(is300 && this.search.base) fq+= ('+AND+tag:'+  encodeURI(this.search.base))
+		    if(this.search.area && (is164 || is300)) fq+= '+AND+areaKey:'+ this.search.area
 		    if(this.search.is4s && is164){
 			    is4s= (this.search.is4s=='yes' ? 'kw:4s': '-kw:4s')
 			    fq+= '+AND+' + is4s
@@ -266,6 +382,7 @@ export default {
 			    url: '/micro/search/company'+ query,
 			    method: 'get',
 		    }).then( (res) => {
+		    	this.loading= false
 			    let datas= res.data.content
 			    if(clearList){
 				    this.list= res.data.content
@@ -303,6 +420,12 @@ export default {
 	    getArea(){
 		    this.axios.get('/area/query').then( (res) => {
 			    this.area.push(...res.data.items)
+			    if(this.loading){
+				    Indicator.open({
+					    text: '请稍候...',
+					    spinnerType: 'snake'
+				    });
+			    }
 		    })
 	    },
       key(e) {
@@ -325,6 +448,10 @@ export default {
 	      switch (this.$route.name){
 		      case 'remark-map':{
 			      this.$router.push({path: '/remarkMatch', query: { corpId: item.sid }})
+			      break;
+		      }
+		      case 'school-map':{
+			      this.$router.push({path: '/school-detail', query: { id: item.sid, distance: item.distance.toFixed(1) }})
 			      break;
 		      }
 		      default :{
@@ -428,7 +555,7 @@ export default {
       width: 100%;
       padding: 5px 10px 5px 28px;
       margin: 0;
-      background: #f9f9f9 url("../assets/img/maintain/放大镜.png") no-repeat 6px center;
+      background: #f9f9f9 url("~@/assets/img/maintain/放大镜.png") no-repeat 6px center;
       background-size: 20px;
       border: 1px solid #e7e7e7;
       border-radius: 20px;
@@ -499,7 +626,7 @@ export default {
     .close{
       width: 24px;
       height: 24px;
-      background: url("../assets/img/maintain/关闭2.png") no-repeat center center;
+      background: url("~@/assets/img/maintain/关闭2.png") no-repeat center center;
       background-size: 100% 100%;
       margin: 0 10px 10px 10px;
       display: inline-block;
@@ -529,7 +656,7 @@ export default {
     position: relative;
   }
   .history, .com-list{
-    padding: 10px 0 0 15px;
+    padding: 10px 0 0 10px;
     .head{
       padding-right: 15px;
       line-height: 16px;
@@ -545,7 +672,7 @@ export default {
       width: 100%;
       overflow: hidden;
       font-size: 13px;
-      padding: 15px 15px 15px 0;
+      padding: 15px 10px 15px 0;
       border-bottom: 1px solid @bottom-border-color;
       .picWrap {
         float: left;
@@ -578,16 +705,22 @@ export default {
           background-color: @blue-color;
           position: absolute;
           top: 0;
-          right: -4px;
+          right: 0;
           border-radius: 2px;
         }
         >span.rest{
           background-color: #bebec0;
         }
+	      >span.orange{
+		      background: #fff7e6;
+		      border: 1px solid #ffd591;
+		      color: #fa8c16;
+		      border-radius: 2px;
+	      }
         p {
           font-size: 14px;
           margin-bottom: 0;
-          margin-right: 42px;
+          margin-right: 30px;
           color: #000;
           overflow: hidden;
           text-overflow:ellipsis;
@@ -625,6 +758,14 @@ export default {
             white-space: nowrap;
           }
         }
+	      .item{
+		      color: #666666;
+		      font-size: 12px;
+		      overflow: hidden;
+		      text-overflow:ellipsis;
+		      white-space: nowrap;
+		      line-height: 16px;
+	      }
       }
     }
     li:last-child{

@@ -63,13 +63,13 @@
     z-index: 16;
     .lookall{
       padding-left: 20px;
-      background: url("../assets/img/maintain/detail.png") no-repeat left center;
+      background: url("~@/assets/img/maintain/detail.png") no-repeat left center;
       display: inline-block;
       background-size: 15px;
     }
     .lookmap{
       padding-left: 20px;
-      background: url("../assets/img/maintain/map.png") no-repeat left center;
+      background: url("~@/assets/img/maintain/map.png") no-repeat left center;
       display: inline-block;
       background-size: 15px;
     }
@@ -79,7 +79,7 @@
       padding: 0 15px 0 35px;
       /*background-color: #438eff;*/
       border-radius: 10px;
-      background: #438eff url("../assets/img/maintain/mile.png") no-repeat 15px center;
+      background: #438eff url("~@/assets/img/maintain/mile.png") no-repeat 15px center;
       background-size: 15px;
       line-height: 30px;
       height: 30px;

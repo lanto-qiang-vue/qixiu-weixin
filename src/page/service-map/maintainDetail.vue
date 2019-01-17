@@ -2,13 +2,13 @@
 <div id="compDetail">
 	<slide-bar v-show="show=='maintainDetail'" :minHeight="minHeight" :toLocation="toMaintainDetailLocation" @bodyHeight="height= $event;calcHeight" ref="slideBar" @toLocation="toMaintainDetailLocation= $event">
 <div>
-<img class="close" @click="closeDetail" src="../assets/img/maintain/关闭.png" />
+<img class="close" @click="closeDetail" src="~@/assets/img/maintain/关闭.png" />
 <div class="info" >
   <div class="head">{{all.name}}<span :class="{rest: !isOpenTime}">{{isOpenTime?'营业中': '休息中'}}</span></div>
   <div class="text address">{{all.addr}}</div>
   <div class="avg">
-    <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(all.rating)||0" :key="'yellow'+index">
-    <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(all.rating))||0" :key="'gray'+index">
+    <img src="~@/assets/img/maintain/score_yellow.png"  v-for="index in parseInt(all.rating)||0" :key="'yellow'+index">
+    <img src="~@/assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(all.rating))||0" :key="'gray'+index">
     {{all.rating?all.rating+'分':'暂无评分'}}
   </div>
   <div class="text">特约维修：{{all.brand}}</div>
@@ -28,22 +28,22 @@
   <div id="list">
     <div class="img">
       <img :src="all.pic||'/static/img/shqxwbig.png'"/>
-      <!--<img @click="small();$emit('back')" class="back" src="../assets/img/maintain/back.png" />-->
+      <!--<img @click="small();$emit('back')" class="back" src="~@/assets/img/maintain/back.png" />-->
     </div>
     <div class="head">累计评论（{{(comment.totalElements||0)+1}}条）
       <router-link tag="a" :to="{path: '/maintainRemark', query: {id: maintainDetail.sid, joint: all.joint} }">
-        <img src="../assets/img/maintain/箭头.png"/>
+        <img src="~@/assets/img/maintain/箭头.png"/>
       </router-link>
     </div>
     <div class="tag"><span v-for="(item, index) in all.companyShowWors" :key="index">{{item}}</span></div>
     <ul>
       <li v-show="!all.joint" class="system">
-        <div class="left"><img src="../assets/img/maintain/shqx-head.png"/></div>
+        <div class="left"><img src="~@/assets/img/maintain/shqx-head.png"/></div>
         <div class="right">
           <div class="name">上海汽修平台<span>系统评分</span></div>
           <div class="avg">
-            <img src="../assets/img/maintain/score_yellow.png"  v-for="index in 1" :key="'yellow'+index">
-            <img src="../assets/img/maintain/score_gray.png"  v-for="index in 4" :key="'gray'+index">
+            <img src="~@/assets/img/maintain/score_yellow.png"  v-for="index in 1" :key="'yellow'+index">
+            <img src="~@/assets/img/maintain/score_gray.png"  v-for="index in 4" :key="'gray'+index">
             1.2分
           </div>
           <div class="msg">企业未能遵照相关法律法规和政策完成《汽车维修电子健康档案系统》对接，因此设置默认评分。</div>
@@ -54,8 +54,8 @@
         <div class="right">
           <div class="name">车友：{{item.vehicleNum}} <span>{{item.createTime | FormatDate}}</span></div>
           <div class="avg">
-            <img src="../assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.userAvgScore)||0" :key="'yellow'+index">
-            <img src="../assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.userAvgScore))||0" :key="'gray'+index">
+            <img src="~@/assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.userAvgScore)||0" :key="'yellow'+index">
+            <img src="~@/assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.userAvgScore))||0" :key="'gray'+index">
             {{item.userAvgScore}}分
           </div>
           <div class="all">
@@ -71,12 +71,12 @@
         </div>
       </li>
       <li v-show="all.joint" class="system">
-        <div class="left"><img src="../assets/img/maintain/shqx-head.png"/></div>
+        <div class="left"><img src="~@/assets/img/maintain/shqx-head.png"/></div>
         <div class="right">
           <div class="name">上海汽修平台<span>系统评分</span></div>
           <div class="avg">
-            <img src="../assets/img/maintain/score_yellow.png"  v-for="index in 3" :key="'yellow'+index">
-            <img src="../assets/img/maintain/score_gray.png"  v-for="index in 2" :key="'gray'+index">
+            <img src="~@/assets/img/maintain/score_yellow.png"  v-for="index in 3" :key="'yellow'+index">
+            <img src="~@/assets/img/maintain/score_gray.png"  v-for="index in 2" :key="'gray'+index">
             3分
           </div>
           <div class="msg">该企业已根据相关法律法规和政策完成《汽车维修电子健康档案系统》对接，因此设置该默认评分。</div>
@@ -101,8 +101,8 @@
 
 <script>
 import { Toast } from 'mint-ui'
-import SlideBar from '@/page/components/SlideBar'
-import maintainBottom from '@/page/maintainBottom'
+import SlideBar from '@/page/service-map/SlideBar'
+import maintainBottom from '@/page/service-map/maintainBottom'
 export default {
   name: "mantain-detail",
 	components:{SlideBar, maintainBottom},
@@ -123,8 +123,7 @@ export default {
 			    let name= _this.companyDetail.name
 			    window.location.href = `http://uri.amap.com/marker?position=${_this.all.lon},${_this.all.lat}&name=${name}&src=上海汽修平台&coordinate=wgs84&callnative=1`
 		    }
-	    },
-		    {
+	    }, {
 			    name: '百度地图',
 			    method(){
 				    let name= _this.all.name
@@ -323,7 +322,7 @@ export default {
         position: absolute;
         right: 0;
         top: 0;
-        background: url("../assets/img/maintain/phone.png") no-repeat right center;
+        background: url("~@/assets/img/maintain/phone.png") no-repeat right center;
         background-size: 20px;
       }
     }
@@ -336,7 +335,7 @@ export default {
     }
     .address{
       padding-left: 16px;
-      background: url("../assets/img/maintain/区域2.png") no-repeat left center;
+      background: url("~@/assets/img/maintain/区域2.png") no-repeat left center;
       background-size: 10px;
     }
     .avg{
@@ -365,19 +364,19 @@ export default {
           padding-left: 15px;
         }
         .yuyue{
-          background: url("../assets/img/maintain/预约服务.png") no-repeat left center;
+          background: url("~@/assets/img/maintain/预约服务.png") no-repeat left center;
           background-size: 13px;
         }
         .shangmeng{
-          background: url("../assets/img/maintain/上门服务.png") no-repeat left center;
+          background: url("~@/assets/img/maintain/上门服务.png") no-repeat left center;
           background-size: 13px;
         }
         .dianping{
-          background: url("../assets/img/maintain/点评.png") no-repeat left center;
+          background: url("~@/assets/img/maintain/点评.png") no-repeat left center;
           background-size: 13px;
         }
         .lianxi{
-          background: url("../assets/img/maintain/phone2.png") no-repeat left center;
+          background: url("~@/assets/img/maintain/phone2.png") no-repeat left center;
           background-size: 10px;
           color: black;
         }
@@ -522,13 +521,13 @@ export default {
     z-index: 10;
     .lookall{
       padding-left: 20px;
-      background: url("../assets/img/maintain/detail.png") no-repeat left center;
+      background: url("~@/assets/img/maintain/detail.png") no-repeat left center;
       display: inline-block;
       background-size: 15px;
     }
     .lookmap{
       padding-left: 20px;
-      background: url("../assets/img/maintain/map.png") no-repeat left center;
+      background: url("~@/assets/img/maintain/map.png") no-repeat left center;
       display: inline-block;
       background-size: 15px;
     }
@@ -538,7 +537,7 @@ export default {
       padding: 0 15px 0 35px;
       /*background-color: #438eff;*/
       border-radius: 10px;
-      background: #438eff url("../assets/img/maintain/mile.png") no-repeat 15px center;
+      background: #438eff url("~@/assets/img/maintain/mile.png") no-repeat 15px center;
       background-size: 15px;
       line-height: 30px;
       height: 30px;

@@ -245,6 +245,7 @@
 			    let height= 50
 			    // console.log('route', route)
 			    switch (this.$route.name){
+				    case 'school-map':
 				    case 'remark-map':{
 					    $('.footer').hide()
 					    height=0;

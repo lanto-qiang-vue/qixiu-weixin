@@ -9,7 +9,8 @@ export default new Router({
 		{path: '/index', name: 'index', component: resolve => require(['@/page/index'], resolve), meta: {index: 10, keepAlive: true}, children: [
 				{path: '/home', name: 'home', alias: '', component: resolve => require(['@/page/home/home'], resolve), meta: {index: 10, keepAlive: true}},
 				{path: '/doctor', name: 'doctor', component: resolve => require(['@/page/doctor/doctor'], resolve), meta: {index: 10}},
-				{path: '/maintain', name: 'maintain', component: resolve => require(['@/page/maintain'], resolve), meta: {index: 10, keepAlive: true}},
+				{path: '/maintain', name: 'maintain', component: resolve => require(['@/page/service-map/maintain'], resolve), meta: {index: 10, keepAlive: true}},
+
 
 				{path: '/my', name: 'my', component: resolve => require(['@/page/my'], resolve), meta: {index: 10}},
 				{path: '/carOwner-centre', name: 'carOwnerCentre', component: resolve => require(['@/page/home/carOwner-centre/carOwner-centre'], resolve), meta: {index: 20}},
@@ -137,12 +138,14 @@ export default new Router({
 		{path: '/myAppointment', name: 'myAppointment', component: resolve => require(['@/page/myAppointment'], resolve), meta: {requiresAuth: true, index: 20}},
 		{path: '/myOrder', name: 'myOrder', component: resolve => require(['@/page/myOrder'], resolve), meta: {requiresAuth: true, index: 20}},
 		{path: '/myRemark', name: 'myRemark', component: resolve => require(['@/page/remark/myRemark'], resolve), meta: {requiresAuth: true}},
-		{path: '/remarkMap', name: 'remark-map', component: resolve => require(['@/page/maintain'], resolve), meta: {keepAlive: false}},
+		{path: '/remarkMap', name: 'remark-map', component: resolve => require(['@/page/service-map/maintain'], resolve), meta: {keepAlive: false}},
 		{path: '/remarkMatch', name: 'remark-match', component: resolve => require(['@/page/remark/match'], resolve)},
 		{path: '/remarkDetail', name: 'remark-detail', component: resolve => require(['@/page/remark/newRemarkDetail'], resolve)},
 		{path: '/maintainRemark', name: 'maintainRemark', component: resolve => require(['@/page/maintainRemark'], resolve)},
 		{path: '/upComplain', name: 'upComplain', component: resolve => require(['@/page/remark/upComplain'], resolve), meta: {requiresAuth: true}},
 		{path: '/myComplaint', name: 'myComplaint', component: resolve => require(['@/page/myComplaint'], resolve), meta: {requiresAuth: true}},
 		{path: '/tips-list', name: 'tips-list', component: resolve => require(['@/page/home/tips-list'], resolve)},
+		{path: '/school-map', name: 'school-map', component: resolve => require(['@/page/service-map/maintain'], resolve), meta: {index: 10, keepAlive: true}},
+		{path: '/school-detail', name: 'school-detail', component: resolve => require(['@/page/service-map/school-detail'], resolve)},
 	]
 })
