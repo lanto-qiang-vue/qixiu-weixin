@@ -38,5 +38,6 @@ Vue.filter("FormatComplaintType", function (val) {
 
 Vue.filter("FormatArticle", function (value, title) {
   // console.log(value)
-  return (value.replace(/\ +/g,"").replace(/[ ]/g,"").replace(/[\r\n]/g,"").replace(/&nbsp;/ig, "")|| title)
+	let text= value? value.replace(/<\/?.+?>/g,"").replace(/\ +/g,"").replace(/[ ]/g,"").replace(/[\r\n]/g,"").replace(/&nbsp;/ig, "") :'';
+  return text|| title
 })

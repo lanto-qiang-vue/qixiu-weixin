@@ -258,6 +258,7 @@ export default {
 	    mapType(){
       	    let type= '164'
 		    switch (this.$route.name){
+			    case 'base-map':
 			    case 'school-map':{
 				    type= '300'
 				    break
@@ -450,6 +451,7 @@ export default {
 			      this.$router.push({path: '/remarkMatch', query: { corpId: item.sid }})
 			      break;
 		      }
+		      case 'base-map':
 		      case 'school-map':{
 			      this.$router.push({path: '/school-detail', query: { id: item.sid, distance: item.distance.toFixed(1) }})
 			      break;
