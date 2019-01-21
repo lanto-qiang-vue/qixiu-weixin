@@ -22,7 +22,7 @@
 		<p><label>学驾类型：</label>{{info.trainingScope}}</p>
 		<p><label>学车基地：</label>
 			<span v-for="(item, index) in info.baseList" :key="index">
-				<a @click="toBase(item.tag)">{{item.tag}}</a> <span v-if="index< info.baseList.length-1">，</span>
+				<a @click="toBase(item)">{{item.tag}}</a> <span v-if="index< info.baseList.length-1">，</span>
 			</span>
 		</p>
 		<p class="intro"><label>驾校介绍：</label><span>{{ info.about | FormatArticle('暂无')}}</span></p>
@@ -140,10 +140,15 @@ export default {
 				this.info= res.data
 			})
 		},
-		toBase(name){
+		toBase(item){
 			this.$router.push({
-				path: '/base-map',
-				query: { base: name }
+				path: '/school-map',
+				query: {
+					base: item.tag,
+					lng: item.lon,
+					lat: item.lat,
+					schoolPoint: 301
+				}
 			})
 		},
 		toCall(){

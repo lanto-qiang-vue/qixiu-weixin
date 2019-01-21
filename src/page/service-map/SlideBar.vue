@@ -131,6 +131,7 @@
           isMove=false
         }
         document.body.removeEventListener('touchmove', self.noscroll,false)
+	      // $(document).unbind('touchmove');
       });
 
       document.body.addEventListener('touchend', this.bodyScrollTop)

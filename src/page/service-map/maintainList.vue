@@ -309,6 +309,7 @@ export default {
 	    this.getQuery()
       // this.calcHeight(this.height)
       $(".roll").bind('touchmove',function(e){
+      	// console.log('.roll-touchmove')
         e.stopPropagation();
       })
     },
@@ -341,12 +342,12 @@ export default {
 
 		    return query
 	    },
-		  calcHeight(height){
-        let lh= parseInt(height -
-	        (document.querySelector(".search-input")?document.querySelector(".search-input").offsetHeight:0) -
-          (document.querySelector(".show")?document.querySelector(".show").offsetHeight: 0))
-        this.listHeight= (lh<0 ? 0 : lh)
-      },
+		calcHeight(height){
+			let lh= parseInt(height -
+			(document.querySelector(".search-input")?document.querySelector(".search-input").offsetHeight:0) -
+			(document.querySelector(".show")?document.querySelector(".show").offsetHeight: 0))
+			this.listHeight= (lh<0 ? 0 : lh)
+		},
 		  tagIsOn( arrName, val ){
         if (this.search[arrName]==val)  return true
         else return false
@@ -359,22 +360,53 @@ export default {
           self.calcHeight(self.height)
         },100)
       },
-      select( arrName, val ){
-        this.search[arrName]= val
-        if(arrName== 'hot') this.search.q= val
-        this.showBlock= 'button'
-        setTimeout(()=>{
-          this.calcHeight(this.height)
-        },500)
-        this.toQuery(true)
-      },
-      toQuery(clearList){
+		select( arrName, val ){
+			this.search[arrName]= val
+			switch(arrName){
+				case 'hot':{
+					this.search.q= val
+					this.toQuery(true)
+					break;
+				}
+				case 'schoolPoint' :{
+					console.log('schoolPoint', val)
+					switch (val){
+						case '300':{
+							this.$emit('renderMap', [], true);
+							this.toQuery(true)
+							break
+						}
+						case '301':{
+							this.$emit('renderMap', []);
+							this.getBase()
+							break
+						}
+						default:{
+							this.getBase()
+							this.toQuery(true)
+						}
+					}
+					break;
+				}
+				default :{
+					this.toQuery(true)
+				}
+			}
+
+			this.showBlock= 'button'
+			setTimeout(()=>{
+				this.calcHeight(this.height)
+			},500)
+
+
+		},
+		toQuery(clearList){
 		    // console.log(clearList)
-        this.clearList= clearList|| false
-        // this.$emit('query', this.search, this.clearList);
-        this.getCompList(clearList, clearList)
-      },
-	    getCompList(clearPoint, clearList){
+			this.clearList= clearList|| false
+			// this.$emit('query', this.search, this.clearList);
+			this.getCompList(clearList, clearList)
+		},
+		getCompList(clearPoint, clearList){
 		    if(clearList) this.page=1
 		    else this.page++
 		    let query= this.calcQuery()
@@ -415,7 +447,7 @@ export default {
 				    this.allLoaded= true
 			    }else this.allLoaded= false
 			    // this.renderMap()
-			    this.$emit('renderMap', this.pointList);
+		    	this.renderMap(this.pointList)
 		    })
 	    },
 	    getArea(){
@@ -428,6 +460,23 @@ export default {
 				    });
 			    }
 		    })
+	    },
+	    getBase(){
+			if(this.$route.name=='school-map' && this.search.schoolPoint!= 300){
+				this.axios({
+					baseURL: '/repairproxy',
+					url: '/micro/search/company?fl=sid,type,name,addr,lon,lat&q=&page=0,10&point='+this.location.lat+','+this.location.lng+'&fq=status:1+AND+type:301',
+					method: 'get',
+				}).then( (res) => {
+					this.renderMap(res.data.content, true)
+				})
+			}
+
+	    },
+	    dragend(){
+		    this.search.schoolPoint= ''
+		    this.search.base= ''
+		    this.getCompList(true, true)
 	    },
       key(e) {
         if ( e.keyCode == 13 || e=='search') {
@@ -446,14 +495,23 @@ export default {
         this.$store.commit('setMaintainListHistory', false)
       },
       goDetail(item){
+			let type= item.type.toString()
 	      switch (this.$route.name){
 		      case 'remark-map':{
 			      this.$router.push({path: '/remarkMatch', query: { corpId: item.sid }})
 			      break;
 		      }
-		      case 'base-map':
 		      case 'school-map':{
-			      this.$router.push({path: '/school-detail', query: { id: item.sid, distance: item.distance.toFixed(1) }})
+			      if(type=='301'){
+				      this.search.schoolPoint= '301'
+				      this.search.base= item.name.replace('驾校基地', '')
+				      this.$emit('goMap', item)
+				      this.getCompList(true, true)
+			      }else{
+				      this.$router.push({
+					      path: '/school-detail',
+					      query: { id: item.sid, distance: item.distance.toFixed(1) }})
+			      }
 			      break;
 		      }
 		      default :{
@@ -464,6 +522,77 @@ export default {
 	      }
 
       },
+	    renderMap(pointList, renderMarker){
+
+		    let iconNormal = new AMap.Icon({
+			    image: "/static/img/maintain/icon-normal.png",
+			    size: new AMap.Size(30, 30),
+			    // imageOffset: new AMap.Size(11, 11),
+			    imageSize: new AMap.Size(30, 30),
+		    });
+		    let icon4s = new AMap.Icon({
+			    image: "/static/img/maintain/icon-4s.png",
+			    size: new AMap.Size(30, 30),
+			    // imageOffset: new AMap.Size(11, 11),
+			    imageSize: new AMap.Size(30, 30),
+		    });
+		    let iconSchool = new AMap.Icon({
+			    image: "/static/img/maintain/icon-school.png",
+			    size: new AMap.Size(30, 30),
+			    // imageOffset: new AMap.Size(11, 11),
+			    imageSize: new AMap.Size(30, 30),
+		    });
+		    let iconBase = new AMap.Icon({
+			    image: "/static/img/maintain/icon-base.png",
+			    size: new AMap.Size(30, 30),
+			    // imageOffset: new AMap.Size(11, 11),
+			    imageSize: new AMap.Size(30, 30),
+		    });
+
+		    let markers= []
+		    for (let i in pointList){
+			    let point= pointList[i]
+			    let type= point.type.toString()
+			    let routeName= this.$route.name
+			    let lngLat= new AMap.LngLat(point.lon|| this.location.lng, point.lat|| this.location.lat)
+			    let marker= null, icon= null
+
+			    switch (type){
+				    case '300':{
+					    icon= iconSchool
+					    break;
+				    }
+				    case '301':{
+					    icon= iconBase
+					    break;
+				    }
+				    default :{
+					    icon= point.is4s? icon4s: iconNormal
+				    }
+			    }
+			    marker= new AMap.Marker({
+				    icon: icon,
+				    position: lngLat,
+				    extData: point
+			    })
+
+			    marker.on('click', (e) => {
+			    	this.goDetail(e.target.getExtData())
+			    })
+			    markers.push(marker)
+		    }
+
+		    console.log('markers', markers)
+
+		    // if(renderMarker){
+			 //    this.$emit('renderMarker', markers);
+		    // }else{
+			 //    this.$emit('renderClusterer', markers);
+		    // }
+
+		    this.$emit('renderMap', markers, renderMarker||false);
+
+	    },
       focus(){
         this.showBlock= 'button'
 		    this.isFocus=true

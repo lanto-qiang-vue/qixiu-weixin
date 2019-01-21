@@ -10,9 +10,9 @@
 
       <div id="container"></div>
 
-    </div>
+     </div>
 
-	<maintain-list ref="maintainList" :location="location" @renderMap="pointList=$event; renderMap()"></maintain-list>
+	<maintain-list ref="maintainList" :location="location" @renderMap="renderMap" @goMap="goMap"></maintain-list>
 	<maintain-detail ref="maintainDetail" ></maintain-detail>
 
 
@@ -34,8 +34,8 @@
 
 	      map: null,
 	      geolocation: null,
-	      markerClusterer: null,
-	      markers: null,
+	      markerClusterer: [],
+	      markers: [],
 
 
 	      location:{
@@ -66,7 +66,8 @@
     },
 
     mounted(){
-		this.init()
+	    this.getQuery(true)
+
 
 	    this.setShowBody()
 
@@ -74,6 +75,7 @@
     },
     activated(){
       let self=this
+	    this.getQuery()
 	    this.setShowBody()
       setTimeout(function () {
         self.renderMap()
@@ -88,6 +90,16 @@
       // document.body.removeEventListener('touchmove', this.noscroll,false)
     },
     methods: {
+	    getQuery( mounted){
+		    if(this.$route.query &&this.$route.query.lng  &&this.$route.query.lat){
+		    	this.location.lng= this.$route.query.lng
+		    	this.location.lat= this.$route.query.lat
+		    }
+		    if(this.$route.query || mounted){
+			    this.init()
+			    history.replaceState(null, null, window.location.origin + window.location.hash)
+		    }
+	    },
     	init(){
 		   Indicator.open({
 			    text: '请稍候...',
@@ -117,7 +129,8 @@
 			    let center= this.map.getCenter()
 			    this.location.lng= center.lng
 			    this.location.lat= center.lat
-			    this.getCompList(false, true)
+			    // this.getCompList(false, true)
+			    this.$refs.maintainList.dragend()
 		    });
 
 
@@ -183,7 +196,7 @@
 
 	    getCompList(clearPoint, clearList){
     		this.$refs.maintainList.getCompList(clearPoint, clearList)
-
+		    this.$refs.maintainList.getBase()
 	    },
 
 
@@ -216,57 +229,34 @@
         }
       },
 
+      renderMap(markers, renderMarker){
 
-      renderMap(){
-	      if(this.markerClusterer ) {
-		      this.markerClusterer.clearMarkers();
-		      this.markerClusterer.setMap(null);
-		      this.markerClusterer= null
-	      }
-	      let iconNormal = new AMap.Icon({
-		      image: "/static/img/maintain/icon-normal.png",
-		      size: new AMap.Size(52, 52),
-		      imageOffset: new AMap.Size(11, 11),
-		      imageSize: new AMap.Size(30, 30),
-	      });
-	      let icon4s = new AMap.Icon({
-		      image: "/static/img/maintain/icon-4s.png",
-		      size: new AMap.Size(52, 52),
-		      imageOffset: new AMap.Size(11, 11),
-		      imageSize: new AMap.Size(30, 30),
-	      });
-	      this.markers= []
-	      for (let i in this.pointList){
-		      let lngLat= new AMap.LngLat(this.pointList[i].lon|| this.location.lng, this.pointList[i].lat|| this.location.lat)
-		      let marker= new AMap.Marker({
-			      icon: this.pointList[i].is4s? icon4s: iconNormal,
-			      position: lngLat,
-			      extData: this.pointList[i]
-		      })
-		      marker.on('click', (e) => {
-			      switch (this.$route.name){
-				      case 'remark-map':{
-					      this.$router.push({path: '/remarkMatch', query: { corpId: e.target.getExtData().sid }})
-					      break;
-				      }
-				      default :{
-					      this.getCompanyDetail(e.target.getExtData())
-				      }
-			      }
-		      })
-		      this.markers.push(marker)
+
+	      this.map.clearMap()
+
+	      if(markers){
+		      if(renderMarker){
+			      //renderMarker为true代表无聚合点，目前学车基地是无聚合点
+			      this.markers= markers
+		      }else{
+			      this.markerClusterer= markers
+		      }
 	      }
 
-	      let style={
-		      url: '/static/img/position-num.png',
-		      size: new AMap.Size(40, 40),
-		      textColor: '#fff',
-		      textSize: 14
+	      if(this.markers.length) this.map.add(this.markers)
+	      if(this.markerClusterer.length){
+		      let style={
+			      url: '/static/img/position-num.png',
+			      size: new AMap.Size(30, 30),
+			      imageOffset:new AMap.Pixel(-5,-5),
+			      textColor: '#fff',
+			      textSize: 14
+		      }
+		      AMap.plugin(["AMap.MarkerClusterer"],() => {
+			       new AMap.MarkerClusterer(this.map, this.markerClusterer,{styles:[style, style, style]});
+			      // console.log('renderMap() over')
+		      });
 	      }
-	      AMap.plugin(["AMap.MarkerClusterer"],() => {
-		      this.markerClusterer = new AMap.MarkerClusterer(this.map, this.markers,{styles:[style, style, style]});
-		      // console.log('renderMap() over')
-	      });
 
 
       },
@@ -302,6 +292,7 @@
 
 	    setShowBody(){
 		    switch (this.$route.name){
+			    case 'school-map':
 			    case 'remark-map':{
 				    this.$store.commit('setSlideShowBody', 'maintainList')
 				    break;
@@ -444,539 +435,6 @@
         height: 100%
       }
 
-    }
-    #popover {
-      z-index: 1000;
-      width: 90%;
-      height: 450px;
-      border-radius: 15px;
-      left: 5% !important;
-      top: 50% !important;
-      transform: translateY(-50%);
-      background-color: #fff;
-      .mui-popover-arrow {
-        height: 0;
-      }
-      .close_btn {
-        position: absolute;
-        left: 50%;
-        bottom: -50px;
-        width: 35px;
-        height: 35px;
-        transform: translateX(-50%);
-        background: url(~@/assets/img/maintain/close.png) no-repeat;
-        background-size: contain;
-      }
-      >#top {
-        height: 130px; // line-height: 20px;
-        border-radius: 15px 15px 0 0;
-        background: linear-gradient(to right, #67aafb, #3b83f6);
-        overflow: hidden;
-        .title {
-          height: 60px;
-          margin-top: 25px;
-          .img {
-            width: 60px;
-            height: 60px;
-            background-color: #fff;
-            margin: 0 13px;
-            float: left;
-          }
-          span {
-            color: #fff;
-            font-size: 16px;
-            line-height: 26px;
-            font-family: 'PingFang-SC-Medium';
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-          }
-        }
-        @media screen and (min-width: 320px) {
-          .address {
-            font-size: 12px;
-          }
-        }
-        @media screen and (min-width: 375px) {
-          .address {
-            font-size: 14px;
-          }
-        }
-        .address {
-          height: 20px;
-          color: #fff;
-          margin-top: 15px;
-          margin-left: 15px;
-          .name {
-            height: 20px;
-            width: 79%;
-            float: left;
-            position: relative;
-            em {
-              width: 15px;
-              height: 15px;
-              background: url(~@/assets/img/maintain/address.png) no-repeat;
-              background-size: contain;
-              position: absolute;
-              top: 2px;
-            }
-            span {
-              margin-left: 18px;
-              display: inline-block;
-              width: 92%;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            }
-          }
-          .mile {
-            float: right;
-            margin-right: 10px;
-            position: relative;
-            i {
-              position: absolute;
-              border: none;
-              width: 15px;
-              height: 15px;
-              background: url(~@/assets/img/maintain/mile.png) no-repeat;
-              background-size: contain;
-              top: -15px;
-              left: 50%;
-              transform: translateX(-50%);
-            }
-          }
-        }
-      }
-      >.content {
-        >.top {
-          height: 50px;
-          color: #666;
-          >.left {
-            float: left;
-            border-bottom: 1px solid #eee;
-            border-right: 1px solid #eee;
-            width: 50%;
-            height: 100%;
-            box-sizing: border-box;
-            >p {
-              text-align: center;
-              color: red;
-              margin-bottom: 0;
-              margin-top: 5px;
-              width: 100%;
-              height: 18px;
-              line-height: 22px;
-            }
-            span {
-              display: block;
-              text-align: center;
-              font-size: 14px;
-              line-height: 24px;
-            }
-          }
-          >.right {
-            border-bottom: 1px solid #eee;
-            height: 100%;
-            float: right;
-            width: 50%;
-            position: relative;
-            .stars {
-              position: absolute;
-              font-size: 1px;
-              width: 88px;
-              height: 14px;
-              left: 50%;
-              transform: translateX(-50%);
-              top: 8px;
-              img {
-                width: 14px;
-                height: 14px;
-                margin-right: 3px;
-                float: left;
-              }
-            }
-            p {
-              text-align: center;
-              margin-top: 22px;
-              color: #666;
-              width: 100%;
-              line-height: 26px;
-            }
-          }
-        }
-        >.middle {
-          height: 230px;
-          padding: 17px 12px;
-          font-size: 12px;
-          color: #333;
-          overflow: auto;
-          .hehe {
-            min-height: 31px;
-            .left {
-              float: left;
-              width: 70px;
-              padding-bottom: 10px;
-              position: relative;
-              img {
-                position: absolute;
-                width: 22px;
-                height: 22px;
-                right: 0;
-                top: 0;
-                transform: translate(50%, 0);
-                border-radius: 50%;
-              }
-            }
-            .right {
-              margin-left: 70px;
-              padding-left: 20px;
-              border-left: 1px solid #eee;
-              padding-bottom: 10px;
-              display: block;
-              min-height: 31px;
-            }
-          }
-        }
-        >.bottom {
-          text-align: center;
-          line-height: 40px;
-          border-radius: 0 0 15px 15px;
-          color: #4285f4;
-          border-top: 1px solid #eee;
-          >div {
-            width: 33.2%;
-            float: left;
-            border-right: 1px solid #ccc;
-          }
-          >div:last-child {
-            border-right: none;
-          }
-        }
-      }
-    }
-    .filter {
-      background-color: rgba(0, 0, 0, 0);
-      width: 100%;
-      height: 100%;
-      .closeFilter {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background-color: #f00;
-        left: 0;
-        top: 0;
-      }
-      .contentAside {
-        width: 12%;
-        height: calc(100vh);
-        float: left;
-      }
-      .contentWrap {
-        margin-left: 12%;
-        background-color: #fff;
-        height: 100%;
-        overflow: auto;
-        .content {
-          position: relative;
-          color: #2d2d2d;
-          padding-bottom: 50px;
-          >ul {
-            >li::after {
-              height: 0;
-            }
-            >li:last-child {}
-            >li {
-              border-bottom: 10px solid #f8f8f8;
-              a {
-                border-bottom: 1px solid #eee;
-                transition: all 50s;
-              }
-              .mui-collapse-content {
-                margin-top: 15px;
-                border-bottom: 1px solid #eee;
-                padding: 15px 0 3px;
-                >ul {
-                  margin: 0 auto;
-                  width: 94%;
-                  overflow: hidden;
-                  >li {
-                    padding: 0 3px;
-                    float: left;
-                    border: 1px solid #ddd;
-                    border-radius: 5px;
-                    width: 31%;
-                    height: 35px;
-                    line-height: 35px;
-                    margin-right: 3.5%;
-                    box-sizing: border-box;
-                    font-size: 12px;
-                    text-align: center;
-                    margin-bottom: 12px;
-                    color: #666;
-                  }
-                  >li:nth-child(3n) {
-                    margin-right: 0;
-                  }
-                  .active {
-                    /* 被选中的样式 */
-                    background-color: #ecf3fe;
-                    color: #4285f4;
-                    border: 1px solid #3e87f6 !important;
-                  }
-                }
-              }
-              .carBrandChoose {
-                padding: 0 0 3px;
-              }
-            }
-            .mui-active {
-              background-color: #fff;
-              margin-top: 0;
-            }
-          }
-          >ul::before,
-          >ul::after {
-            height: 0;
-          }
-          .carBrand {
-            height: 100%;
-            overflow: auto;
-            .mint-indexlist-navlist {
-              overflow: auto;
-            }
-            .mint-indexsection-index {
-              padding: 5px 10px;
-            }
-            .mint-cell-title {
-              flex: 0;
-            }
-            .mint-cell-wrapper {
-              position: relative;
-              .mint-cell-value {
-                width: 100%;
-                span {
-                  margin-left: 15px;
-                  color: #333;
-                }
-                .mui-radio {
-                  width: 100%;
-                  position: static;
-                  label {
-                    color: #333;
-                  }
-                  input {
-                    position: absolute;
-                    right: 35px;
-                    top: 10px;
-                  }
-                  input[type=radio]::before {
-                    content: ''
-                  }
-                  input[type=radio]:checked::before {
-                    content: '\e442'
-                  }
-                }
-              }
-            }
-          }
-        }
-        .content_brand {
-          padding-top: 40px;
-          .brand_header {
-            width: 88%;
-            height: 40px;
-            background-color: #f7f7f7;
-            border-bottom: 1px solid #ddd;
-            position: fixed;
-            top: 0;
-            right: 0;
-            z-index: 10000;
-            h1 {
-              margin: 0;
-              font-size: 16px;
-              text-align: center;
-              line-height: 40px;
-              font-weight: normal;
-            }
-            a {
-              width: 50px;
-              height: 100%;
-              position: absolute;
-              right: 0;
-              top: 0;
-              line-height: 40px;
-              text-align: center;
-            }
-          }
-          .mint-indexlist {
-            height: calc(100vh - 40px);
-            >ul {
-              height: 100% !important;
-              li {
-                ul li {
-                  border-bottom: 1px solid #eee;
-                  &:last-child {
-                    border-bottom: none;
-                  }
-                  .mint-cell-wrapper {
-                    img {
-                      margin-right: 5px;
-                    }
-                    .mui-input-row input::before {
-                      content: ''
-                    }
-                    .mui-input-row .choosed::before {
-                      content: '\e442';
-                    }
-                  }
-                }
-              }
-            }
-            .mint-indexlist-navlist {
-              overflow: scroll;
-              li {
-                padding: 1px 6px;
-              }
-            }
-          }
-        }
-        .confirm {
-          height: 50px;
-          width: 100%;
-          transform: translateZ(0);
-          -webkit-transform: translateZ(0);
-          border-top: 1px solid #eee;
-          position: fixed;
-          left: 12%;
-          bottom: 0;
-          padding: 0 6%;
-          font-size: 0;
-          z-index: 3000;
-          background-color: #fff;
-          button {
-            font-size: 16px;
-            width: 40%;
-            margin-right: 6%;
-            height: 35px;
-            margin-top: 7px;
-            background-color: #fff;
-            border-radius: 6px;
-            border: none;
-            border: 1px solid #ddd;
-            outline: none;
-          }
-          button:nth-child(2) {
-            background: linear-gradient(to right, #77b9fe, #3882f5);
-            color: #fff;
-          }
-        }
-      }
-    }
-    .company_list {
-      border-top: 1px solid #f6f6f6;
-      width: 100%;
-      height: calc(100vh - 135px);
-      background-color: #fff;
-      position: absolute;
-      top: 85px;
-      left: 0;
-      z-index: 15;
-      overflow: scroll;
-      /*ul{margin-bottom: 50px}*/
-      ul li {
-        padding: 10px;
-        border-bottom: 1px solid #f6f6f6;
-        .picWrap {
-          float: left;
-          width: 80px;
-          height: 80px;
-          border-radius: 5px;
-          overflow: hidden;
-          img {
-            width: 100%;
-            height: 100%;
-          }
-        }
-        .info {
-          height: 80px;
-          margin-left: 90px;
-          p {
-            font-size: 16px;
-            margin-bottom: 0;
-            color: #000;
-            overflow: hidden;
-            text-overflow:ellipsis;
-            white-space: nowrap;
-            span {
-              color: red;
-            }
-          }
-          .stars {
-            height: 20px;
-            margin: 6px 0 10px;
-            img {
-              width: 15px;
-              height: 15px;
-              margin-top: 2px;
-              margin-right: 3px;
-              float: left;
-            }
-            span {
-              color: #999;
-              margin-left: 10px;
-              font-size: 14px;
-            }
-          }
-          .address {
-            color: #666;
-            font-size: 14px;
-            .miles {
-              float: right;
-            }
-            .address_area {
-              display: block;
-              margin-right: 60px;
-              overflow: hidden;
-              text-overflow:ellipsis;
-              white-space: nowrap;
-            }
-          }
-        }
-      }
-    }
-    .maplist{
-      width: 100%;
-      max-height: 40vh;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      background: white;
-      overflow: auto;
-      padding: 0 10px;
-      /*border-top: 10px solid white;*/
-      li{
-        padding: 10px 0;
-        border-bottom: 1px solid #eeeeee;
-        position: relative;
-        p{
-          margin-top: 5px;
-          margin-bottom: 0;
-        }
-        .sight{
-          width: 20px;
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          right: 0;
-          margin: auto 5px;
-          display: none;
-        }
-      }
-      li.on .sight{
-        display: block;
-      }
     }
 
   }

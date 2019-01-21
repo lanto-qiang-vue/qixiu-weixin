@@ -643,7 +643,7 @@ export default {
         margin-top: 65%;
       }
       .dummy.on{
-        margin-top: 64%;
+        margin-top: 62%;
       }
       .content{
         position:absolute;
@@ -666,7 +666,8 @@ export default {
             text-align: center;
             margin-top: 5px;
             img{
-              width: 65%;
+	            width: 65%;
+                max-width: 55px;
             }
             p{
               color: black;
