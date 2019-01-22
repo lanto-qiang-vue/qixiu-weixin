@@ -13,7 +13,7 @@
 	<div id="head1" v-show="showHead=='search'">
     <div class="search-input">
     <div class="left" :class="{on: !isFocus&& !search.q}">
-      <input v-model="search.q" type="search" placeholder=' 搜索：企业名、地址、品牌、服务内容'
+      <input v-model="search.q" type="search" :placeholder='inputPlaceholder'
              @focus="focus" @blur="isFocus=false" @keydown="key($event)" ref="searchInput"/>
       <div class="query"  @click="toQuery(true)"></div>
       <img class="close" v-show="search.q" @click="search.q='';toQuery(true)" src="~@/assets/img/maintain/关闭.png" />
@@ -143,8 +143,8 @@
 					    <!--<span>{{businessStatus(item.status)}}</span>-->
 
 					    <!--<span class="orange">{{item.grade=='N' ?'未评级' :item.grade}}</span>-->
-					    <p>{{ item.name.split('(')[0] }}<span style="color: #fa8c16">{{item.grade=='N' ?'未评级' :item.grade}}级</span></p>
-					    <div class="item">({{ item.name.split('(')[1] }}</div>
+					    <p>{{ item.name.split('(')[0] }}<span style="color: #fa8c16">{{item.grade=='N' ?'未评' :item.grade}}级</span></p>
+					    <div class="item">{{ item.name.substring(item.name.indexOf('('), item.name.length)  }}</div>
 					    <div class="item">培训驾照类型：{{item.bizScope}}</div>
 					    <!--<div class="item">训练基地：{{item.tag}}</div>-->
 					    <div class="address">
@@ -265,6 +265,7 @@ export default {
         clearList: true,
 			loading: true,
 			showHead: 'search',
+			inputPlaceholder: '搜索：企业名、地址、品牌、服务内容'
 
       }
     },
@@ -278,8 +279,9 @@ export default {
 	    mapType(){
       	    let type= '164'
 		    switch (this.$route.name){
-			    case 'base-map':
 			    case 'school-map':{
+			    	this.search.sort= 'rating desc,distance asc'
+			    	this.inputPlaceholder= '搜索：驾校名、驾校地址'
 				    type= '300'
 				    break
 			    }
@@ -296,6 +298,9 @@ export default {
       },
 	    getSchoolPoint(){
       	    return this.search.schoolPoint
+	    },
+	    originalLng(){
+      	    return this.originalLocation.lng
 	    }
     },
     watch:{
@@ -322,7 +327,11 @@ export default {
       },
       blur(){
         $('.search-input input').blur()
-      }
+      },
+	    originalLng(){
+      	    this.search.sort= ''
+		    this.getCompList(true, true)
+	    }
     },
     mounted(){
 		this.getArea()
@@ -502,7 +511,7 @@ export default {
 	    },
 	    dragend(){
 		    this.showHead= 'search'
-		    this.search.schoolPoint= ''
+		    // this.search.schoolPoint= ''
 		    this.search.base= ''
 		    this.search.area= ''
 		    this.getCompList(true, true)
@@ -606,6 +615,7 @@ export default {
 					    callback= (e)=>{
 							this.search= deepClone(search)
 						    this.search.type= '300'
+						    this.search.sort= 'rating desc,distance asc'
 						    this.search.base= e.target.getExtData().name.replace('驾校基地', '')
 						    this.showHead= 'base'
 						    this.getCompList(true, true, true)

@@ -12,7 +12,7 @@
 	</div>
 	<img v-else style="width: 100%" src="~@/assets/img/maintain/暂无图片.png"/>
 	<div class="head">
-		<div class="title">{{info.name}}</div>
+		<div class="title">{{info.simpleName}}({{info.name}})</div>
 		<div class="level">{{info.creditLevel=="N" ? "未评" :info.creditLevel}}级</div>
 		<div class="address">
 			<span class="miles" @click="sheetVisible= true">距离{{ distance }}km</span>
@@ -55,7 +55,7 @@
 		<div class="body">
 			<div class="title">{{info.name}}</div>
 			<div v-html="info.about" class="detail"></div>
-			<img v-for="(item, key) in bannerList" :key="key" :src="item"/>
+			<!--<img v-for="(item, key) in bannerList" :key="key" :src="item"/>-->
 		</div>
 
 	</mt-popup>

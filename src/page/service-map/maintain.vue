@@ -307,6 +307,7 @@
 		  let self=this
 		  this.getQuery()
 		  this.setShowBody()
+		  this.bodyNoScoll()
 		  setTimeout(function () {
 			  self.renderMap()
 			  // self.bodyNoScoll()
