@@ -143,7 +143,7 @@
       },
 
       tel(newVal, oldVal){
-        let reg = /^1[3|4|5|7|8|9][0-9]{9}$/
+        let reg = /^1[3456789]\d{9}$/
         if (reg.test(newVal)) {
           this.state1 = 'success'
         } else if(newVal.trim()==='') {
@@ -394,7 +394,7 @@
       },
 
       getCaptcha() {
-        let reg = /^1[3|4|5|7|8|9][0-9]{9}$/
+        let reg = /^1[3456789]\d{9}$/
         let _this = this
         if(this.tel === ''){
           return Toast('手机号不能为空')

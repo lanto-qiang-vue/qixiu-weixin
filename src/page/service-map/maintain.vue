@@ -12,7 +12,7 @@
 
      </div>
 
-	<maintain-list ref="maintainList" :location="location" @renderMap="renderMap" @goMap="goMap"></maintain-list>
+	<maintain-list ref="maintainList" :location="location" :originalLocation="originalLocation" @renderMap="renderMap" @goMap="goMap"></maintain-list>
 	<maintain-detail ref="maintainDetail" ></maintain-detail>
 
 
@@ -30,11 +30,10 @@
     data() {
       return {
 
-	      pointList: [],
-
 	      map: null,
 	      geolocation: null,
-	      markerClusterer: [],
+	      markerClustererPoint: [],
+	      markerClusterer: null,
 	      markers: [],
 
 
@@ -42,7 +41,10 @@
 		      lng: '121.480236',
 		      lat: '31.236301'
 	      },
-
+	      originalLocation:{
+		      lng: '121.480236',
+		      lat: '31.236301'
+	      }
       }
     },
 
@@ -66,6 +68,7 @@
     },
 
     mounted(){
+    	this.bodyNoScoll()
 	    this.getQuery(true)
 
 
@@ -73,22 +76,7 @@
 
 
     },
-    activated(){
-      let self=this
-	    this.getQuery()
-	    this.setShowBody()
-      setTimeout(function () {
-        self.renderMap()
-        // self.bodyNoScoll()
-        // self.toQuery()
-      },500)
-    },
-    deactivated(){
-      // document.body.removeEventListener('touchmove', this.noscroll,false)
-    },
-    beforeDestory(){
-      // document.body.removeEventListener('touchmove', this.noscroll,false)
-    },
+
     methods: {
 	    getQuery( mounted){
 		    if(this.$route.query &&this.$route.query.lng  &&this.$route.query.lat){
@@ -97,7 +85,7 @@
 		    }
 		    if(this.$route.query || mounted){
 			    this.init()
-			    history.replaceState(null, null, window.location.origin + window.location.hash)
+			    history.replaceState(null, null, window.location.origin + window.location.hash.split('?')[0])
 		    }
 	    },
     	init(){
@@ -112,11 +100,16 @@
 		    // 同时引入工具条插件，比例尺插件和鹰眼插件
 		    AMap.plugin(['AMap.ToolBar',], () => {
 			    // 在图面添加工具条控件，工具条控件集成了缩放、平移、定位等功能按钮在内的组合控件
-			    this.map.addControl(new AMap.ToolBar({
+			    let tool= new AMap.ToolBar({
 				    locate: false,
 				    position: 'LT',
 				    offset: new AMap.Pixel(0,55)
-			    }));
+			    })
+			    tool.on('zoomchanged',(obj) => {
+			    	// console.log('zoomchanged.obj', obj)
+				    // return false
+			    })
+			    this.map.addControl(tool);
 		    });
 
 		    this.map.on('complete', () => {
@@ -154,6 +147,8 @@
 					    this.map.add(new AMap.Marker(result.position))
 					    this.location.lng= result.position.lng
 					    this.location.lat= result.position.lat
+					    this.originalLocation.lng= result.position.lng
+					    this.originalLocation.lat= result.position.lat
 					    this.getCompList(true, true)
 				    });//返回定位信息
 				    AMap.event.addListener(this.geolocation, 'error', (err)=>{
@@ -221,7 +216,7 @@
         }
         // overscroll(document.querySelector('.slide-bar'));
         document.body.addEventListener('touchmove', this.noscroll, { passive: false })
-        document.getElementById("allmap").addEventListener('touchmove', this.noscroll, { passive: false })
+        // document.getElementById("allmap").addEventListener('touchmove', this.noscroll, { passive: false })
       },
       noscroll(evt) {
         if(!evt._isScroller) {
@@ -230,7 +225,11 @@
       },
 
       renderMap(markers, renderMarker){
-
+	      if(this.markerClusterer ) {
+		      this.markerClusterer.clearMarkers();
+		      this.markerClusterer.setMap(null);
+		      this.markerClusterer= null
+	      }
 
 	      this.map.clearMap()
 
@@ -239,12 +238,12 @@
 			      //renderMarker为true代表无聚合点，目前学车基地是无聚合点
 			      this.markers= markers
 		      }else{
-			      this.markerClusterer= markers
+			      this.markerClustererPoint= markers
 		      }
 	      }
 
 	      if(this.markers.length) this.map.add(this.markers)
-	      if(this.markerClusterer.length){
+	      if(this.markerClustererPoint.length){
 		      let style={
 			      url: '/static/img/position-num.png',
 			      size: new AMap.Size(30, 30),
@@ -253,7 +252,7 @@
 			      textSize: 14
 		      }
 		      AMap.plugin(["AMap.MarkerClusterer"],() => {
-			       new AMap.MarkerClusterer(this.map, this.markerClusterer,{styles:[style, style, style]});
+			      this.markerClusterer= new AMap.MarkerClusterer(this.map, this.markerClustererPoint,{styles:[style, style, style]});
 			      // console.log('renderMap() over')
 		      });
 	      }
@@ -263,8 +262,9 @@
 
 
       goLatePoint(){
-    		if(this.pointList.length)
-	      this.map.panTo(new AMap.LngLat(this.pointList[0].lng, this.pointList[0].lat))
+    		if(this.markerClustererPoint.length)
+	      this.map.panTo(new AMap.LngLat(this.markerClustererPoint[0].getExtData().lon,
+		      this.markerClustererPoint[0].getExtData().lat))
 
       },
 
@@ -302,7 +302,23 @@
 			    }
 		    }
 	    }
-    }
+    },
+	  activated(){
+		  let self=this
+		  this.getQuery()
+		  this.setShowBody()
+		  setTimeout(function () {
+			  self.renderMap()
+			  // self.bodyNoScoll()
+			  // self.toQuery()
+		  },500)
+	  },
+	  deactivated(){
+		  document.body.removeEventListener('touchmove', this.noscroll,false)
+	  },
+	  beforeDestory(){
+		  document.body.removeEventListener('touchmove', this.noscroll,false)
+	  },
   }
 </script>
 <style scoped>

@@ -1,20 +1,21 @@
 <template>
 <div class="school-detail">
-	<div class="banner">
+	<div class="banner" v-if="bannerList.length">
 		<div class='dummy'></div>
 		<div class='content'>
 			<mt-swipe :auto="3000">
-				<mt-swipe-item v-for="(item, index) in getBanner" :key="index">
+				<mt-swipe-item v-for="(item, index) in bannerList" :key="index">
 					<img :src="item" v-img="{group: 'school-img'}"/>
 				</mt-swipe-item>
 			</mt-swipe>
 		</div>
 	</div>
+	<img v-else style="width: 100%" src="~@/assets/img/maintain/暂无图片.png"/>
 	<div class="head">
 		<div class="title">{{info.name}}</div>
 		<div class="level">{{info.creditLevel=="N" ? "未评" :info.creditLevel}}级</div>
 		<div class="address">
-			<span class="miles">距离{{ $route.query.distance }}km</span>
+			<span class="miles" @click="sheetVisible= true">距离{{ distance }}km</span>
 			<span class="address_area">{{ info.address }}</span>
 		</div>
 	</div>
@@ -51,9 +52,12 @@
 
 	<mt-popup v-model="showMore" position="right" class="show-more">
 		<mt-header title="驾校详情" class="popup-header"><mt-button icon="back" slot="left" @click="showMore=false"></mt-button></mt-header>
-		<div class="title">{{info.name}}</div>
-		<div v-html="info.about" class="detail"></div>
-		<img v-for="(item, key) in getPic" :key="key" :src="item"/>
+		<div class="body">
+			<div class="title">{{info.name}}</div>
+			<div v-html="info.about" class="detail"></div>
+			<img v-for="(item, key) in bannerList" :key="key" :src="item"/>
+		</div>
+
 	</mt-popup>
 
 	<mt-popup v-model="showForm" position="right" class="show-form">
@@ -72,6 +76,12 @@
 		<span>请留意手机，驾校将与您联系</span>
 		<div class="back-home" @click="$router.go(-2)">返回首页</div>
 	</mt-popup>
+
+	<mt-actionsheet
+			style="z-index: 16"
+			:actions="actions"
+			v-model="sheetVisible">
+	</mt-actionsheet>
 </div>
 </template>
 
@@ -92,7 +102,10 @@ export default {
 				phoneNo: '',
 				category: ''
 			},
-			state: 'warning'
+			state: 'warning',
+
+			actions: [],
+			sheetVisible: false,
 		}
 	},
 	computed: {
@@ -106,23 +119,29 @@ export default {
 			}
 			return type
 		},
-		getBanner(){
-			return this.bannerList()
-		},
-		getPic(){
-			return this.bannerList(true)
-		},
 		tel(){
 			return this.info.phoneNo? this.info.phoneNo.split('/'): []
 		},
 		inputTel(){
 			// console.log(this.signForm.phoneNo)
 			return this.signForm.phoneNo
+		},
+		bannerList(){
+			// console.log('bannerList')
+			let arr= this.info.pic? this.info.pic.split(','): []
+			return arr
+		},
+		distance(){
+			let p1= [this.$route.query.lng, this.$route.query.lat]
+			let p2= [this.info.lon||0, this.info.lat|| 0]
+			let distance= AMap.GeometryUtil.distance(p1, p2)
+			// console.log('distance', distance)
+			return (distance/1000).toFixed(1);
 		}
 	},
 	watch:{
 		inputTel(val){
-			let p1 = /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[013-8]|8\d|9\d)\d{8}$/;
+			let p1 = /^1[3456789]\d{9}$/;
 			let p2=/0\d{2,3}-\d{7,8}/;
 			if (p2.test(val)||p1.test(val)||!val) {
 				this.state= 'success'
@@ -138,6 +157,7 @@ export default {
 		getInfo(){
 			this.axios.get('/training/driving/school/'+ this.$route.query.id).then( (res) => {
 				this.info= res.data
+				this.toNavigation()
 			})
 		},
 		toBase(item){
@@ -163,11 +183,6 @@ export default {
 				this.showTel= true
 			}
 		},
-		bannerList(detail){
-			console.log('bannerList')
-			let arr= this.info.pic? this.info.pic.split(','): (detail? []:['/static/img/shqxwbig.png'])
-			return arr
-		},
 		toSign(){
 			if(this.state!= 'success'){
 				return
@@ -179,6 +194,22 @@ export default {
 					this.showOk= true
 				}
 			})
+		},
+		toNavigation(){
+			let name= this.info.name
+			let address= this.info.address
+			let position= `${this.info.lon},${this.info.lat}`
+			this.actions= [{
+				name: '高德地图',
+				method(){
+					window.location.href = `http://uri.amap.com/marker?position=${position}&name=${name}&src=上海汽修平台&coordinate=wgs84&callnative=1`
+				}
+			}, {
+				name: '百度地图',
+				method(){
+					window.location.href = `http://api.map.baidu.com/geocoder?address=${address}&output=html&src=上海汽修平台`
+				}
+			}]
 		}
 	}
 }
@@ -319,23 +350,26 @@ export default {
 	.show-more{
 		width: 100%;
 		height: 100vh;
-		padding: 10px 15px;
-		.title{
-			margin-top: 40px;
-			margin-bottom: 10px;
-			font-size: 22px;
-			line-height: 25px;
-			text-align: center;
+		.body{
+			padding: 40px 15px 10px 15px;
+			height: 100vh;
+			overflow: auto;
+			.title{
+				margin: 10px 0;
+				font-size: 22px;
+				line-height: 25px;
+				text-align: center;
 
-		}
-		.detail {
-			width: 100%;
-			overflow: hidden;
-			position: relative;
-			font-size: 14px;
-		}
-		img{
-			max-width: 100%;
+			}
+			.detail {
+				width: 100%;
+				overflow: hidden;
+				position: relative;
+				font-size: 14px;
+			}
+			img{
+				max-width: 100%;
+			}
 		}
 	}
 	.show-form{

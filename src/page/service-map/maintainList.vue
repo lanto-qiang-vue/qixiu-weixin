@@ -10,7 +10,8 @@
 	</ul>
 <slide-bar v-show="show=='maintainList'" :minHeight="45" :toLocation="toLocation" @bodyHeight="height= $event;calcHeight">
 <div class="maintainList">
-  <div class="search-input">
+	<div id="head1" v-show="showHead=='search'">
+    <div class="search-input">
     <div class="left" :class="{on: !isFocus&& !search.q}">
       <input v-model="search.q" type="search" placeholder=' 搜索：企业名、地址、品牌、服务内容'
              @focus="focus" @blur="isFocus=false" @keydown="key($event)" ref="searchInput"/>
@@ -18,7 +19,7 @@
       <img class="close" v-show="search.q" @click="search.q='';toQuery(true)" src="~@/assets/img/maintain/关闭.png" />
     </div>
     <span @click="cancel" v-show="isFocus || search.q">取消</span>
-  </div>
+    </div>
 	<div v-if="mapType=='164'">
 		<div class="button" :class="{show: showBlock=='button'}">
 			<div class="area-button"  @click="switchBlock('area-block')"><img src="~@/assets/img/maintain/区域.png" />
@@ -69,7 +70,10 @@
 			    :class="{on : tagIsOn('biz', item.value)}">{{item.name}}</li>
 		</ul>
 	</div>
-
+	</div>
+	<div id="head2" v-show="showHead=='base'">
+		<div class="search-input"><p class="base-head">{{search.base}}驾校基地（{{total}}）家驾校</p></div>
+	</div>
   <div class="roll" :style="{height: listHeight+'px'}">
     <mt-loadmore :bottom-method="toQuery" :bottom-all-loaded="allLoaded" :autoFill="false"
                  bottomPullText="加载更多"   ref="loadMore">
@@ -78,7 +82,7 @@
         <div class="head"><span>最近搜索</span><img @click="clearHistory" src="~@/assets/img/maintain/del.png"/></div>
         <li v-for="(item, index) in maintainListHistory" :key="index" @click="goDetail(item)">
           <div class="picWrap">
-            <img :src="item.pic ||'/static/img/shqxw.jpg'" />
+            <img :src="item.pic? item.pic.split(',')[0] :'/static/img/shqxw.jpg'" />
             <img class="tag" :src="item.is4s?'/static/img/maintain/tag-4s.png':'/static/img/maintain/tag-normal.png'"/>
           </div>
           <div class="info">
@@ -104,7 +108,7 @@
         <div class="head"><span>智能推荐</span></div>
         <li v-for="(item, index) in list" :key="index" @click="goDetail(item)">
           <div class="picWrap">
-            <img :src="item.pic ||'/static/img/shqxw.jpg'" />
+            <img :src="item.pic? item.pic.split(',')[0] :'/static/img/shqxw.jpg'" />
             <img class="tag" :src="item.is4s?'/static/img/maintain/tag-4s.png':'/static/img/maintain/tag-normal.png'"/>
           </div>
           <div class="info">
@@ -132,18 +136,20 @@
 			    <!--<div class="head"><span>智能推荐</span></div>-->
 			    <li v-for="(item, index) in list" :key="index" @click="goDetail(item)">
 				    <div class="picWrap">
-					    <img :src="item.pic ||'/static/img/shqxw.jpg'" />
+					    <img :src="item.pic? item.pic.split(',')[0] :'/static/img/shqxw.jpg'" />
 					    <!--<img class="tag" :src="item.is4s?'/static/img/maintain/tag-4s.png':'/static/img/maintain/tag-normal.png'"/>-->
 				    </div>
 				    <div class="info">
 					    <!--<span>{{businessStatus(item.status)}}</span>-->
-					    <span class="orange">{{item.grade=='N' ?'未评级' :item.grade}}</span>
-					    <p>{{ item.name }}</p>
+
+					    <!--<span class="orange">{{item.grade=='N' ?'未评级' :item.grade}}</span>-->
+					    <p>{{ item.name.split('(')[0] }}<span style="color: #fa8c16">{{item.grade=='N' ?'未评级' :item.grade}}级</span></p>
+					    <div class="item">({{ item.name.split('(')[1] }}</div>
 					    <div class="item">培训驾照类型：{{item.bizScope}}</div>
-					    <div class="item">训练基地：{{item.tag}}</div>
+					    <!--<div class="item">训练基地：{{item.tag}}</div>-->
 					    <div class="address">
 						    <span class="miles">{{ item.distance.toFixed(1) }}km</span>
-						    <span class="address_area">{{ item.addr }}</span>
+						    <!--<span class="address_area">{{ item.addr }}</span>-->
 					    </div>
 
 				    </div>
@@ -162,10 +168,22 @@
 <script>
 import SlideBar from '@/page/service-map/SlideBar'
 import { Indicator} from 'mint-ui'
+import {deepClone} from '@/util.js'
+let search= {
+		type: '',
+		q: '',
+		sort:'',
+		area: '',
+		is4s: '',
+		hot: '',
+		base: '',
+		biz: '',
+		schoolPoint: ''
+	}
 export default {
 	name: "maintain-list",
 	components: { SlideBar},
-	props: [ 'blur', 'location'],
+	props: [ 'blur', 'location', 'originalLocation'],
     data(){
 		return{
 			toLocation: 0,
@@ -245,7 +263,9 @@ export default {
         timer: null,
         allLoaded: false,
         clearList: true,
-			loading: true
+			loading: true,
+			showHead: 'search',
+
       }
     },
     computed: {
@@ -342,11 +362,18 @@ export default {
 
 		    return query
 	    },
-		calcHeight(height){
-			let lh= parseInt(height -
-			(document.querySelector(".search-input")?document.querySelector(".search-input").offsetHeight:0) -
-			(document.querySelector(".show")?document.querySelector(".show").offsetHeight: 0))
-			this.listHeight= (lh<0 ? 0 : lh)
+		calcHeight(height, time){
+			// let lh= parseInt(height -
+			// (document.querySelector(".search-input")?document.querySelector(".search-input").offsetHeight:0) -
+			// (document.querySelector(".show")?document.querySelector(".show").offsetHeight: 0))
+			let lh=0
+
+			setTimeout(()=>{
+				lh= parseInt(height -
+					document.querySelector("#head1").offsetHeight- document.querySelector("#head2").offsetHeight)
+				this.listHeight= (lh<0 ? 0 : lh)
+			},time|| 100)
+
 		},
 		  tagIsOn( arrName, val ){
         if (this.search[arrName]==val)  return true
@@ -355,10 +382,10 @@ export default {
       switchBlock(val){
 		    this.showBlock= val
         let self= this
-        setTimeout(function () {
+        // setTimeout(function () {
           // console.log(document.querySelector(".show").offsetHeight)
           self.calcHeight(self.height)
-        },100)
+        // },100)
       },
 		select( arrName, val ){
 			this.search[arrName]= val
@@ -394,9 +421,9 @@ export default {
 			}
 
 			this.showBlock= 'button'
-			setTimeout(()=>{
+			// setTimeout(()=>{
 				this.calcHeight(this.height)
-			},500)
+			// },500)
 
 
 		},
@@ -406,7 +433,7 @@ export default {
 			// this.$emit('query', this.search, this.clearList);
 			this.getCompList(clearList, clearList)
 		},
-		getCompList(clearPoint, clearList){
+		getCompList(clearPoint, clearList, hidePoint){
 		    if(clearList) this.page=1
 		    else this.page++
 		    let query= this.calcQuery()
@@ -447,7 +474,7 @@ export default {
 				    this.allLoaded= true
 			    }else this.allLoaded= false
 			    // this.renderMap()
-		    	this.renderMap(this.pointList)
+			    if(!hidePoint) this.renderMap(this.pointList)
 		    })
 	    },
 	    getArea(){
@@ -474,9 +501,12 @@ export default {
 
 	    },
 	    dragend(){
+		    this.showHead= 'search'
 		    this.search.schoolPoint= ''
 		    this.search.base= ''
+		    this.search.area= ''
 		    this.getCompList(true, true)
+		    this.getBase()
 	    },
       key(e) {
         if ( e.keyCode == 13 || e=='search') {
@@ -510,7 +540,7 @@ export default {
 			      }else{
 				      this.$router.push({
 					      path: '/school-detail',
-					      query: { id: item.sid, distance: item.distance.toFixed(1) }})
+					      query: { id: item.sid, lng: this.originalLocation.lng, lat: this.originalLocation.lat }})
 			      }
 			      break;
 		      }
@@ -555,29 +585,57 @@ export default {
 			    let type= point.type.toString()
 			    let routeName= this.$route.name
 			    let lngLat= new AMap.LngLat(point.lon|| this.location.lng, point.lat|| this.location.lat)
-			    let marker= null, icon= null
+			    let marker= null, icon= null, callback= null, zIndex= 100
 
 			    switch (type){
 				    case '300':{
 					    icon= iconSchool
+					    callback= (e)=>{
+							this.list=[e.target.getExtData()]
+						    this.total=1
+						    this.showHead= 'none'
+						    this.allLoaded= true
+						    this.$emit('goMap', e.target.getExtData())
+						    this.calcHeight(this.height)
+					    }
 					    break;
 				    }
 				    case '301':{
 					    icon= iconBase
+					    zIndex= 110
+					    callback= (e)=>{
+							this.search= deepClone(search)
+						    this.search.type= '300'
+						    this.search.base= e.target.getExtData().name.replace('驾校基地', '')
+						    this.showHead= 'base'
+						    this.getCompList(true, true, true)
+						    this.$emit('goMap', e.target.getExtData())
+						    this.$emit('renderMap', []);
+						    this.$emit('renderMap', [e.target], true);
+						    this.calcHeight(this.height)
+					    }
 					    break;
 				    }
 				    default :{
 					    icon= point.is4s? icon4s: iconNormal
+					    callback= (e)=>{
+						    this.showHead= 'search'
+						    this.goDetail(e.target.getExtData())
+						    this.$emit('goMap', e.target.getExtData())
+						    this.calcHeight(this.height)
+					    }
 				    }
 			    }
 			    marker= new AMap.Marker({
 				    icon: icon,
 				    position: lngLat,
-				    extData: point
+				    extData: point,
+				    zIndex: zIndex
 			    })
 
 			    marker.on('click', (e) => {
-			    	this.goDetail(e.target.getExtData())
+			    	// this.goDetail(e.target.getExtData())
+				    callback(e)
 			    })
 			    markers.push(marker)
 		    }
@@ -602,10 +660,10 @@ export default {
         // },200)
 
         this.toLocation=2
-        setTimeout(()=>{
+        // setTimeout(()=>{
           this.calcHeight(this.height)
           $("body").scrollTop(0)
-        },500)
+        // },500)
       },
       isOpenTime(timeStr){
 		    let sTime=0, eTime=0, now=0;
@@ -728,6 +786,10 @@ export default {
     width: 40px;
     text-align: center;
   }
+	.base-head{
+		text-align: center;
+		font-size: 14px;
+	}
 }
   .button{
     display: none;
@@ -891,10 +953,10 @@ export default {
         }
 	      .item{
 		      color: #666666;
-		      font-size: 12px;
-		      overflow: hidden;
-		      text-overflow:ellipsis;
-		      white-space: nowrap;
+		      font-size: 13px;
+		      /*overflow: hidden;*/
+		      /*text-overflow:ellipsis;*/
+		      /*white-space: nowrap;*/
 		      line-height: 16px;
 	      }
       }
