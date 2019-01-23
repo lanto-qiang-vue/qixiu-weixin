@@ -102,7 +102,7 @@ export default {
 				phoneNo: '',
 				category: ''
 			},
-			state: 'warning',
+			state: '',
 
 			actions: [],
 			sheetVisible: false,
@@ -142,8 +142,7 @@ export default {
 	watch:{
 		inputTel(val){
 			let p1 = /^1[3456789]\d{9}$/;
-			let p2=/0\d{2,3}-\d{7,8}/;
-			if (p2.test(val)||p1.test(val)||!val) {
+			if (p1.test(val)) {
 				this.state= 'success'
 			}else{
 				this.state= 'error'

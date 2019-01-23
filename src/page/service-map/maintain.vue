@@ -3,10 +3,14 @@
 
     <div class='search'>
 
-      <div class="fixGuide">
-        <img src="/static/img/maintain/center-location.png"/>
-        <div class="fixGuideClick" @click="goLatePoint">{{centerName}}</div>
-      </div>
+	    <div class="fixGuide" v-show="routeName=='base-map'">
+		    <img class="point" src="/static/img/maintain/center-point.png"/>
+	    </div>
+		<div class="fixGuide" v-show="routeName!='base-map'">
+			<img src="/static/img/maintain/center-location.png"/>
+			<div class="fixGuideClick" @click="goLatePoint">{{centerName}}</div>
+		</div>
+
 
       <div id="container"></div>
 
@@ -52,6 +56,9 @@
       show(){
         return this.$store.state.app.slideState.showBody
       },
+	    routeName(){
+		    return this.$route.name
+	    },
 	    centerName(){
 		    let name= '164'
 		    switch (this.$route.name){
@@ -460,6 +467,9 @@
           transform: translate(-50%, -100%);
           pointer-events: none;
         }
+	      .point{
+		      width: 20px;
+	      }
         .fixGuideClick{
           width: 100px;
           height: 24px;

@@ -71,7 +71,7 @@
 		</ul>
 	</div>
 	</div>
-	<div id="head2" v-show="showHead=='base'">
+	<div id="head2" v-show="showHead=='base'||showHead=='baseMap'">
 		<div class="search-input"><p class="base-head">{{search.base}}驾校基地（{{total}}家驾校）</p></div>
 	</div>
   <div class="roll" :style="{height: listHeight+'px'}">
@@ -156,7 +156,7 @@
 			    </li>
 		    </ul>
 	    </div>
-      <div v-show="allLoaded" style="text-align: center; line-height: 30px; background-color: #f8f8f8; font-size: 14px; color: #999;">已经到底啦...</div>
+      <div v-show="allLoaded && total>=10" style="text-align: center; line-height: 30px; background-color: #f8f8f8; font-size: 14px; color: #999;">已经到底啦...</div>
     </mt-loadmore>
   </div>
 
