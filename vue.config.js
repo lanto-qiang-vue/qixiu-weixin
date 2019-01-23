@@ -17,15 +17,15 @@ module.exports = {
 		port: 8888,
 		proxy: {
 			'/repairproxy': {
-				target: 'http://192.168.169.230:7210/',
-				// target: 'https://www.shanghaiqixiu.org/repair/',
+				// target: 'http://192.168.169.230:7210/',
+				target: 'https://www.shanghaiqixiu.org/repair/',
 				pathRewrite: {'^/repairproxy': ''},
 				secure: false
 			},
 			'/proxy': {
-				target: 'http://192.168.169.231:8888/',
+				// target: 'http://192.168.169.231:8888/',
 				// target: 'http://192.168.169.128:7310/',
-				// target: 'http://212.64.5.54:8888/',
+				target: 'http://212.64.5.54:8888/',
 				pathRewrite: {'^/proxy': ''},
 				secure: false
 			},

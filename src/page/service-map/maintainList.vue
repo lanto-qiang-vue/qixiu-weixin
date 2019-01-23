@@ -4,7 +4,7 @@
 		<li v-for="(item, index) in maintainType" :class="{on : tagIsOn('is4s', item.value)}"
 		    @click="select('is4s', item.value)" :key="index">{{item.name}}</li>
 	</ul>
-	<ul class="maintain-type" v-if="mapType=='300'">
+	<ul class="maintain-type" v-if="mapType=='300' && showHead!='baseMap'">
 		<li v-for="(item, index) in schoolPoint" :class="{on : tagIsOn('schoolPoint', item.value)}"
 		    @click="select('schoolPoint', item.value)" :key="index">{{item.name}}</li>
 	</ul>
@@ -61,7 +61,7 @@
 		</ul>
 		<ul class="sort-block" :class="{show: showBlock=='sort-block'}">
 			<div class="close"  @click="switchBlock('button')"></div>
-			<li v-for="(item, index) in sortSchool" :key="index" @click="select('sort', item.value)"
+			<li v-for="(item, index) in sort" :key="index" @click="select('sort', item.value)"
 			    :class="{on : tagIsOn('sort', item.value)}">{{item.name}}</li>
 		</ul>
 		<ul class="hot-block" :class="{show: showBlock=='biz-block'}">
@@ -72,7 +72,7 @@
 	</div>
 	</div>
 	<div id="head2" v-show="showHead=='base'">
-		<div class="search-input"><p class="base-head">{{search.base}}驾校基地（{{total}}）家驾校</p></div>
+		<div class="search-input"><p class="base-head">{{search.base}}驾校基地（{{total}}家驾校）</p></div>
 	</div>
   <div class="roll" :style="{height: listHeight+'px'}">
     <mt-loadmore :bottom-method="toQuery" :bottom-all-loaded="allLoaded" :autoFill="false"
@@ -185,6 +185,16 @@ export default {
 	components: { SlideBar},
 	props: [ 'blur', 'location', 'originalLocation'],
     data(){
+		let sotrName= ''
+	    switch (this.$route.name){
+		    case 'school-map':{
+			    sotrName= '评级优先'
+			    break
+		    }
+		    default: {
+			    sotrName= '好评优先'
+		    }
+	    }
 		return{
 			toLocation: 0,
 			height: 0,
@@ -208,31 +218,25 @@ export default {
 				{name: '4S店', value: 'yes'},
 				{name: '维修厂', value: 'no'},
 			],
-        area: [{name: '全部', value: ''}],
-        sort:[
-          {name: '默认', value: ''},
-          {name: '距离优先', value: 'distance'},
-          {name: '好评优先', value: 'rating desc,distance asc'},
-          // {name: '距离优先', value: 'distance'},
-        ],
-			sortSchool: [
+	        area: [{name: '全部', value: ''}],
+	        sort:[
 				{name: '默认', value: ''},
 				{name: '距离优先', value: 'distance'},
-				{name: '评级优先', value: 'rating desc,distance asc'},
-			],
-        hot:[
-          {name: '默认', value: ''},
-          {name: '宝马', value: '宝马'},
-          {name: '奥迪', value: '奥迪'},
-          {name: '迈巴赫', value: '迈巴赫'},
-          {name: '保时捷', value: '保时捷'},
-          {name: '玛莎拉蒂', value: '玛莎拉蒂'},
-          {name: '年检', value: '年检'},
-          {name: '保养', value: '保养'},
-          {name: '车轮', value: '车轮'},
-          {name: '发动机', value: '发动机'},
-          {name: '汽车美容', value: '汽车美容'},
-        ],
+				{name: sotrName, value: 'rating desc,distance asc'},
+	        ],
+	        hot:[
+				{name: '默认', value: ''},
+				{name: '宝马', value: '宝马'},
+				{name: '奥迪', value: '奥迪'},
+				{name: '迈巴赫', value: '迈巴赫'},
+				{name: '保时捷', value: '保时捷'},
+				{name: '玛莎拉蒂', value: '玛莎拉蒂'},
+				{name: '年检', value: '年检'},
+				{name: '保养', value: '保养'},
+				{name: '车轮', value: '车轮'},
+				{name: '发动机', value: '发动机'},
+				{name: '汽车美容', value: '汽车美容'},
+	        ],
 			biz:[
 				{name: '全部', value: ''},
 				{name: 'A1', value: 'A1'},
@@ -256,18 +260,18 @@ export default {
 				{name: '驾校报名', value: '300'},
 				{name: '学车基地', value: '301'},
 			],
-        showBlock: '',
-        list:[],
+	        showBlock: '',
+	        list:[],
 			pointList:[],
-        listHeight: 0,
-        timer: null,
-        allLoaded: false,
-        clearList: true,
+	        listHeight: 0,
+	        timer: null,
+	        allLoaded: false,
+	        clearList: true,
 			loading: true,
 			showHead: 'search',
 			inputPlaceholder: '搜索：企业名、地址、品牌、服务内容'
 
-      }
+        }
     },
     computed: {
       q(){
@@ -279,6 +283,9 @@ export default {
 	    mapType(){
       	    let type= '164'
 		    switch (this.$route.name){
+			    case 'base-map':{
+			    	this.showHead= 'baseMap'
+			    }
 			    case 'school-map':{
 			    	this.search.sort= 'rating desc,distance asc'
 			    	this.inputPlaceholder= '搜索：驾校名、驾校地址'
@@ -347,7 +354,32 @@ export default {
     },
     methods:{
 		getQuery(){
-			for(let key in this.$route.query){
+			let query= this.$route.query
+			if(query){
+				switch(query.special){
+					case 'base':{
+						console.log('query.item', query.item)
+
+						this.search= deepClone(search)
+						this.search.type= '300'
+						this.search.sort= 'rating desc,distance asc'
+						this.search.base= query.item.name.replace('驾校基地', '')
+						this.showHead= 'base'
+						this.getCompList(true, true, true)
+						setTimeout(()=>{
+							this.$emit('goMap', query.item)
+							this.$emit('renderMap', []);
+							this.renderMap([query.item], true)
+						},100)
+
+					}
+					default:{
+
+					}
+				}
+			}
+
+			for(let key in query){
 				this.search[key]= this.$route.query[key]
 			}
 		},
@@ -510,12 +542,21 @@ export default {
 
 	    },
 	    dragend(){
-		    this.showHead= 'search'
-		    // this.search.schoolPoint= ''
-		    this.search.base= ''
-		    this.search.area= ''
-		    this.getCompList(true, true)
-		    this.getBase()
+		    switch (this.$route.name){
+			    case 'base-map':{
+			    	break
+			    }
+			    default:{
+				    this.showHead= 'search'
+				    // this.search.schoolPoint= ''
+				    this.search.sort= ''
+				    this.search.base= ''
+				    this.search.area= ''
+				    this.getCompList(true, true, this.search.schoolPoint=='301')
+				    this.getBase()
+			    }
+		    }
+
 	    },
       key(e) {
         if ( e.keyCode == 13 || e=='search') {
@@ -540,6 +581,7 @@ export default {
 			      this.$router.push({path: '/remarkMatch', query: { corpId: item.sid }})
 			      break;
 		      }
+		      case 'base-map':
 		      case 'school-map':{
 			      if(type=='301'){
 				      this.search.schoolPoint= '301'
@@ -613,15 +655,17 @@ export default {
 					    icon= iconBase
 					    zIndex= 110
 					    callback= (e)=>{
+					    	let temp= this.search
 							this.search= deepClone(search)
+						    this.search.schoolPoint= temp.schoolPoint
 						    this.search.type= '300'
 						    this.search.sort= 'rating desc,distance asc'
 						    this.search.base= e.target.getExtData().name.replace('驾校基地', '')
 						    this.showHead= 'base'
 						    this.getCompList(true, true, true)
 						    this.$emit('goMap', e.target.getExtData())
-						    this.$emit('renderMap', []);
-						    this.$emit('renderMap', [e.target], true);
+						    // this.$emit('renderMap', []);
+						    // this.$emit('renderMap', [e.target], true);
 						    this.calcHeight(this.height)
 					    }
 					    break;
@@ -638,6 +682,7 @@ export default {
 			    }
 			    marker= new AMap.Marker({
 				    icon: icon,
+				    offset: new AMap.Pixel(-16, -16),
 				    position: lngLat,
 				    extData: point,
 				    zIndex: zIndex
@@ -650,7 +695,7 @@ export default {
 			    markers.push(marker)
 		    }
 
-		    console.log('markers', markers)
+		    // console.log('markers', markers)
 
 		    // if(renderMarker){
 			 //    this.$emit('renderMarker', markers);

@@ -55,6 +55,7 @@
 	    centerName(){
 		    let name= '164'
 		    switch (this.$route.name){
+			    case 'base-map':
 			    case 'school-map':{
 				    name= '查找最近驾校'
 				    break
@@ -83,9 +84,16 @@
 		    	this.location.lng= this.$route.query.lng
 		    	this.location.lat= this.$route.query.lat
 		    }
-		    if(this.$route.query || mounted){
+		    if(this.$route.query &&this.$route.query.special && !mounted){
+			    this.clearMap()
+			    let center= new AMap.LngLat(this.originalLocation.lng, this.originalLocation.lat)
+			    // this.map.panTo(center)
+			    this.map.add(new AMap.Marker( {
+				    position: center
+			    }))
+		    }
+		    if(mounted){
 			    this.init()
-			    history.replaceState(null, null, window.location.origin + window.location.hash.split('?')[0])
 		    }
 	    },
     	init(){
@@ -190,8 +198,10 @@
 	    },
 
 	    getCompList(clearPoint, clearList){
-    		this.$refs.maintainList.getCompList(clearPoint, clearList)
-		    this.$refs.maintainList.getBase()
+	    	setTimeout(()=>{
+			    this.$refs.maintainList.getCompList(clearPoint, clearList)
+			    this.$refs.maintainList.getBase()
+		    },50)
 	    },
 
 
@@ -224,14 +234,18 @@
         }
       },
 
+	    clearMap(){
+		    if(this.map){
+			    if(this.markerClusterer ) {
+				    this.markerClusterer.clearMarkers();
+				    this.markerClusterer.setMap(null);
+				    this.markerClusterer= null
+			    }
+			    this.map.clearMap()
+		    }
+	    },
       renderMap(markers, renderMarker){
-	      if(this.markerClusterer ) {
-		      this.markerClusterer.clearMarkers();
-		      this.markerClusterer.setMap(null);
-		      this.markerClusterer= null
-	      }
-
-	      this.map.clearMap()
+	     this.clearMap()
 
 	      if(markers){
 		      if(renderMarker){
@@ -256,15 +270,20 @@
 			      // console.log('renderMap() over')
 		      });
 	      }
-
+	      // history.replaceState(null, null, window.location.origin + window.location.hash.split('?')[0])
 
       },
 
 
       goLatePoint(){
-    		if(this.markerClustererPoint.length)
-	      this.map.panTo(new AMap.LngLat(this.markerClustererPoint[0].getExtData().lon,
-		      this.markerClustererPoint[0].getExtData().lat))
+    		if(this.markerClustererPoint.length){
+			    this.map.panTo(new AMap.LngLat(this.markerClustererPoint[0].getExtData().lon,
+				    this.markerClustererPoint[0].getExtData().lat))
+		    }else if(this.markers.length){
+			    this.map.panTo(new AMap.LngLat(this.markers[0].getExtData().lon,
+				    this.markers[0].getExtData().lat))
+		    }
+
 
       },
 
@@ -292,6 +311,7 @@
 
 	    setShowBody(){
 		    switch (this.$route.name){
+			    case 'base-map':
 			    case 'school-map':
 			    case 'remark-map':{
 				    this.$store.commit('setSlideShowBody', 'maintainList')
@@ -313,6 +333,14 @@
 			  // self.bodyNoScoll()
 			  // self.toQuery()
 		  },500)
+	  },
+	  beforeRouteUpdate (to, from, next) {
+		  // 在当前路由改变，但是该组件被复用时调用
+		  // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+		  // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+		  // 可以访问组件实例 `this`
+		  this.getCompList(true, true)
+		  next()
 	  },
 	  deactivated(){
 		  document.body.removeEventListener('touchmove', this.noscroll,false)

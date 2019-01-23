@@ -29,7 +29,7 @@
         },
         minTop: 80,
         bodyHeight: 0,
-        location: 0,
+        location: 1,
 
 	    footerHeight: 50
       }
