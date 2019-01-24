@@ -172,6 +172,10 @@ export default {
 			})
 		},
 		toCall(){
+			if(!this.tel.length){
+				Toast('暂无电话')
+				return
+			}
 			if (!localStorage.getItem("ACCESSTOKEN")) {
 				Toast('登录后可拨打电话')
 				// console.log(to.fullPath)
