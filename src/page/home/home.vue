@@ -42,10 +42,10 @@
 		          <img src="../../assets/img/home/维修记录.png"/>
 		          <p>维修记录</p>
 	          </li>
-            <!--<router-link  tag="li" to="/remarkMap">-->
-              <!--<img src="../../assets/img/home/救援找我.png"/>-->
-              <!--<p>救援找我</p>-->
-            <!--</router-link>-->
+            <router-link  tag="li" to="/rescue-map">
+              <img src="../../assets/img/home/救援找我.png"/>
+              <p>救援找我</p>
+            </router-link>
             <router-link tag="li" to="/school-map">
               <img src="../../assets/img/home/学车找我.png"/>
               <p>学车找我</p>

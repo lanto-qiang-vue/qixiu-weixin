@@ -3,10 +3,10 @@
 
     <div class='search'>
 
-	    <div class="fixGuide" v-show="routeName=='base-map'">
+	    <div class="fixGuide" v-show="showCenter=='simple'">
 		    <img class="point" src="/static/img/maintain/center-point.png"/>
 	    </div>
-		<div class="fixGuide" v-show="routeName!='base-map'">
+		<div class="fixGuide" v-show="showCenter=='all'">
 			<img src="/static/img/maintain/center-location.png"/>
 			<div class="fixGuideClick" @click="goLatePoint">{{centerName}}</div>
 		</div>
@@ -16,9 +16,9 @@
 
      </div>
 
-	<maintain-list ref="maintainList" :location="location" :originalLocation="originalLocation" @renderMap="renderMap" @goMap="goMap"></maintain-list>
-	<maintain-detail ref="maintainDetail" ></maintain-detail>
-
+	<maintain-list v-if="hasList" ref="maintainList" :location="location" :originalLocation="originalLocation" @renderMap="renderMap" @goMap="goMap"></maintain-list>
+	<maintain-detail v-if="routeName=='maintain'" ref="maintainDetail" ></maintain-detail>
+	  <rescue-list v-if="routeName=='rescue-map'" ref="rescueList" :location="location" :originalLocation="originalLocation"></rescue-list>
 
 
   </div>
@@ -28,9 +28,10 @@
   import { Toast,  Actionsheet, Indicator } from 'mint-ui'
   import maintainDetail from '@/page/service-map/maintainDetail.vue'
   import maintainList from '@/page/service-map/maintainList'
+  import rescueList from '@/page/service-map/rescueList'
   export default {
     name: 'maintain',
-	  components: {maintainDetail,  maintainList},
+	  components: {maintainDetail,  maintainList, rescueList},
     data() {
       return {
 
@@ -47,12 +48,41 @@
 	      },
 	      originalLocation:{
 		      lng: '121.480236',
-		      lat: '31.236301'
+		      lat: '31.236301',
+		      success: false,
 	      }
       }
     },
 
     computed: {
+    	hasList(){
+    		let has= false
+    		switch (this.routeName){
+			    case 'base-map':
+			    case 'school-map':
+			    case 'remark-map':
+			    case 'maintain':{
+				    has= true
+			    }
+		    }
+		    return has
+	    },
+	    showCenter(){
+		    let show= ''
+		    switch (this.routeName){
+			    case 'rescue-map':{
+			    	break
+			    }
+			    case 'base-map':{
+				    show= 'simple'
+				    break
+			    }
+			    default:{
+				    show= 'all'
+			    }
+		    }
+		    return show
+	    },
       show(){
         return this.$store.state.app.slideState.showBody
       },
@@ -73,6 +103,19 @@
 		    }
 		    return name
 	    },
+	    locationSuccess(){
+    		return this.originalLocation.success
+	    },
+	    mustLocation(){
+		    let must= false
+		    switch (this.routeName){
+			    case 'rescue-map':{
+				    must= true
+				    break
+			    }
+		    }
+		    return must
+	    }
     },
 
     mounted(){
@@ -138,7 +181,7 @@
 			    this.location.lng= center.lng
 			    this.location.lat= center.lat
 			    // this.getCompList(false, true)
-			    this.$refs.maintainList.dragend()
+			    if(this.hasList) this.$refs.maintainList.dragend()
 		    });
 
 
@@ -159,17 +202,21 @@
 				    	// console.log('result', result)
 					    this.map.clearMap()
 					    this.map.setCenter(result.position)
-					    this.map.add(new AMap.Marker(result.position))
-					    this.location.lng= result.position.lng
-					    this.location.lat= result.position.lat
 					    this.originalLocation.lng= result.position.lng
 					    this.originalLocation.lat= result.position.lat
-					    this.getCompList(true, true)
+					    this.originalLocation.success= true
+
+					    if(this.hasList){
+						    this.map.add(new AMap.Marker(result.position))
+						    this.location.lng= result.position.lng
+						    this.location.lat= result.position.lat
+						    this.getCompList(true, true)
+					    }
 				    });//返回定位信息
 				    AMap.event.addListener(this.geolocation, 'error', (err)=>{
 					    this.map.clearMap()
 				    	// console.log('err', err)
-					    this.getCity()
+					    if(!this.mustLocation) this.getCity()
 				    });      //返回定位出错信息
 
 
@@ -189,7 +236,7 @@
 						    // console.log('this.map.add(new AMap.Marker( center))')
 						    this.location.lng= center.lng
 						    this.location.lat= center.lat
-						    this.getCompList(true, true)
+						    if(this.hasList) this.getCompList(true, true)
 						    // this.initPiontList()
 					    })
 				    }else{
@@ -198,7 +245,7 @@
 					    this.map.add(new AMap.Marker( {
 						    position: center
 					    }))
-					    this.getCompList(true, true)
+					    if(this.hasList) this.getCompList(true, true)
 				    }
 			    })
 		    });
