@@ -11,7 +11,7 @@ axios.defaults.timeout = 60000;
 let doing= false
 
 axios.defaults.baseURL = '/proxy/';
-
+axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 
 // Add a request interceptor  请求拦截器
 axios.interceptors.request.use(config => {

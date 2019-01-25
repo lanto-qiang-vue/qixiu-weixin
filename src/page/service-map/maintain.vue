@@ -212,6 +212,18 @@
 						    this.location.lat= result.position.lat
 						    this.getCompList(true, true)
 					    }
+
+					    if(this.routeName=='rescue-map'){
+						    this.map.add(new AMap.Marker({
+							    icon: new AMap.Icon({
+								    image: "/static/img/maintain/center-point.png",
+								    size: new AMap.Size(20, 30),
+								    imageSize: new AMap.Size(20, 30),
+							    }),
+							    offset: new AMap.Pixel(-6, -16),
+							    position: result.position,
+						    }))
+					    }
 				    });//返回定位信息
 				    AMap.event.addListener(this.geolocation, 'error', (err)=>{
 					    this.map.clearMap()
