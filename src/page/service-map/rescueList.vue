@@ -5,7 +5,7 @@
 		<span>机动车因故障抛锚或发生交通事故等原因造成车辆不能正常行驶而影响道路交通的，请拨打110或12122</span>
 		<i class="fa fa-close right" @click="showTop= false"></i>
 	</div>
-	<slide-bar v-show="show=='maintainList' &&locationSuccess && list.length" :minHeight="45" :toLocation="toLocation">
+	<slide-bar v-show="show=='maintainList' &&locationSuccess && list.length &&showBlock" :minHeight="45" :toLocation="toLocation">
 		<div class="roll">
 			<mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
 			             bottomPullText="加载更多"   ref="loadMore">
@@ -28,8 +28,9 @@
 	</slide-bar>
 
 	<div class="failure" v-show="!locationSuccess">
-		<div class="content">
-			<i class="fa fa-refresh"></i><span>加载失败，请开启定位后重试。</span>
+		<div class="content" @click="getCurrentPosition">
+			<i class="fa fa-refresh"></i><span v-show="showBlock">请开启定位后点击此处重试。</span>
+			<span v-show="!showBlock">加载中。</span>
 		</div>
 	</div>
 	<div class="failure" v-show="locationSuccess && !list.length">
@@ -66,6 +67,7 @@ export default {
 			total: 0,
 			allLoaded: false,
 			showTop: true,
+			showBlock:false
 		}
 	},
 	computed:{
@@ -79,18 +81,17 @@ export default {
 	watch:{
 		locationSuccess(val){
 			if(val){
-
 				this.getList()
 			}
 		}
 	},
 	mounted(){
-		setTimeout(()=>{
-			Indicator.close()
-		},1000)
 
 	},
 	methods:{
+		getCurrentPosition(){
+			this.$emit('getCurrentPosition')
+		},
 		getList(){
 			this.axios.post('/corp/rt/rescuetome', {
 				"location": this.originalLocation.lng+ ','+ this.originalLocation.lat,
@@ -100,17 +101,21 @@ export default {
 				if(res.data.code==='0'){
 					this.list=res.data.items
 					this.total=res.data.total
-
 					if(this.page!=1) this.$refs.loadMore.onBottomLoaded()
 					if (this.list.length>= this.total){
 						this.allLoaded= true
 					}else this.allLoaded= false
+					this.loadStop()
 				}
 			})
 		},
 		loadMore(){
 			this.total++
 			this.getList()
+		},
+		loadStop(){
+			this.showBlock= true
+			Indicator.close()
 		}
 	}
 }

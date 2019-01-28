@@ -149,5 +149,6 @@ export default new Router({
 		{path: '/base-map', name: 'base-map', component: resolve => require(['@/page/service-map/maintain'], resolve)},
 		{path: '/rescue-map', name: 'rescue-map', component: resolve => require(['@/page/service-map/maintain'], resolve)},
 		{path: '/school-detail', name: 'school-detail', component: resolve => require(['@/page/service-map/school-detail'], resolve)},
+		{path: '/com-remind', name: 'com-remind', component: resolve => require(['@/page/com-remind'], resolve)},
 	]
 })

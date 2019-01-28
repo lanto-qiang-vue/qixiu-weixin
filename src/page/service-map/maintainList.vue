@@ -12,13 +12,14 @@
 <div class="maintainList">
 	<div id="head1" v-show="showHead=='search'">
     <div class="search-input">
-    <div class="left" :class="{on: !isFocus&& !search.q}">
+    <!--<div class="left" :class="{on: !isFocus&& !search.q}">-->
+    <div class="left on">
       <input v-model="search.q" type="search" :placeholder='inputPlaceholder'
              @focus="focus" @blur="isFocus=false" @keydown="key($event)" ref="searchInput"/>
       <div class="query"  @click="toQuery(true)"></div>
       <img class="close" v-show="search.q" @click="search.q='';toQuery(true)" src="~@/assets/img/maintain/关闭.png" />
     </div>
-    <span @click="cancel" v-show="isFocus || search.q">取消</span>
+    <!--<span @click="cancel" v-show="isFocus || search.q">取消</span>-->
     </div>
 	<div v-if="mapType=='164'">
 		<div class="button" :class="{show: showBlock=='button'}">
@@ -144,12 +145,10 @@
 
 					    <!--<span class="orange">{{item.grade=='N' ?'未评级' :item.grade}}</span>-->
 					    <p>{{ item.name.split('(')[0] }}<span style="color: #fa8c16">{{item.grade=='N' ?'未评' :item.grade}}级</span></p>
-					    <div class="item">{{ item.name.substring(item.name.indexOf('('), item.name.length)  }}</div>
-					    <div class="item">培训驾照类型：{{item.bizScope}}</div>
-					    <!--<div class="item">训练基地：{{item.tag}}</div>-->
+					    <div class="address">{{ item.name.substring(item.name.indexOf('('), item.name.length)  }}</div>
 					    <div class="address">
 						    <span class="miles">{{ item.distance.toFixed(1) }}km</span>
-						    <!--<span class="address_area">{{ item.addr }}</span>-->
+						    <span class="address_area" style="white-space: normal;">培训驾照类型：{{item.bizScope}}</span>
 					    </div>
 
 				    </div>
@@ -709,10 +708,6 @@ export default {
       focus(){
         this.showBlock= 'button'
 		    this.isFocus=true
-        // this.showBlock= 'button'
-        // setTimeout(()=>{
-        //   this.$store.commit('reSetSlideBodyHeight', $(document).height())
-        // },200)
 
         this.toLocation=2
         // setTimeout(()=>{
@@ -805,9 +800,6 @@ export default {
       border-radius: 20px;
       font-size: 14px;
       text-align: left;
-      /*caret-color:@blue-color;*/
-      color:@blue-color;
-      /*transition: all .2s;*/
     }
     input:focus{
       /*border-color: @blue-color; */

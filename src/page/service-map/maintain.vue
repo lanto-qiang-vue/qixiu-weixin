@@ -18,7 +18,7 @@
 
 	<maintain-list v-if="hasList" ref="maintainList" :location="location" :originalLocation="originalLocation" @renderMap="renderMap" @goMap="goMap"></maintain-list>
 	<maintain-detail v-if="routeName=='maintain'" ref="maintainDetail" ></maintain-detail>
-	  <rescue-list v-if="routeName=='rescue-map'" ref="rescueList" :location="location" :originalLocation="originalLocation"></rescue-list>
+	  <rescue-list v-if="routeName=='rescue-map'" ref="rescueList" :location="location" :originalLocation="originalLocation" @getCurrentPosition="getCurrentPosition"></rescue-list>
 
 
   </div>
@@ -229,11 +229,22 @@
 					    this.map.clearMap()
 				    	// console.log('err', err)
 					    if(!this.mustLocation) this.getCity()
+
+					    if(this.routeName=='rescue-map'){
+					    	this.$refs.rescueList.loadStop()
+					    }
 				    });      //返回定位出错信息
 
 
 			    });
 		    }
+	    },
+	    getCurrentPosition(){
+		    Indicator.open({
+			    text: '请稍候...',
+			    spinnerType: 'snake'
+		    });
+		    this.geolocation.getCurrentPosition();
 	    },
 	    getCity(){
 		    AMap.plugin('AMap.CitySearch', () => {
