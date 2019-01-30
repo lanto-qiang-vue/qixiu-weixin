@@ -1,6 +1,6 @@
 <template>
   <div class="welcome">
-    <img src="../assets/img/welcome/welcome.jpg" alt="">
+    <img src="~@/assets/img/welcome/welcome-red.png">
     <div @click="goIndex">跳过(<span> {{ time/1000 }} </span>)</div>
   </div>
 </template>

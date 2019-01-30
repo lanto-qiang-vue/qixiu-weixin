@@ -11,7 +11,7 @@
 <script>
 	export default {
 		name: "slide-bar",
-    props: [  'minHeight', 'init', 'toLocation'],
+    props: [  'minHeight', 'init', 'toLocation', 'noslide'],
     data(){
 		  return {
         timer: null,
@@ -85,6 +85,8 @@
       // $(dom).css({transform: 'translateY('+ (docHeight- this.setBodyHeight - touchBarHeight) + 'px)'})
       // $(dom).css({transform: 'translateY('+ this.slideState.minTop+ 'px);'})
       dom.bind('touchstart',function(startE){
+      	if(self.noslide){return}
+
         // console.log('touchstart')
       // dom.children('.real-touch-bar').bind('touchstart',function(startE){
         startY= startE.originalEvent.targetTouches[0].pageY;
@@ -248,6 +250,7 @@
 			    switch (this.$route.name){
 				    case 'base-map':
 				    case 'school-map':
+				    case 'rescue-map':
 				    case 'remark-map':{
 					    $('.footer').hide()
 					    height=0;

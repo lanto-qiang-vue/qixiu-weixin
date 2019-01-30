@@ -1,18 +1,18 @@
 <template>
   <ul class="footer">
     <router-link :class="{active: findex==1}" :to="{ path: '/home' }" tag="li">
-      <img src="../assets/img/footer/home.png" v-show="findex==1">
-      <img src="../assets/img/footer/unhome.png" v-show="findex!=1">
+      <img src="../assets/img/footer/temp/home.png" v-show="findex==1">
+      <img src="../assets/img/footer/temp/unhome.png" v-show="findex!=1">
       <p>首页</p>
     </router-link>
     <router-link :class="{active: findex==2}" :to="{ path: '/maintain' }" tag="li">
-      <img src="../assets/img/footer/maintain.png" v-show="findex==2">
-      <img src="../assets/img/footer/unmaintain.png" v-show="findex!=2">
+      <img src="../assets/img/footer/temp/maintain.png" v-show="findex==2">
+      <img src="../assets/img/footer/temp/unmaintain.png" v-show="findex!=2">
       <p>维修服务</p>
     </router-link>
     <router-link :class="{active: findex==3}" :to="{ path: '/doctor' }" tag="li">
-      <img src="../assets/img/footer/ask.png" v-show="findex==3">
-      <img src="../assets/img/footer/unask.png" v-show="findex!=3">
+      <img src="../assets/img/footer/temp/ask.png" v-show="findex==3">
+      <img src="../assets/img/footer/temp/unask.png" v-show="findex!=3">
       <p>车大夫门诊</p>
     </router-link>
     <!--<router-link :class="{active: findex==4}" :to="{ path: '/infoService' }" tag="li">-->
@@ -21,8 +21,8 @@
       <!--<p>公共服务</p>-->
     <!--</router-link>-->
     <router-link :class="{active: findex==5}" :to="{ path: '/my' }" tag="li">
-      <img src="../assets/img/footer/my.png" v-show="findex==5">
-      <img src="../assets/img/footer/unmy.png" v-show="findex!=5">
+      <img src="../assets/img/footer/temp/my.png" v-show="findex==5">
+      <img src="../assets/img/footer/temp/unmy.png" v-show="findex!=5">
       <p>我的</p>
     </router-link>
   </ul>
@@ -99,6 +99,7 @@ li p{
   margin: 0;
 }
 .active p{
-  color: #1383ca
+  /*color: #1383ca*/
+  color: #CD220D
 }
 </style>

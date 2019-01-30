@@ -5,8 +5,8 @@
 		<span>机动车因故障抛锚或发生交通事故等原因造成车辆不能正常行驶而影响道路交通的，请拨打110或12122</span>
 		<i class="fa fa-close right" @click="showTop= false"></i>
 	</div>
-	<slide-bar v-show="show=='maintainList' &&locationSuccess && list.length &&showBlock" :minHeight="45" :toLocation="toLocation">
-		<div class="roll">
+	<slide-bar v-show="show=='maintainList' &&locationSuccess && list.length &&showBlock" :minHeight="45" :toLocation="toLocation"  @bodyHeight="height= $event">
+		<div class="roll" :style="{height: height+'px'}">
 			<mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
 			             bottomPullText="加载更多"   ref="loadMore">
 				<ul class="list">
@@ -67,7 +67,8 @@ export default {
 			total: 0,
 			allLoaded: false,
 			showTop: true,
-			showBlock:false
+			showBlock:false,
+			height: 0
 		}
 	},
 	computed:{
@@ -86,7 +87,10 @@ export default {
 		}
 	},
 	mounted(){
-
+		$(".roll").bind('touchmove',function(e){
+			// console.log('.roll-touchmove')
+			e.stopPropagation();
+		})
 	},
 	methods:{
 		getCurrentPosition(){
