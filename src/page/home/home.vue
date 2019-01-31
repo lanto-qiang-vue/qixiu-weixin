@@ -676,14 +676,14 @@ export default {
                 max-width: 55px;
 	            position: absolute;
 	            left: 50%;
-	            top: 0;
+	            top: 6%;
 	            transform: translateX(-50%);
             }
             p{
               color: black;
-              margin: 10px 0 ;
+              /*margin: 10px 0 ;*/
 	            position: absolute;
-	            bottom: 0;
+	            bottom: 4%;
 	            width: 100%;
             }
           }
