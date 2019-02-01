@@ -419,12 +419,19 @@
 		  this.getCompList(true, true)
 		  next()
 	  },
+	  beforeRouteLeave (to, from, next) {
+		  // 导航离开该组件的对应路由时调用
+		  // 可以访问组件实例 `this`
+		  document.body.removeEventListener('touchmove', this.noscroll,false)
+		  next()
+	  },
 	  deactivated(){
 		  document.body.removeEventListener('touchmove', this.noscroll,false)
 	  },
 	  beforeDestory(){
 		  document.body.removeEventListener('touchmove', this.noscroll,false)
 	  },
+
   }
 </script>
 <style scoped>
