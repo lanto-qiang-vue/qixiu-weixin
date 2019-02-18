@@ -21,7 +21,8 @@ export default {
 			minHeight: 45,
 		},
 		maintainDetail: {},
-		maintainListHistory: maintainListHistory()
+		maintainListHistory: maintainListHistory(),
+		nowRole: 'chezhu'
 	},
 	getters: {
 
@@ -74,6 +75,9 @@ export default {
 			} else state.maintainListHistory=[]
 			localStorage.setItem('maintainListHistory', JSON.stringify(state.maintainListHistory))
 		},
+		setNowRole(state, val){
+			state.nowRole= val
+		}
 	},
 	actions:{
 

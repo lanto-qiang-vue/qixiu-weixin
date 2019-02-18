@@ -114,7 +114,7 @@ export default {
 			})
 		},
 		loadMore(){
-			this.total++
+			this.pageNo++
 			this.getList()
 		},
 		loadStop(){

@@ -150,5 +150,7 @@ export default new Router({
 		{path: '/rescue-map', name: 'rescue-map', component: resolve => require(['@/page/service-map/maintain'], resolve)},
 		{path: '/school-detail', name: 'school-detail', component: resolve => require(['@/page/service-map/school-detail'], resolve)},
 		{path: '/com-remind', name: 'com-remind', component: resolve => require(['@/page/com-remind'], resolve)},
+		{path: '/com-abnormal', name: 'com-abnormal', component: resolve => require(['@/page/comCenter/abnormal'], resolve), meta: {requiresAuth: true}},
+		{path: '/edit-com-info', name: 'edit-com-info', component: resolve => require(['@/page/comCenter/editComInfo'], resolve), meta: {requiresAuth: true}},
 	]
 })

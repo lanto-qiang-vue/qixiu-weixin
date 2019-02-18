@@ -2,16 +2,17 @@
   <div style="overflow: scroll; height: calc(100vh - 50px)">
     <!-- 已登录 -->
 	  <upload @done="changeAvatar" ref="upload"></upload>
-    <div class="header" v-if="userInfo">
+    <div class="header hasrole" v-if="userInfo">
       <div class="text-one-cut" >
         <p>{{name}}</p>
         <u @click="goToSet"></u>
-        <span class="telNum">{{ tel }}</span>
+	      <div class="role-name" v-if="hasRole('weixiuqiye')" @click="switchRole= true"><span>{{showRole}}</span><i></i></div>
+	      <span class="telNum">{{ tel }}</span>
       </div>
 	    <div class="img" @click="toUpload">
 		    <img ref="headerImg" :src="picURL || '/static/img/home/user.png'"  alt="点击更换头像" style="width: 60px;height: 60px;border-radius: 100%">
-
 	    </div>
+
 
     </div>
     <!-- 未登录 -->
@@ -29,6 +30,8 @@
       <!--<img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>运营统计</span> <i></i>-->
     <!--</div>-->
 
+	  <div v-show="nowRole=='chezhu'">
+
     <div class="list" @click="goCarListManager" v-if="hasRole('guanlibumen')">
       <img src="../assets/img/my/health.png" alt=""><span>电子健康档案</span> <i></i>
     </div>
@@ -45,9 +48,6 @@
     </div>
     <div class="list" @click="goMyOrder">
       <img src="../assets/img/my/order.png" alt=""><span>我的预约服务</span> <i></i>
-    </div>
-    <div @click="goMyAppointmentOrder" class="list" v-if="hasRole('weixiuqiye')">
-      <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的预约订单</span> <i></i>
     </div>
     <div class="list" @click="goMyAppointment">
       <img src="../assets/img/my/appointment.png" alt=""><span>我的上门服务</span> <i></i>
@@ -71,6 +71,18 @@
     <div @click="goSatisfaction" class="list">
       <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>满意度调查</span> <i></i>
     </div>
+  </div>
+  <div v-show="nowRole=='weixiuqiye'">
+	  <router-link tag="div" to="/com-abnormal" class="list">
+		  <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>异常提醒</span> <i></i>
+	  </router-link>
+	  <router-link tag="div" to="/edit-com-info" class="list">
+		  <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>企业信息维护</span> <i></i>
+	  </router-link>
+	  <div @click="goMyAppointmentOrder" class="list" v-if="hasRole('weixiuqiye')">
+		  <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的预约订单</span> <i></i>
+	  </div>
+  </div>
 
     <div class="list" @click='goSetting(tel)' style="border-top: 10px solid #f8f8f8;box-sizing: content-box;">
       <img src="../assets/img/my/set.png" alt=""><span>设置</span> <i></i>
@@ -84,26 +96,60 @@
     <div class="list" @click='goComplaint'>
       <img src="../assets/img/my/report.png" alt=""><span>投诉举报</span> <i></i>
     </div>
+
+	  <mt-popup v-model="switchRole"  style="width: 90%" >
+		  <div class="telBlock">
+			  <mt-radio
+					  @click.native="switchRole= false"
+					  align="right"
+					  v-model="nowRole"
+					  :options="roleOptions">
+			  </mt-radio>
+		  </div>
+	  </mt-popup>
   </div>
 </template>
 
 <script>
-  import {MessageBox, Actionsheet, Toast} from 'mint-ui'
+  import {MessageBox, Actionsheet, Toast, Radio} from 'mint-ui'
   import Upload from '@/page/components/compress-upload.vue'
   export default {
     name: 'my',
 	  components: {Upload},
     data () {
       return {
-        name: "",
-        tel: '',
-        userInfo: localStorage.getItem("USERINFO"),
-        jueSe: '',
-        notbind: false,
+		name: "",
+		tel: '',
+		userInfo: localStorage.getItem("USERINFO"),
+		jueSe: '',
+		notbind: false,
 	      picURL: '',
-	      roles:''
+	      roles:'',
+	      switchRole: false,
+	      nowRole: 'chezhu',
+	      roleOptions:[
+		      {label: '车主', value: 'chezhu'},
+		      {label: '维修企业', value: 'weixiuqiye'}
+	      ]
       }
     },
+	  computed:{
+    	showRole(){
+    		let role=''
+    		for(let i in this.roleOptions){
+    			if(this.nowRole== this.roleOptions[i].value){
+				    role= this.roleOptions[i].label
+    				break
+			    }
+		    }
+		    return role
+	    }
+	  },
+	  watch:{
+		  nowRole(val){
+			  this.$store.commit('setNowRole', val)
+		  }
+	  },
     created(){
       let userinfo = JSON.parse(localStorage.getItem("USERINFO"))
       if (userinfo) {
@@ -112,10 +158,16 @@
         this.picURL = userinfo.photo
         this.roles= JSON.stringify(userinfo.roles)
 
-
         if(localStorage.getItem('UNIONID')!= userinfo.openid) this.notbind=true
+      }else{
+	      this.$store.commit('setNowRole', 'chezhu')
       }
+	    this.nowRole= this.$store.state.app.nowRole
     },
+	  mounted(){
+
+
+	  },
     methods: {
     	hasRole(name){
 			return this.roles.indexOf(name)>=0
@@ -255,7 +307,7 @@
 		  u {
 			  position: absolute;
 			  right: 84px;
-			  bottom: 4px;
+			  bottom: 8px;
 			  width: 15px;
 			  height: 15px;
 			  background: url(../assets/img/my/edit.png);
@@ -269,12 +321,33 @@
       top: 50%;
       transform: translateY(-50%);
     }
+	  .role-name{
+		  padding: 4px 4px 4px;
+		  display: inline-block;
+		  margin-right: 10px;
+		  font-size: 14px;
+		  color: #333333;
+		  i{
+			  width: 0;
+			  height: 0;
+			  border-left: 4px solid transparent;
+			  border-right:4px solid transparent;
+			  border-top:6px solid #757575;
+			  vertical-align: middle;
+			  display: inline-block;
+			  margin-left: 2px;
+			  padding-bottom: 2px;
+		  }
+	  }
 
     .telNum, .fastLogin {
-      margin-top: 10px;
-      display: block;
+      margin-top: 16px;
+      display: inline-block;
       color: #999;
     }
+	  .telNum{
+		  font-size: 14px;
+	  }
     > .login {
       font-size: 20px;
     }
