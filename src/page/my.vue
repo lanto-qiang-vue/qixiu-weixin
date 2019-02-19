@@ -74,13 +74,19 @@
   </div>
   <div v-show="nowRole=='weixiuqiye'">
 	  <router-link tag="div" to="/com-abnormal" class="list">
-		  <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>异常提醒</span> <i></i>
+		  <img src="../assets/img/my/异常提醒.png" alt=""><span>异常提醒</span> <i></i>
 	  </router-link>
 	  <router-link tag="div" to="/edit-com-info" class="list">
-		  <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>企业信息维护</span> <i></i>
+		  <img src="../assets/img/my/企业信息维护.png" alt=""><span>企业信息维护</span> <i></i>
 	  </router-link>
-	  <div @click="goMyAppointmentOrder" class="list" v-if="hasRole('weixiuqiye')">
+	  <div @click="goMyAppointmentOrder" class="list">
 		  <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的预约订单</span> <i></i>
+	  </div>
+	  <div @click="goMyAppointmentOrder" class="list">
+		  <img src="../assets/img/my/营业时间及状态调整.png" alt=""><span>营业时间及状态调整</span> <i></i>
+	  </div>
+	  <div @click="goMyAppointmentOrder" class="list">
+		  <img src="../assets/img/my/企业特色标签.png" alt=""><span>企业特色标签</span> <i></i>
 	  </div>
   </div>
 
@@ -351,8 +357,9 @@
     > .login {
       font-size: 20px;
     }
-    > .fastLogin {
-      font-size: 14px;
+    .fastLogin {
+	    float: left;
+	    width: 100%;
     }
 
   }
@@ -366,7 +373,7 @@
     img {
       position: absolute;
       width: 16px;
-      height: 16px;
+      height: auto;
       top: 17px;
       left: 18px;
     }
