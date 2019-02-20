@@ -82,12 +82,12 @@
 	  <div @click="goMyAppointmentOrder" class="list">
 		  <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的预约订单</span> <i></i>
 	  </div>
-	  <div @click="goMyAppointmentOrder" class="list">
+	  <router-link tag="div" to="/my?comOtherInfo=businessHours" class="list">
 		  <img src="../assets/img/my/营业时间及状态调整.png" alt=""><span>营业时间及状态调整</span> <i></i>
-	  </div>
-	  <div @click="goMyAppointmentOrder" class="list">
+	  </router-link>
+	  <router-link tag="div" to="/my?comOtherInfo=featureTag" class="list">
 		  <img src="../assets/img/my/企业特色标签.png" alt=""><span>企业特色标签</span> <i></i>
-	  </div>
+	  </router-link>
   </div>
 
     <div class="list" @click='goSetting(tel)' style="border-top: 10px solid #f8f8f8;box-sizing: content-box;">
@@ -113,15 +113,18 @@
 			  </mt-radio>
 		  </div>
 	  </mt-popup>
+
+	  <com-other-info v-if="hasRole('weixiuqiye')"></com-other-info>
   </div>
 </template>
 
 <script>
   import {MessageBox, Actionsheet, Toast, Radio} from 'mint-ui'
   import Upload from '@/page/components/compress-upload.vue'
+  import ComOtherInfo from '@/page/comCenter/other-info.vue'
   export default {
     name: 'my',
-	  components: {Upload},
+	  components: {Upload, ComOtherInfo},
     data () {
       return {
 		name: "",

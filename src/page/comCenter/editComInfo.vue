@@ -3,7 +3,7 @@
 	<div :class="['status', 'statu'+status]" v-show="statusText">{{statusText}}</div>
 	<div class="err-info" v-show="status==3">不通过原因：{{form.cruxAuditInfo}}</div>
 	<Form :model="form" class="common-form"
-	      :label-width="100" label-position="left" ref="form" :rules="ruleValidate">
+	      :label-width="100" label-position="left" ref="form" :rules="ruleValidate" :style="{'margin-bottom:60px;':status!=1}">
 		<FormItem label="企业名称" prop="name">
 			<Input v-model="form.name"></Input>
 		</FormItem>
@@ -19,7 +19,7 @@
 			<span class="ivu-input half" @click="pick('registerDate')">{{form.registerDate}}</span>
 		</FormItem>
 		<FormItem label="工商注册区域" prop="registerRegion">
-			<span class="ivu-input half select" @click="popupShow('registerRegion')">{{showArea}}</span>
+			<span class="ivu-input half select" @click="radioShow('registerRegion')">{{showArea}}</span>
 		</FormItem>
 		<FormItem label="工商注册地址" prop="registerAddress">
 			<Input v-model="form.registerAddress"></Input>
@@ -28,7 +28,7 @@
 			<Input v-model="form.legalName"></Input>
 		</FormItem>
 		<FormItem label="经营范围" prop="businessScope">
-			<span class="ivu-input half select" @click="popupShow('businessScope')">{{showBusinessScope}}</span>
+			<span class="ivu-input half select" @click="radioShow('businessScope')">{{showBusinessScope}}</span>
 		</FormItem>
 		<FormItem label="经营范围子类" v-show="form.businessScope" class="top-position" prop="businessScope2">
 			<mt-checklist
@@ -323,7 +323,7 @@ export default {
 			}
 			return text
 		},
-		popupShow(type){
+		radioShow(type){
 			this.radioType= type
 			this.showRadio= true
 		},
@@ -376,9 +376,6 @@ export default {
 		font-size: 14px;
 		border-bottom: 1px solid #E5E5E5
 	}
-	.common-form{
-		margin-bottom: 60px;
-	}
 	.up{
 		margin: 0;
 		line-height: 40px;
@@ -425,37 +422,6 @@ export default {
 			text-align: center;
 		}
 	}
-	.half, .line{
-		width: 45%;
-		min-height: 25px;
-		margin-top: 10px!important;
-	}
-	.half{
-		padding-left: 10px;
-		line-height: 20px!important;
-		white-space: nowrap;
-	}
-	.line{
-		width: auto;
-		line-height: 18px;
-		margin-left: 10px;
-	}
-	.select{
-		width: 100%;
-		padding-right: 16px;
-		&:after{
-			content: '';
-			position: absolute;
-			right: 4px;
-			top: 5px;
-			border-right: 1px solid #666666;
-			border-bottom: 1px solid #666666;
-			width: 10px;
-			height: 10px;
-			-webkit-transform: rotate(-45deg);
-			transform: rotate(-45deg);
-		}
-	}
 	.submit{
 		position: fixed;
 		left: 0;
@@ -489,20 +455,7 @@ export default {
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	.popupBlock{
-		overflow: scroll;
-		max-height: 60vh;
-		a{
-			display: block;
-			color: black;
-			line-height: 40px;
-			text-align: center;
-			border-bottom: 1px solid #EEEEEE;
-			&:last-child{
-				border: 0;
-			}
-		}
-	}
+
 	.checklist{
 		margin-top: 0;
 		.mint-checklist-title{

@@ -76,6 +76,8 @@ p {
 .common-form {
   padding-left: 15px;
   overflow: hidden;
+  background-color: white;
+  border-bottom:1px solid #E5E5E5;
   .ivu-form-item{
     display: inline-block;
     vertical-align: top;
@@ -131,6 +133,49 @@ p {
         margin: 0 0 2px 0;
       }
     }
+
+    .half, .line{
+      min-height: 25px;
+      margin-top: 10px;
+      line-height: 20px;
+    }
+    .half{
+      width: auto;
+      min-width: 50px;
+      max-width: 45%;
+      padding-left: 10px;
+      //line-height: 20px!important;
+      white-space: nowrap;
+    }
+    .half.ivu-input{
+      margin-top: 3px;
+    }
+    .line{
+      //min-width: 10px;
+      //max-width: 10px;
+      width: auto;
+      line-height: 18px;
+      margin-left: 10px;
+    }
+    .select{
+      min-width: 100%;
+      max-width: 100%;
+      padding-right: 16px;
+      line-height: 20px!important;
+      margin-top: 10px!important;
+      &:after{
+        content: '';
+        position: absolute;
+        right: 4px;
+        top: 5px;
+        border-right: 1px solid #666666;
+        border-bottom: 1px solid #666666;
+        width: 10px;
+        height: 10px;
+        -webkit-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+      }
+    }
   }
   .top-position{
     .ivu-form-item-label{
@@ -148,6 +193,47 @@ p {
   }
   .ivu-form-item-error .ivu-form-item-content .ivu-input{
     border: 1px solid #ed4014;
+  }
+}
+
+.popupBlock{
+  overflow: scroll;
+  max-height: 60vh;
+  a{
+    display: block;
+    color: black;
+    line-height: 40px;
+    text-align: center;
+    border-bottom: 1px solid #EEEEEE;
+    &:last-child{
+      border: 0;
+    }
+  }
+}
+
+.style-tags{
+  overflow: hidden;
+  background-color: white;
+  padding: 20px 10px 0;
+  li{
+    min-width: 80px;
+    display: inline-block;
+    padding: 0 10px;
+    margin: 0 5px 15px;
+    vertical-align: top;
+    text-align: center;
+    height: 27px;
+    line-height: 25px;
+    color: #666666;
+    border-radius:3px;
+    font-size: 12px;
+    border:1px solid #DDDDDD;
+    background-color: white;
+  }
+  li.on{
+    color: #4285F4;
+    border-color: #4285F4;
+    background-color: #ECF2FD;
   }
 }
 

@@ -17,10 +17,11 @@ Vue.config.productionTip = false
 Vue.use(MintUI)
 Vue.use(VueImg);
 Vue.prototype.axios = axios;
-import { Input, Form, FormItem } from 'iview';
+import { Input, Form, FormItem, Tag } from 'iview';
 Vue.component('Input', Input);
 Vue.component('Form', Form);
 Vue.component('FormItem', FormItem);
+Vue.component('Tag', Tag);
 
 new Vue({
 	router,
