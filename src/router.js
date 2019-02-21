@@ -152,5 +152,6 @@ export default new Router({
 		{path: '/com-remind', name: 'com-remind', component: resolve => require(['@/page/com-remind'], resolve)},
 		{path: '/com-abnormal', name: 'com-abnormal', component: resolve => require(['@/page/comCenter/abnormal'], resolve), meta: {requiresAuth: true}},
 		{path: '/edit-com-info', name: 'edit-com-info', component: resolve => require(['@/page/comCenter/editComInfo'], resolve), meta: {requiresAuth: true}},
+		{path: '/com-other-info', name: 'com-other-info', component: resolve => require(['@/page/comCenter/other-info'], resolve), meta: {requiresAuth: true}},
 	]
 })

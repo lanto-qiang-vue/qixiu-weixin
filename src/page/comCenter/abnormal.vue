@@ -9,7 +9,7 @@
 	             bottomPullText="加载更多"   ref="loadmore">
 		<ul class="list">
 			<router-link tag="li" v-for="(item, key) in list" :key="key" :to="'/com-remind?id='+ item.id">
-				<p :clas="item.type">{{showText(item.type)}}</p>
+				<p :class="item.type">{{showText(item.type)}}</p>
 				<span>{{item.sendDate}}</span>
 				<div class="right">{{item.hasRead?'已读':'未读'}}<i></i></div>
 			</router-link>

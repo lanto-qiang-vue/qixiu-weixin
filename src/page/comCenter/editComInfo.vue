@@ -3,7 +3,7 @@
 	<div :class="['status', 'statu'+status]" v-show="statusText">{{statusText}}</div>
 	<div class="err-info" v-show="status==3">不通过原因：{{form.cruxAuditInfo}}</div>
 	<Form :model="form" class="common-form"
-	      :label-width="100" label-position="left" ref="form" :rules="ruleValidate" :style="{'margin-bottom:60px;':status!=1}">
+	      :label-width="100" label-position="left" ref="form" :rules="ruleValidate" :style="status!='1'?'margin-bottom:60px;':''">
 		<FormItem label="企业名称" prop="name">
 			<Input v-model="form.name"></Input>
 		</FormItem>
@@ -221,7 +221,7 @@ export default {
 				let arr= res.data.items
 				for(let i in arr){
 					this.registerRegion.push({
-						label: arr[i].regionName,
+						label: arr[i].shortName,
 						value: arr[i].regionCode,
 					})
 				}

@@ -1,7 +1,5 @@
 <template>
 <div class="com-other-info">
-<mt-popup v-model="showPopup" position="right" style="width: 100%;" :closeOnClickModal="false">
-<div class="body">
 	<div class="businessHours" v-show="showBlock=='businessHours'">
 		<Form :model="formBusinessHours" class="common-form" :label-width="100" label-position="left" ref="formBusinessHours" :rules="ruleBusinessHours">
 			<FormItem label="营业时间" prop="businessHours">
@@ -24,8 +22,7 @@
 		</ul>
 		<div class="submit"><a @click="featureTagSubmit">提交</a></div>
 	</div>
-</div>
-</mt-popup>
+
 
 	<mt-datetime-picker
 			ref="picker"
@@ -55,7 +52,6 @@ export default {
 	data(){
 		let rule= { required: true, message:'必填项不能为空'}
 		return{
-			showPopup: false,
 			showBlock: '',
 			formBusinessHours: {
 				stime: '',
@@ -94,15 +90,7 @@ export default {
 	},
 	mounted(){
 		this.popupShow(this.$route)
-		this.getBusinessHours()
-		this.axios.get('/corp/manage/tags/list/all').then(res=>{
-			let item= res.data.items
-			for(let i in item){
-				item[i].checked= false
-				this.allTagList.push(item[i])
-			}
-			this.getFeatureTag()
-		})
+
 	},
 	methods:{
 		getBusinessHours(){
@@ -143,10 +131,26 @@ export default {
 		popupShow(route){
 			if(route.query.comOtherInfo) {
 				this.showBlock= route.query.comOtherInfo
-				this.showPopup= true
+				switch (route.query.comOtherInfo){
+					case 'businessHours':{
+						this.getBusinessHours()
+						break
+					}
+					case 'featureTag':{
+						this.axios.get('/corp/manage/tags/list/all').then(res=>{
+							let item= res.data.items
+							for(let i in item){
+								item[i].checked= false
+								this.allTagList.push(item[i])
+								this.getFeatureTag()
+							}
+						})
+
+						break
+					}
+				}
 			}else{
 				this.showBlock= ''
-				this.showPopup= false
 			}
 		},
 		pick(str){
@@ -222,14 +226,14 @@ export default {
 
 <style scoped lang="less">
 .com-other-info{
-	.body{
+
 		height: 100vh;
 		width: 100%;
 		overflow: auto;
 		background-color: #F8F8F8;
-	}
 
 	.submit{
+		z-index: 25;
 		position: fixed;
 		left: 0;
 		bottom: 0;
