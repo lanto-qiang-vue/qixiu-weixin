@@ -303,6 +303,9 @@ export default {
 				if(!this.form.longitude || !this.form.latitude){
 					this.geoCode(this.form.businessAddress)
 				}
+				if(this.form.licenceBeginDate && this.form.licenceEndDate){
+					this.form.dataRang= Math.random()
+				}
 			})
 		},
 		pick(field){
