@@ -4,33 +4,41 @@
 	<div class="err-info" v-show="status==3">不通过原因：{{form.cruxAuditInfo}}</div>
 	<Form :model="form" class="common-form"
 	      :label-width="100" label-position="left" ref="form" :rules="ruleValidate" :style="status!='1'?'margin-bottom:60px;':''">
-		<FormItem label="企业名称" prop="name">
+		<FormItem label="企业名称" :class="[{'mark-change': markChange('name')}, '']" prop="name">
 			<Input v-model="form.name"></Input>
 		</FormItem>
-		<FormItem label="许可证号" prop="license">
+		<FormItem label="许可证号" :class="[{'mark-change': markChange('license')}, '']" prop="license">
 			<Input v-model="form.license"></Input>
 		</FormItem>
-		<FormItem label="许可证有效期" prop="dataRang">
+		<FormItem label="许可证有效期" :class="[{'mark-change': markChange('licenceBeginDate,licenceEndDate')}, '']" prop="dataRang">
 			<span :class="[ !form.licenceBeginDate? 'ivu-input':'' ,'half']" @click="pick('licenceBeginDate')">{{form.licenceBeginDate}}</span>
 			<span class="line"> - </span>
 			<span :class="[ !form.licenceEndDate? 'ivu-input':'' ,'half']" @click="pick('licenceEndDate')">{{form.licenceEndDate}}</span>
 		</FormItem>
-		<FormItem label="工商注册日期" prop="registerDate">
+		<FormItem label="工商注册日期" :class="[{'mark-change': markChange('registerDate')}, '']" prop="registerDate">
 			<span class="ivu-input half" @click="pick('registerDate')">{{form.registerDate}}</span>
 		</FormItem>
-		<FormItem label="工商注册区域" prop="registerRegion">
+		<FormItem label="工商注册区域" :class="[{'mark-change': markChange('registerRegion')}, '']" prop="registerRegion">
 			<span class="ivu-input half select" @click="radioShow('registerRegion')">{{showArea}}</span>
 		</FormItem>
-		<FormItem label="工商注册地址" prop="registerAddress">
+		<FormItem label="工商注册地址" :class="[{'mark-change': markChange('registerAddress')}, '']" prop="registerAddress">
 			<Input v-model="form.registerAddress"></Input>
 		</FormItem>
-		<FormItem label="法人代表" prop="legalName">
+
+		<FormItem label="经营地地址:" :class="[{'mark-change': markChange('businessAddress')}, '']" prop="businessAddress">
+			<Input type="text" v-model="form.businessAddress" placeholder="请输入经营地地址" @on-change="changeBusinessAddress"></Input>
+		</FormItem>
+		<FormItem label="经营地址区域:" :class="[{'mark-change': markChange('businessRegion')}, '']" prop="businessRegion">
+			<span class="ivu-input half select" @click="radioShow('businessRegion')">{{showBusinessArea}}</span>
+		</FormItem>
+
+		<FormItem label="法人代表" :class="[{'mark-change': markChange('legalName')}, '']" prop="legalName">
 			<Input v-model="form.legalName"></Input>
 		</FormItem>
-		<FormItem label="经营范围" prop="businessScope">
+		<FormItem label="经营范围" :class="[{'mark-change': markChange('businessScope')}, '']" prop="businessScope">
 			<span class="ivu-input half select" @click="radioShow('businessScope')">{{showBusinessScope}}</span>
 		</FormItem>
-		<FormItem label="经营范围子类" v-show="form.businessScope" class="top-position" prop="businessScope2">
+		<FormItem label="经营范围子类" v-show="form.businessScope" :class="[{'mark-change': markChange('businessScope2')}, 'top-position']" prop="businessScope2">
 			<mt-checklist
 					class="checklist"
 					align="right"
@@ -38,19 +46,19 @@
 					:options="businessScope2">
 			</mt-checklist>
 		</FormItem>
-		<FormItem label="营业执照（文件大小不超过3M）" class="top-position" prop="yyzz">
+		<FormItem label="营业执照（文件大小不超过3M）" :class="[{'mark-change': markChange('yyzz')}, 'top-position']" prop="yyzz">
 			<a class="up" v-show="!readOnly">上传<up-img-block @done="getImg($event, 'yyzz')"></up-img-block></a>
 			<div class="content" v-if="form.yyzz">
 				<img :src="form.yyzz" v-img/>
 			</div>
 		</FormItem>
-		<FormItem label="道路运输经营许可证（文件大小不超过3M）" class="top-position" prop="dlysxkz">
+		<FormItem label="道路运输经营许可证（文件大小不超过3M）" :class="[{'mark-change': markChange('dlysxkz')}, 'top-position']" prop="dlysxkz">
 			<a class="up" v-show="!readOnly">上传<up-img-block @done="getImg($event, 'dlysxkz')"></up-img-block></a>
 			<div class="content" v-if="form.dlysxkz">
 				<img :src="form.dlysxkz" v-img/>
 			</div>
 		</FormItem>
-		<FormItem label="门店门头照（文件大小不超过3M）" class="top-position" prop="mdmtz">
+		<FormItem label="门店门头照（文件大小不超过3M）" :class="[{'mark-change': markChange('mdmtz')}, 'top-position']" prop="mdmtz">
 			<a class="up" v-show="!readOnly">上传<up-img-block @done="getImg($event, 'mdmtz')"></up-img-block></a>
 			<div class="content" v-if="form.mdmtz">
 				<img :src="form.mdmtz" v-img/>
@@ -141,11 +149,17 @@ export default {
 				dlysxkz: '',
 				mdmtz: '',
 				status: '',
+				businessAddress: "",
+				businessRegion: "",
+				longitude: '',
+				latitude: '',
+				fields:[],
+				cruxAuditInfo: ''
 			},
 			ruleValidate : {
 				name: [rule],
 				license: [rule],
-				dataRang:[{
+				dataRang:[rule,{
 					validator: validRang
 				}],
 				licenceBeginDate: [rule],
@@ -159,19 +173,41 @@ export default {
 				yyzz: [rule],
 				dlysxkz: [rule],
 				mdmtz: [rule],
+				businessRegion: [rule],
+				businessAddress: [rule,{
+					validator: (rule, value, callback) => {
+						let wrongAddress= this.$data.wrongAddress, flag=false
+						for(let i in wrongAddress){
+							if (value == wrongAddress[i]) flag= true
+						}
+						if (flag) {
+							callback(new Error('您输入的地址查不到对应坐标，请输入更详细地址'));
+						} else {
+							callback();
+						}
+					}
+				}],
 			},
 			dateField: '',
 			dataVal: '',
 			businessScope: [],
 			registerRegion: [],
+			businessRegion: [],
 			businessScope2: [],
 			showRadio: false,
-			radioType: ''
+			radioType: '',
+
+			timer: null,
+			geocoder:null,//地标
+			wrongAddress: [],
 		}
 	},
 	computed:{
 		showArea(){
 			return this.getText('registerRegion')
+		},
+		showBusinessArea(){
+			return this.getText('businessRegion')
 		},
 		showBusinessScope(){
 			return this.getText('businessScope')
@@ -202,7 +238,12 @@ export default {
 		},
 		readOnly(){
 			return this.form.status&& this.form.status.toString()== '1'
-		}
+		},
+		allFields(){
+			let str1=this.form.fields?this.form.fields.join(','):''
+
+			return str1
+		},
 	},
 	watch:{
 		showArea(){
@@ -224,10 +265,17 @@ export default {
 						label: arr[i].shortName,
 						value: arr[i].regionCode,
 					})
+					this.businessRegion= this.registerRegion
 				}
 			}
 		})
 		this.getInfo()
+
+		AMap.plugin('AMap.Geocoder', () => {
+			this.geocoder = new AMap.Geocoder({
+				city: "021",
+			});
+		})
 	},
 	methods:{
 		getInfo(){
@@ -251,6 +299,9 @@ export default {
 							this.form[key]= item[key]
 						}
 					}
+				}
+				if(!this.form.longitude || !this.form.latitude){
+					this.geoCode(this.form.businessAddress)
 				}
 			})
 		},
@@ -330,6 +381,37 @@ export default {
 		getImg(res, name){
 			this.form[name]= res.item.path
 			this.$refs.form.validateField(name)
+		},
+		changeBusinessAddress(event){
+			// console.log(event)
+			clearTimeout(this.timer)
+			this.timer= setTimeout(()=>{
+				this.geoCode(event.target.value);
+			},500)
+		},
+		geoCode(value){
+			this.geocoder.getLocation(value, (status, result)=> {
+				if (status === 'complete'&&result.geocodes.length) {
+					let lnglat = result.geocodes[0].location;
+					this.form.longitude=lnglat.lng;
+					this.form.latitude=lnglat.lat;
+				}else{
+					this.form.longitude= '';
+					this.form.latitude= '';
+					this.wrongAddress.push(value)
+					this.$refs.form.validateField('businessAddress')
+				}
+			});
+		},
+		markChange(fields){
+			let arr= fields.split(','),flag=false
+			for(let i in arr){
+				if(this.allFields.indexOf(arr[i])>=0){
+					flag= true
+					break
+				}
+			}
+			return flag
 		},
 		submit(){
 
@@ -465,6 +547,9 @@ export default {
 			background-color: #FCFCFD;
 			border-top: 1px dashed #EEEEEE;
 		}
+	}
+	.mark-change .ivu-form-item-label{
+		color: orange;
 	}
 }
 </style>
