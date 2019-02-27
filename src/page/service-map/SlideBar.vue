@@ -143,21 +143,30 @@
         self.resize(docHeight- self.minTop -touchBarHeight)
       }
     },
-		activated(){
-			this.needHideFooter()
-			let name= this.moveLocation[this.showBody]
-			for (let i in name){
-				if(name[i].now){
-					this.resize(name[i].height, 0)
-				}
+	activated(){
+		this.needHideFooter()
+		let name= this.moveLocation[this.showBody]
+		for (let i in name){
+			if(name[i].now){
+				this.resize(name[i].height, 0)
 			}
-		},
+		}
+	},
     deactivated(){
       document.body.removeEventListener('touchend', this.bodyScrollTop,false)
+	    document.body.removeEventListener('touchmove', this.noscroll,false)
     },
     beforeDestory(){
       document.body.removeEventListener('touchend', this.bodyScrollTop,false)
+	    document.body.removeEventListener('touchmove', this.noscroll,false)
     },
+	beforeRouteLeave (to, from, next) {
+		// 导航离开该组件的对应路由时调用
+		// 可以访问组件实例 `this`
+		document.body.removeEventListener('touchend', this.bodyScrollTop,false)
+		document.body.removeEventListener('touchmove', this.noscroll,false)
+		next()
+	},
     methods:{
 	  bodyScrollTop(){
         if($('body').scrollTop()!= 0 ) $('body').scrollTop(0)
