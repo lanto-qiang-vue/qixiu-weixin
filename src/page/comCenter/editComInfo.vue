@@ -47,19 +47,19 @@
 			</mt-checklist>
 		</FormItem>
 		<FormItem label="营业执照（文件大小不超过3M）" :class="[{'mark-change': markChange('yyzz')}, 'top-position']" prop="yyzz">
-			<a class="up" v-show="!readOnly">上传<up-img-block @done="getImg($event, 'yyzz')"></up-img-block></a>
+			<a class="up" v-show="!readOnly &&!desabled">上传<up-img-block @done="getImg($event, 'yyzz')"></up-img-block></a>
 			<div class="content" v-if="form.yyzz">
 				<img :src="form.yyzz" v-img/>
 			</div>
 		</FormItem>
 		<FormItem label="道路运输经营许可证（文件大小不超过3M）" :class="[{'mark-change': markChange('dlysxkz')}, 'top-position']" prop="dlysxkz">
-			<a class="up" v-show="!readOnly">上传<up-img-block @done="getImg($event, 'dlysxkz')"></up-img-block></a>
+			<a class="up" v-show="!readOnly&&!desabled">上传<up-img-block @done="getImg($event, 'dlysxkz')"></up-img-block></a>
 			<div class="content" v-if="form.dlysxkz">
 				<img :src="form.dlysxkz" v-img/>
 			</div>
 		</FormItem>
 		<FormItem label="门店门头照（文件大小不超过3M）" :class="[{'mark-change': markChange('mdmtz')}, 'top-position']" prop="mdmtz">
-			<a class="up" v-show="!readOnly">上传<up-img-block @done="getImg($event, 'mdmtz')"></up-img-block></a>
+			<a class="up" v-show="!readOnly&&!desabled">上传<up-img-block @done="getImg($event, 'mdmtz')"></up-img-block></a>
 			<div class="content" v-if="form.mdmtz">
 				<img :src="form.mdmtz" v-img/>
 			</div>
@@ -70,7 +70,7 @@
 		</FormItem>
 	</Form>
 
-	<div class="submit" v-if="status!=1"><a @click="submit">提交审核</a></div>
+	<div class="submit" v-if="!desabled && status!=1"><a @click="submit">提交审核</a></div>
 
 	<mt-datetime-picker
 			ref="picker"
@@ -244,6 +244,9 @@ export default {
 
 			return str1
 		},
+		desabled(){
+			return true
+		}
 	},
 	watch:{
 		showArea(){

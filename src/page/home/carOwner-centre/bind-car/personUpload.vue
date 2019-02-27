@@ -255,12 +255,15 @@
             image: baseImg.split(',')[1],
           }
         }).then(res=>{
-            this.showDriveLicenseInfo = true
-            this.vehiclePlateNumber = res.data.item.vehiclePlateNumber
-            this.ownerName = res.data.item.ownerName
-            this.vin = res.data.item.vin
-            this.engineNo = res.data.item.engineNo
-            this.licenseId = res.data.item.id
+	        if(res.data.code==='0'){
+		        this.showDriveLicenseInfo = true
+		        this.vehiclePlateNumber = res.data.item.vehiclePlateNumber
+		        this.ownerName = res.data.item.ownerName
+		        this.vin = res.data.item.vin
+		        this.engineNo = res.data.item.engineNo
+		        this.licenseId = res.data.item.id
+	        }
+
         })
       },
 
@@ -336,6 +339,9 @@
             new_license_owner_name: this.ownerName,
             property: 2
           }
+        }
+        if(this.name!= this.ownerName){
+	        return Toast('身份证与行驶证持有人不一致')
         }
 
         this.axios({
