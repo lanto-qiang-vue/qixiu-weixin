@@ -274,6 +274,9 @@
         }else if(this.vehiclePlateNumber==='' || this.ownerName==='' || this.vin==='' || this.engineNo===''){
           return Toast('请上传行驶证')
         }
+	      if(this.name!= this.ownerName){
+		      return Toast('身份证与行驶证持有人不一致')
+	      }
         this.axios({
           url: '/scan/newBind',
           method: 'post',
@@ -282,8 +285,10 @@
             licenseId: this.licenseId
           }
         }).then(res=>{
-	        Toast('绑定成功')
-            this.$router.go(-2)
+	        if(res.data.code==='0'){
+		        Toast('绑定成功')
+		        this.$router.go(-2)
+	        }
         })
       },
 
@@ -340,9 +345,7 @@
             property: 2
           }
         }
-        if(this.name!= this.ownerName){
-	        return Toast('身份证与行驶证持有人不一致')
-        }
+
 
         this.axios({
           url: '/scan/update',
