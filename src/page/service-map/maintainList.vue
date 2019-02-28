@@ -385,7 +385,7 @@ export default {
 	    calcQuery(limit){
 		    let is164= this.search.type== '164'
 		    let is300= this.search.type== '300'
-		    let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,rating'+
+		    let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,rating,openHours'+
 			    '&q='+ this.search.q +
 			    '&page='+ (this.page-1) +','+ (limit ||this.limit)
 		    query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))

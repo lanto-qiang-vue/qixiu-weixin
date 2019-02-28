@@ -9,6 +9,9 @@
 </template>
 
 <script>
+	let   bodyScrollTop= function(){
+		if($('body').scrollTop()!= 0 ) $('body').scrollTop(0)
+	}
 	export default {
 		name: "slide-bar",
     props: [  'minHeight', 'init', 'toLocation', 'noslide'],
@@ -42,7 +45,6 @@
 
     },
     watch:{
-
       showBody(){
       	let name= this.moveLocation[this.showBody]
 	      for (let i in name){
@@ -122,7 +124,7 @@
       });
       $(document).bind('touchend',function(endE){
         // console.log('touchend')
-        $(document).off('touchmove');
+        $(document).unbind('touchmove');
         endY= endE.originalEvent.changedTouches[0].pageY
         // console.log('move', endY- startY)
         if(isMove){
@@ -136,7 +138,8 @@
 	      // $(document).unbind('touchmove');
       });
 
-      document.body.addEventListener('touchend', this.bodyScrollTop)
+      // document.body.addEventListener('touchend', bodyScrollTop)
+	    $("body").bind('touchend', this.bodyScrollTop)
 
       window.onresize = function(){
         if($(document).height()== (docHeight+ self.footerHeight)) self.$emit('maintainListBlur')
@@ -153,23 +156,31 @@
 		}
 	},
     deactivated(){
-      document.body.removeEventListener('touchend', this.bodyScrollTop,false)
-	    document.body.removeEventListener('touchmove', this.noscroll,false)
+			// console.log(1)
+	    this.removeEvent()
     },
-    beforeDestory(){
-      document.body.removeEventListener('touchend', this.bodyScrollTop,false)
-	    document.body.removeEventListener('touchmove', this.noscroll,false)
+	beforeDestroy(){
+	    // console.log(2)
+	    this.removeEvent()
     },
 	beforeRouteLeave (to, from, next) {
+		// console.log(3)
 		// 导航离开该组件的对应路由时调用
 		// 可以访问组件实例 `this`
-		document.body.removeEventListener('touchend', this.bodyScrollTop,false)
-		document.body.removeEventListener('touchmove', this.noscroll,false)
+		this.removeEvent()
 		next()
 	},
     methods:{
-	  bodyScrollTop(){
-        if($('body').scrollTop()!= 0 ) $('body').scrollTop(0)
+	    removeEvent(){
+
+		    document.body.removeEventListener('touchmove', this.noscroll,false)
+		    $("body").unbind('touchend')
+		    $(document).unbind('touchstart');
+		    $(document).unbind('touchend');
+		    $(document).unbind('touchmove');
+	    },
+      bodyScrollTop(){
+		  if($('body').scrollTop()!= 0 ) $('body').scrollTop(0)
       },
       noscroll(evt) {
         if(!evt._isScroller) {
