@@ -423,7 +423,7 @@
 <style scoped lang='less'>
 .compImg{
   width: 100%;
-	max-height: 300px;
+	max-height: 200px;
   margin-top: 40px;
 }
   .content{
