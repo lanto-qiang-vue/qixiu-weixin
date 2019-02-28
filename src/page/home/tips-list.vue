@@ -51,7 +51,7 @@
 
         this.axios({
           method: 'get',
-          url: '/wechat/material?type=news&offset='+this.page+'&count=20',
+          url: '/weixin/qixiu/material/query?type=news&offset='+this.page+'&count=20',
           headers: {'Content-type': 'application/json'},
         })
           .then(res => {
