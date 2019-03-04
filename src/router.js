@@ -145,7 +145,7 @@ export default new Router({
 		{path: '/upComplain', name: 'upComplain', component: resolve => require(['@/page/remark/upComplain'], resolve), meta: {requiresAuth: true}},
 		{path: '/myComplaint', name: 'myComplaint', component: resolve => require(['@/page/myComplaint'], resolve), meta: {requiresAuth: true}},
 		{path: '/tips-list', name: 'tips-list', component: resolve => require(['@/page/home/tips-list'], resolve)},
-		{path: '/school-map', name: 'school-map', component: resolve => require(['@/page/service-map/maintain'], resolve), meta: {index: 10, keepAlive: true}},
+		{path: '/school-map', name: 'school-map', component: resolve => require(['@/page/service-map/maintain'], resolve), meta: {index: 10, keepAlive: false}},
 		{path: '/base-map', name: 'base-map', component: resolve => require(['@/page/service-map/maintain'], resolve)},
 		{path: '/rescue-map', name: 'rescue-map', component: resolve => require(['@/page/service-map/maintain'], resolve)},
 		{path: '/school-detail', name: 'school-detail', component: resolve => require(['@/page/service-map/school-detail'], resolve)},
