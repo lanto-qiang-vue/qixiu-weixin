@@ -2,13 +2,14 @@
 <div class="edit-com-info">
 	<div :class="['status', 'statu'+status]" v-show="statusText">{{statusText}}</div>
 	<div class="err-info" v-show="status==3">不通过原因：{{form.cruxAuditInfo}}</div>
-	<Form :model="form" class="common-form"
-	      :label-width="100" label-position="left" ref="form" :rules="ruleValidate" :style="status!='1'?'margin-bottom:60px;':''">
+	<Form :model="form" :class="['common-form', {desabled: desabled}]"
+	      :label-width="100" label-position="left" ref="form" :rules="ruleValidate"
+	      :style="status!='1'&& !desabled?'margin-bottom:60px;':''">
 		<FormItem label="企业名称" :class="[{'mark-change': markChange('name')}, '']" prop="name">
-			<Input v-model="form.name"></Input>
+			<Input v-model="form.name" :readonly="desabled"></Input>
 		</FormItem>
 		<FormItem label="许可证号" :class="[{'mark-change': markChange('license')}, '']" prop="license">
-			<Input v-model="form.license"></Input>
+			<Input v-model="form.license" :readonly="desabled"></Input>
 		</FormItem>
 		<FormItem label="许可证有效期" :class="[{'mark-change': markChange('licenceBeginDate,licenceEndDate')}, '']" prop="dataRang">
 			<span :class="[ !form.licenceBeginDate? 'ivu-input':'' ,'half']" @click="pick('licenceBeginDate')">{{form.licenceBeginDate}}</span>
@@ -22,18 +23,18 @@
 			<span class="ivu-input half select" @click="radioShow('registerRegion')">{{showArea}}</span>
 		</FormItem>
 		<FormItem label="工商注册地址" :class="[{'mark-change': markChange('registerAddress')}, '']" prop="registerAddress">
-			<Input v-model="form.registerAddress"></Input>
+			<Input v-model="form.registerAddress" :readonly="desabled"></Input>
 		</FormItem>
 
 		<FormItem label="经营地地址:" :class="[{'mark-change': markChange('businessAddress')}, '']" prop="businessAddress">
-			<Input type="text" v-model="form.businessAddress" placeholder="请输入经营地地址" @on-change="changeBusinessAddress"></Input>
+			<Input type="text" v-model="form.businessAddress" placeholder="请输入经营地地址" :readonly="desabled" @on-change="changeBusinessAddress"></Input>
 		</FormItem>
 		<FormItem label="经营地址区域:" :class="[{'mark-change': markChange('businessRegion')}, '']" prop="businessRegion">
 			<span class="ivu-input half select" @click="radioShow('businessRegion')">{{showBusinessArea}}</span>
 		</FormItem>
 
 		<FormItem label="法人代表" :class="[{'mark-change': markChange('legalName')}, '']" prop="legalName">
-			<Input v-model="form.legalName"></Input>
+			<Input v-model="form.legalName" :readonly="desabled"></Input>
 		</FormItem>
 		<FormItem label="经营范围" :class="[{'mark-change': markChange('businessScope')}, '']" prop="businessScope">
 			<span class="ivu-input half select" @click="radioShow('businessScope')">{{showBusinessScope}}</span>
@@ -312,6 +313,7 @@ export default {
 			})
 		},
 		pick(field){
+			if(this.desabled) return
 			// this.dateShow= true
 			this.dateField= field
 			this.dataVal= new Date(this.form[field]||  new Date())
@@ -381,6 +383,7 @@ export default {
 			return text
 		},
 		radioShow(type){
+			if(this.desabled) return
 			this.radioType= type
 			this.showRadio= true
 		},
@@ -531,7 +534,9 @@ export default {
 			line-height: 40px;
 		}
 	}
-
+	.common-form.desabled .ivu-form-item .select:after{
+		display: none;
+	}
 
 }
 </style>
