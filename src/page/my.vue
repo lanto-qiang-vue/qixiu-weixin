@@ -77,7 +77,8 @@
 		  <img src="../assets/img/my/异常提醒.png" alt=""><span>异常提醒</span> <i></i>
 	  </router-link>
 	  <router-link tag="div" to="/edit-com-info" class="list">
-		  <img src="../assets/img/my/企业信息维护.png" alt=""><span>企业信息维护</span> <i></i>
+		  <img src="../assets/img/my/企业信息维护.png" alt=""><span>企业信息维护</span>
+		  <small :style="{color: comSta.color}" v-if="comSta.text">{{comSta.text}}</small> <i></i>
 	  </router-link>
 	  <div @click="goMyAppointmentOrder" class="list">
 		  <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的预约订单</span> <i></i>
@@ -137,7 +138,8 @@
 	      roleOptions:[
 		      {label: '车主', value: 'chezhu'},
 		      {label: '维修企业', value: 'weixiuqiye'}
-	      ]
+	      ],
+	      comstatus: 0
       }
     },
 	  computed:{
@@ -150,7 +152,10 @@
 			    }
 		    }
 		    return role
-	    }
+	    },
+		  comSta(){
+    		return this.calcStatus(this.comstatus)
+		  }
 	  },
 	  watch:{
 		  nowRole(val){
@@ -172,7 +177,13 @@
 	    this.nowRole= this.$store.state.app.nowRole
     },
 	  mounted(){
-
+		if(this.hasRole('weixiuqiye')){
+			this.axios.get('/corp/manage/corpDetail/crux').then(res=> {
+				if(res.data.code=='0'){
+					this.comstatus= res.data.item.status
+				}
+			})
+		}
 
 	  },
     methods: {
@@ -266,7 +277,28 @@
       },
 	    toUpload(){
     		this.$refs.upload.clickBox()
-	    }
+	    },
+	    calcStatus(status){
+		    let obj={}, statu= status? status.toString(): ''
+		    switch (statu){
+			    case '1':{
+				    obj.text='待审核'
+				    obj.color= 'orange'
+				    break
+			    }
+			    case '2':{
+				    obj.text='审核通过'
+				    obj.color= 'green'
+				    break
+			    }
+			    case '3':{
+				    obj.text='审核不通过'
+				    obj.color= 'red'
+				    break
+			    }
+		    }
+		    return obj
+	    },
     }
   }
 </script>
@@ -382,10 +414,18 @@
       margin-left: 35px;
       font-size: 15px;
     }
+	  small{
+		  position: absolute;
+		  height: 49px;
+		  line-height: 49px;
+		  font-size: 15px;
+		  top: 0;
+		  right: 25px;
+	  }
     i {
       position: absolute;
       right: 10px;
-      top: 18px;
+      top: 20px;
       border-right: 1px solid;
       border-bottom: 1px solid;
       width: 10px;
