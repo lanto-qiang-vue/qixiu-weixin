@@ -276,6 +276,9 @@ export default {
 	.info{
 		padding: 15px;
 		font-size: 14px;
+		a{
+			color: #1890FF;
+		}
 		p{
 			color: #666666;
 			line-height: 25px;
