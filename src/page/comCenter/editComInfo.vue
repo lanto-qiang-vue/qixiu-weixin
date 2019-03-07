@@ -4,7 +4,7 @@
 	<div class="err-info" v-show="status==3">不通过原因：{{form.cruxAuditInfo}}</div>
 	<Form :model="form" :class="['common-form', {desabled: desabled}]"
 	      :label-width="100" label-position="left" ref="form" :rules="ruleValidate"
-	      :style="status!='1'&& !desabled?'margin-bottom:60px;':''">
+	      :style="status!='1'&& desabled?'margin-bottom:60px;':''">
 		<FormItem label="企业名称" :class="[{'mark-change': markChange('name')}, '']" prop="name">
 			<Input v-model="form.name" :readonly="desabled"></Input>
 		</FormItem>
@@ -60,13 +60,13 @@
 			</mt-checklist>
 		</FormItem>
 		<FormItem label="营业执照（文件大小不超过3M）" :class="[{'mark-change': markChange('yyzz')}, 'top-position']" prop="yyzz">
-			<a class="up" v-show="!readOnly &&!desabled">上传<up-img-block @done="getImg($event, 'yyzz')"></up-img-block></a>
+			<a class="up" v-show="!readOnly">上传<up-img-block @done="getImg($event, 'yyzz')"></up-img-block></a>
 			<div class="content" v-if="form.yyzz">
 				<img :src="form.yyzz" v-img/>
 			</div>
 		</FormItem>
 		<FormItem label="道路运输经营许可证（文件大小不超过3M）" :class="[{'mark-change': markChange('dlysxkz')}, 'top-position']" prop="dlysxkz">
-			<a class="up" v-show="!readOnly&&!desabled">上传<up-img-block @done="getImg($event, 'dlysxkz')"></up-img-block></a>
+			<a class="up" v-show="!readOnly">上传<up-img-block @done="getImg($event, 'dlysxkz')"></up-img-block></a>
 			<div class="content" v-if="form.dlysxkz">
 				<img :src="form.dlysxkz" v-img/>
 			</div>
@@ -83,7 +83,7 @@
 		<!--</FormItem>-->
 	</Form>
 
-	<div class="submit" v-if="!desabled && status!=1"><a @click="submit">提交审核</a></div>
+	<div class="submit" v-if="desabled && status!=1"><a @click="submit">提交审核</a></div>
 
 	<mt-datetime-picker
 			ref="picker"
@@ -406,6 +406,7 @@ export default {
 						this.businessScope2.push({
 							label: arr[i].name,
 							value: arr[i].id.toString(),
+							disabled: this.desabled
 						})
 					}
 				}
