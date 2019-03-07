@@ -36,6 +36,18 @@
 		<FormItem label="法人代表" :class="[{'mark-change': markChange('legalName')}, '']" prop="legalName">
 			<Input v-model="form.legalName" :readonly="desabled"></Input>
 		</FormItem>
+
+		<FormItem label="经营状态" :class="[{'mark-change': markChange('businessStatus')}, '']" prop="businessStatus">
+			<span class="ivu-input half select" @click="radioShow('businessStatus')">{{showbusinessStatus}}</span>
+		</FormItem>
+		<FormItem label="经济类型" :class="[{'mark-change': markChange('economicType')}, '']" prop="economicType">
+			<span class="ivu-input half select" @click="radioShow('economicType')">{{showeconomicType}}</span>
+		</FormItem>
+		<FormItem label="其他经济类型" :class="[{'mark-change': markChange('economicTypeOther')}, '']"
+		          prop="economicTypeOther" v-show="form.economicType==900">
+			<Input v-model="form.economicTypeOther" :readonly="desabled"></Input>
+		</FormItem>
+
 		<FormItem label="经营范围" :class="[{'mark-change': markChange('businessScope')}, '']" prop="businessScope">
 			<span class="ivu-input half select" @click="radioShow('businessScope')">{{showBusinessScope}}</span>
 		</FormItem>
@@ -59,16 +71,16 @@
 				<img :src="form.dlysxkz" v-img/>
 			</div>
 		</FormItem>
-		<FormItem label="门店门头照（文件大小不超过3M）" :class="[{'mark-change': markChange('mdmtz')}, 'top-position']" prop="mdmtz">
-			<a class="up" v-show="!readOnly&&!desabled">上传<up-img-block @done="getImg($event, 'mdmtz')"></up-img-block></a>
-			<div class="content" v-if="form.mdmtz">
-				<img :src="form.mdmtz" v-img/>
-			</div>
-			<div class="content" v-else>
-				<img src="/static/img/shqxwbig.png" />
-				<p>示例图</p>
-			</div>
-		</FormItem>
+		<!--<FormItem label="门店门头照（文件大小不超过3M）" :class="[{'mark-change': markChange('mdmtz')}, 'top-position']" prop="mdmtz">-->
+			<!--<a class="up" v-show="!readOnly&&!desabled">上传<up-img-block @done="getImg($event, 'mdmtz')"></up-img-block></a>-->
+			<!--<div class="content" v-if="form.mdmtz">-->
+				<!--<img :src="form.mdmtz" v-img/>-->
+			<!--</div>-->
+			<!--<div class="content" v-else>-->
+				<!--<img src="/static/img/shqxwbig.png" />-->
+				<!--<p>示例图</p>-->
+			<!--</div>-->
+		<!--</FormItem>-->
 	</Form>
 
 	<div class="submit" v-if="!desabled && status!=1"><a @click="submit">提交审核</a></div>
@@ -148,14 +160,17 @@ export default {
 				businessScope2: [],
 				yyzz: '',
 				dlysxkz: '',
-				mdmtz: '',
+				// mdmtz: '',
 				status: '',
 				businessAddress: "",
 				businessRegion: "",
 				longitude: '',
 				latitude: '',
 				fields:[],
-				cruxAuditInfo: ''
+				cruxAuditInfo: '',
+				businessStatus: '',
+				economicType: '',
+				economicTypeOther: '',
 			},
 			ruleValidate : {
 				name: [rule],
@@ -169,11 +184,12 @@ export default {
 				registerRegion: [rule],
 				registerAddress: [rule],
 				legalName: [rule],
+				businessStatus: [rule],
 				businessScope: [rule],
 				businessScope2: [rule],
 				yyzz: [rule],
 				dlysxkz: [rule],
-				mdmtz: [rule],
+				// mdmtz: [rule],
 				businessRegion: [rule],
 				businessAddress: [rule,{
 					validator: (rule, value, callback) => {
@@ -184,6 +200,15 @@ export default {
 						if (flag) {
 							callback(new Error('您输入的地址查不到对应坐标，请输入更详细地址'));
 						} else {
+							callback();
+						}
+					}
+				}],
+				economicTypeOther: [{
+					validator: (rule, value, callback) => {
+						if (this.$data.form.economicType == 900 && !value) {
+							callback(new Error('请填写其他经济类型'));
+						}else{
 							callback();
 						}
 					}
@@ -201,6 +226,9 @@ export default {
 			timer: null,
 			geocoder:null,//地标
 			wrongAddress: [],
+
+			businessStatus:[],
+			economicType:[],
 		}
 	},
 	computed:{
@@ -212,6 +240,12 @@ export default {
 		},
 		showBusinessScope(){
 			return this.getText('businessScope')
+		},
+		showbusinessStatus(){
+			return this.getText('businessStatus')
+		},
+		showeconomicType(){
+			return this.getText('economicType')
 		},
 		radioOptions(){
 			return this.radioType? this[this.radioType]: []
@@ -261,6 +295,8 @@ export default {
 	},
 	mounted(){
 		this.getPubliceType(1)
+		this.getPubliceType(4, 'key')
+		this.getPubliceType(24, 'key')
 		this.axios.post('/area/region/list', {areaName: 'shanghai'}).then((res) => {
 			if (res.data.code == '0') {
 				let arr= res.data.items
@@ -331,18 +367,27 @@ export default {
 				}
 			}
 		},
-		getPubliceType(id) {
+		getPubliceType(id, key='id') {
 			this.axios.get('/dict/getValuesByTypeId/' + id).then((res) => {
 				if (res.data.code == '0') {
+					let resarr= res.data.items, arr=[]
+					for(let i in resarr){
+						arr.push({
+							label: resarr[i].name,
+							value: resarr[i][key].toString(),
+						})
+					}
 					switch (id){
 						case 1:{
-							let arr= res.data.items
-							for(let i in arr){
-								this.businessScope.push({
-									label: arr[i].name,
-									value: arr[i].id.toString(),
-								})
-							}
+							this.businessScope= arr
+							break
+						}
+						case 4:{
+							this.economicType= arr
+							break
+						}
+						case 24:{
+							this.businessStatus= arr
 							break
 						}
 					}

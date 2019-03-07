@@ -26,37 +26,37 @@
         <mt-swipe-item>
           <ul class="tab1" >
 	          <router-link tag="li" to="/maintain">
-		          <img src="../../assets/img/home/temp/查选维修.png"/>
+		          <img src="../../assets/img/home/查选维修.png"/>
 		          <p>查选维修</p>
 	          </router-link>
             <li @click="goYYFW">
-              <img src="../../assets/img/home/temp/预约服务.png"/>
+              <img src="../../assets/img/home/预约服务.png"/>
               <p>预约服务</p>
             </li>
 
             <router-link tag="li" to="/remarkMap">
-              <img src="../../assets/img/home/temp/维修点评.png"/>
+              <img src="../../assets/img/home/维修点评.png"/>
               <p>维修点评</p>
             </router-link>
 	          <li @click="goJKDA">
-		          <img src="../../assets/img/home/temp/维修记录.png"/>
+		          <img src="../../assets/img/home/维修记录.png"/>
 		          <p>维修记录</p>
 	          </li>
             <router-link  tag="li" to="/rescue-map">
-              <img src="../../assets/img/home/temp/救援找我.png"/>
+              <img src="../../assets/img/home/救援找我.png"/>
               <p>救援找我</p>
             </router-link>
             <router-link tag="li" to="/school-map">
-              <img src="../../assets/img/home/temp/学车找我.png"/>
+              <img src="../../assets/img/home/学车找我.png"/>
               <p>学车找我</p>
             </router-link>
 
 	          <router-link tag="li" to="/government-service">
-		          <img src="../../assets/img/home/temp/政务服务.png"/>
+		          <img src="../../assets/img/home/政务服务.png"/>
 		          <p>政务服务</p>
 	          </router-link>
 	          <router-link tag="li" to="/repair-company">
-		          <img src="../../assets/img/home/temp/汽修企业.png"/>
+		          <img src="../../assets/img/home/汽修企业.png"/>
 		          <p>汽修企业</p>
 	          </router-link>
 
@@ -72,7 +72,7 @@
 
 
             <router-link tag="li" to="/association-service">
-              <img src="../../assets/img/home/temp/协会服务.png"/>
+              <img src="../../assets/img/home/协会服务.png"/>
               <p>协会服务</p>
             </router-link>
 
@@ -85,11 +85,11 @@
               <!--<p>大数据</p>-->
             <!--</router-link>-->
             <router-link tag="li" to="/public-supervision">
-              <img src="../../assets/img/home/temp/公共监督.png"/>
+              <img src="../../assets/img/home/公共监督.png"/>
               <p>公共监督</p>
             </router-link>
             <router-link tag="li" to="/business-service">
-            <img src="../../assets/img/home/temp/商务服务.png"/>
+            <img src="../../assets/img/home/商务服务.png"/>
             <p>商务服务</p>
             </router-link>
              <!--<router-link tag="li" to="/about-industry">-->
@@ -121,7 +121,7 @@
           <p class="ask"><label>问题：</label><span>{{item.content}}</span></p>
           <p class="answer" v-if="item.answerContent">
             <label>{{item.answerName || '匿名'}}：</label>
-            <span>{{item.answerContent || ''}}</span></p>
+            <span>{{item.answerContent | FormatArticle}}</span></p>
           <p class="answer" style="margin-top: 25px" v-else><label></label><span style="color: #c1c1c1;height: 20px">暂无回答</span></p>
         </router-link>
       </ul>
