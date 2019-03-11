@@ -153,8 +153,10 @@ export default new Router({
 		{path: '/com-abnormal', name: 'com-abnormal', component: resolve => require(['@/page/comCenter/abnormal'], resolve), meta: {requiresAuth: true}},
 		{path: '/edit-com-info', name: 'edit-com-info', component: resolve => require(['@/page/comCenter/editComInfo'], resolve), meta: {requiresAuth: true}},
 		{path: '/com-other-info', name: 'com-other-info', component: resolve => require(['@/page/comCenter/other-info'], resolve), meta: {requiresAuth: true}},
-		{path: '/get-coupons', name: 'get-coupons', component: resolve => require(['@/page//coupons/get-coupons.vue'], resolve), },
-		{path: '/my-coupons', name: 'my-coupons', component: resolve => require(['@/page//coupons/my-coupons.vue'], resolve), meta: {requiresAuth: true}},
+		{path: '/get-coupons', name: 'get-coupons', component: resolve => require(['@/page/coupons/get-coupons.vue'], resolve), },
+		{path: '/my-coupons', name: 'my-coupons', component: resolve => require(['@/page/coupons/my-coupons.vue'], resolve), meta: {requiresAuth: true}},
 		{path: '/coupons-detail', name: 'coupons-detail', component: resolve => require(['@/page//coupons/coupons-detail.vue'], resolve), meta: {requiresAuth: true}},
+		{path: '/coupons-coms', name: 'coupons-coms', component: resolve => require(['@/page/coupons/coupons-coms.vue'], resolve), meta: {requiresAuth: true}},
+		{path: '/coupons-check', name: 'coupons-check', component: resolve => require(['@/page/coupons/coupons-check.vue'], resolve), meta: {requiresAuth: true}},
 	]
 })

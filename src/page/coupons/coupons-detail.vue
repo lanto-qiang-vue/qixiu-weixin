@@ -21,14 +21,11 @@
 			</div>
 		</li>
 	</ul>
-	<!--<ul class="detail">-->
-		<!--<li><label>验证二维码</label><img src="/static/img/coupons/head.png"/></li>-->
-		<!--<li><label>优惠券兑换码 使用日期 使用门店 门店地址 查看适合门店</label><img src="/static/img/coupons/head.png"/></li>-->
-	<!--</ul>-->
 	<Form class="common-form" :label-width="100" label-position="left" ref="form">
 		<FormItem label="验证二维码" class="top-position">
 			<div class="content">
-				<img id="qrcode" src="/static/img/coupons/head.png"/>
+				<!--<img id="qrcode" src="/static/img/coupons/head.png"/>-->
+				<img id="qrcode" :src="img"/>
 			</div>
 		</FormItem>
 		<FormItem label="优惠券兑换码">
@@ -44,7 +41,7 @@
 			<Input v-model="detail.name" :readonly="true"></Input>
 		</FormItem>
 		<FormItem label="适用门店">
-			<span class="ivu-input half select"></span>
+			<router-link tag="span" to="/coupons-coms" class="ivu-input half select"></router-link>
 		</FormItem>
 	</Form>
 	<Form class="common-form" :label-width="100" label-position="left" ref="form">
@@ -62,25 +59,22 @@
 </template>
 
 <script>
-import '~/public/static/lib/qrcode.min.js'
+import qrcode from '~/public/static/lib/qrcode.js'
 export default {
 	name: "coupons-detail",
 	data(){
 		return{
 			detail:{
-				name: 'ssssxxxx'
-			}
+				name: 'ssssxxxx',
+			},
+			img: ''
 		}
 	},
 	mounted(){
-		let qrcode = new QRCode(document.getElementById("qrcode"), {
-			text: window.location.origin+'/#'+'/check-coupons',
-			// width: 128,
-			// height: 128,
-			colorDark : "#000000",
-			colorLight : "#ffffff",
-			correctLevel : QRCode.CorrectLevel.H
+		let qr = new qrcode({
+			text: window.location.origin+'/#'+'/check-coupons'
 		});
+		this.img =  qr.toDataURL("image/png");
 	}
 }
 </script>
