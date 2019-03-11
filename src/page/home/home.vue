@@ -48,7 +48,7 @@
             </router-link>
             <router-link tag="li" to="/school-map">
               <img src="../../assets/img/home/学车找我.png"/>
-              <p>学车找我</p>
+              <p>学驾找我</p>
             </router-link>
 
 	          <router-link tag="li" to="/government-service">

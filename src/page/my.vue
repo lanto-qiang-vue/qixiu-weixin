@@ -62,6 +62,10 @@
       <img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的反馈</span> <i></i>
       <!--</div>-->
     </router-link>
+	<!--<router-link to="/my-coupons" tag="div" class="list">-->
+	  <!--<img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的优惠券</span> <i></i>-->
+	<!--</router-link>-->
+
     <!--<div @click="goMyDiscount" class="list">-->
       <!--<img src="../assets/img/my/Satisfaction_degree.png" alt=""><span>我的优惠券</span> <i></i>-->
     <!--</div>-->
