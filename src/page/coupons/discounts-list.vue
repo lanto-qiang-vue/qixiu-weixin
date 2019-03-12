@@ -2,7 +2,10 @@
 <div class="discounts-list">
 	<div class="head">
 		<div class="left"><i class="fa fa-search icon"></i>
-			<input type="search" v-model="search.q" @keydown="key($event)" placeholder="企业名称/优惠内容"/></div>
+			<form action="">
+				<input type="search" v-model="search.q" @keydown="key($event)" placeholder="企业名称/优惠内容"/>
+			</form>
+			</div>
 		<div class="area" @click="showRadio= true">{{areaName }}</div>
 	</div>
 	<mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
