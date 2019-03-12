@@ -255,6 +255,7 @@ export default {
 			float: right;
 			padding-right: 12px;
 			line-height: 26px;
+			margin-right: 20px;
 			&:after{
 				position: absolute;
 				right: 0;
