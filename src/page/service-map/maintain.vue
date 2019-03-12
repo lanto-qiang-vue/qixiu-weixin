@@ -119,6 +119,7 @@
     },
 
     mounted(){
+	    console.log('maintain.mounted')
     	this.bodyNoScoll()
 	    this.getQuery(true)
 

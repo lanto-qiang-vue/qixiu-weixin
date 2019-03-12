@@ -83,6 +83,7 @@ export default {
 		}
 	},
 	mounted(){
+		console.log('discounts-list.mounted')
 		this.getList(false)
 		this.getLocation()
 		this.axios.post('/area/region/list', {areaName: 'shanghai'}).then((res) => {
@@ -140,7 +141,7 @@ export default {
 						console.log(this.form.lng, this.form.lat)
 					});//返回定位信息
 					AMap.event.addListener(this.geolocation, 'error', (err)=>{
-						console.log(err)
+						// console.log(err)
 						Toast('定位失败')
 					});      //返回定位出错信息
 
