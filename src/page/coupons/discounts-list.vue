@@ -2,22 +2,23 @@
 <div class="discounts-list">
 	<div class="head">
 		<div class="left"><i class="fa fa-search icon"></i>
-			<input type="search" placeholder="企业名称/优惠内容"/></div>
-		<div class="area" @click=" showRadio= true">{{areaName }}</div>
+			<input type="search" v-model="search.q" @keydown="key($event)" placeholder="企业名称/优惠内容"/></div>
+		<div class="area" @click="showRadio= true">{{areaName }}</div>
 	</div>
 	<mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
 	             bottomPullText="加载更多"   ref="loadmore">
 	<ul class="list">
-		<li>
-			<h2>上海申海汽车修理有限公司</h2>
+		<li v-for="(item, index) in list" :key="index">
+			<h2>{{item.name}}</h2>
 			<div class="info">
-				<span class="level">AAA级</span>
-				<div class="right">距离1.4km <i class="fa fa-location-arrow icon"></i>
-					<router-link tag="div" class="goto" to="/maintain?maintainId=3162">前往</router-link>
+				<span class="level">{{item.credit?'全国诚信企业 ':''}}{{item.grade?item.grade+'级': ''}}</span>
+				<div class="right">
+					<span v-show="localSuccess">距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
+					<router-link tag="div" class="goto" :to="'/maintain?maintainId='+item.sid">前往</router-link>
 				</div>
 			</div>
 			<h4>服务承诺及惠民项目</h4>
-			<div class="items">
+			<div class="items" v-html="item.promoDetail.replace('\n','</br>')">
 				1、基盘内所有老客户推荐新客户，提前一天报备到售后信息员处备案，新客户消费金额满200元，老客户可获得100元优惠A券，同时新客户也可获得100元优惠A券； 2、客户参加厂方焕新礼活动，领取空气滤8.5折券，可以享受空气滤8.5折优惠；
 			</div>
 		</li>
@@ -35,9 +36,9 @@
 	<mt-popup v-model="showRadio"  style="width: 90%" >
 		<div class="popupBlock">
 			<mt-radio
-					@click.native="showRadio= false"
+					@click.native="selectArea"
 					align="right"
-					v-model="form.area"
+					v-model="search.area"
 					:options="area">
 			</mt-radio>
 		</div>
@@ -53,32 +54,34 @@ export default {
 		return{
 			list:[],
 			page: 1,
+			limit: 10,
 			total: 0,
 			allLoaded: false,
 			showRadio: false,
 			area:[],
-			form:{
+			search:{
+				type: '164',
+				q:'',
 				area: '',
-				lng: '',
-				lat: ''
-			}
+				lng: '121.480236',
+				lat: '31.236301',
+			},
+			localSuccess: true
 		}
 	},
 	computed:{
 		areaName(){
 			let name=''
 			for(let i in this.area){
-				if(this.form.area &&this.area[i].value== this.form.area){
+				if(this.search.area &&this.area[i].value== this.search.area){
 					name= this.area[i].label
 				}
 			}
 			return name|| '区域'
-		}
+		},
 	},
 	watch:{
-		selected(val){
-			// console.log(val)
-			// this.allLoaded= false
+		areaName(){
 			this.page=1
 			this.list=[]
 			this.getList()
@@ -86,7 +89,6 @@ export default {
 	},
 	mounted(){
 		console.log('discounts-list.mounted')
-		this.getList(false)
 		this.getLocation()
 		this.axios.post('/area/region/list', {areaName: 'shanghai'}).then((res) => {
 			if (res.data.code == '0') {
@@ -101,13 +103,40 @@ export default {
 		})
 	},
 	methods:{
-		getList(flag){
-			let params={
-				page: this.page-1,
-				size: 10
+		key(e) {
+			if ( e.keyCode == 13 || e=='search') {
+				this.page=1
+				this.list=[]
+				this.getList()
 			}
-			if(this.selected) params.hasRead= this.selected
-			this.axios.get('/monitoring/message/company-docking/query/companyCode',{params: params}).then(res=>{
+		},
+		selectArea(){
+			console.log('selectArea')
+			this.showRadio= false
+		},
+		calcQuery(limit){
+			let is164= this.search.type== '164'
+			let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,promoDetail,credit'+
+				'&q='+ this.search.q +
+				'&page='+ (this.page-1) +','+ (limit ||this.limit)
+			query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
+			if(this.search.lng) query+=('&point='+this.search.lat+','+this.search.lng)
+			let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
+			if(this.search.area && (is164)) fq+= '+AND+areaKey:'+ this.search.area
+			if(this.search.is4s && is164){
+				is4s= (this.search.is4s=='yes' ? 'kw:4s': '-kw:4s')
+				fq+= '+AND+' + is4s
+			}
+			query += fq
+
+			return query
+		},
+		getList(flag){
+			this.axios({
+				baseURL: '/repairproxy',
+				url: '/micro/search/promotion'+ this.calcQuery(),
+				method: 'get',
+			}).then(res=>{
 				this.total= res.data.totalElements
 				if(res.data.content&&res.data.content.length){
 					this.list=this.list.concat(res.data.content)
@@ -137,14 +166,16 @@ export default {
 					this.geolocation.getCurrentPosition();
 					AMap.event.addListener(this.geolocation, 'complete', (result)=>{
 						// console.log('result', result)
-						this.form.lng= result.position.lng
-						this.form.lat= result.position.lat
-
-						console.log(this.form.lng, this.form.lat)
+						this.search.lng= result.position.lng
+						this.search.lat= result.position.lat
+						this.localSuccess= true
+						this.getList(false)
+						console.log(this.search.lng, this.search.lat)
 					});//返回定位信息
 					AMap.event.addListener(this.geolocation, 'error', (err)=>{
 						// console.log(err)
 						Toast('定位失败')
+						this.getList(false)
 					});      //返回定位出错信息
 
 
