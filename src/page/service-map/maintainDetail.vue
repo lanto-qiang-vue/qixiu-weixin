@@ -195,8 +195,7 @@ export default {
     getData(){
       this.maintainDetailShow=false
       let self= this
-      this.$store.commit('setMaintainListHistory', false)
-      this.$store.commit('setMaintainListHistory', this.maintainDetail)
+
 
 	    this.axios({
 		    method: 'get',
@@ -217,6 +216,7 @@ export default {
 				    $("#compDetail .list").scrollTop(0)
 			    },0)
 
+			    this.$emit('goMap', {lon: res.data.lon, lat: res.data.lat})
 			    // this.toMaintainDetailLocation=0
 			    this.$emit('toLocation', 0)
 			    this.$emit('init')

@@ -11,7 +11,7 @@
   <div class="banner">
     <div class='dummy'></div>
     <div class='content'>
-      <mt-swipe :auto="0">
+      <mt-swipe :auto="4000">
         <mt-swipe-item v-for="(item, index) in bannerList" :key="index">
           <router-link :to="item.linkUrl" tag="a"><img :src="item.imageUrl"></router-link>
         </mt-swipe-item>
@@ -29,36 +29,21 @@
 		          <img src="../../assets/img/home/查选维修.png"/>
 		          <p>查选维修</p>
 	          </router-link>
-            <li @click="goYYFW">
-              <img src="../../assets/img/home/预约服务.png"/>
-              <p>预约服务</p>
-            </li>
-
-            <router-link tag="li" to="/remarkMap">
-              <img src="../../assets/img/home/维修点评.png"/>
-              <p>维修点评</p>
-            </router-link>
 	          <li @click="goJKDA">
 		          <img src="../../assets/img/home/维修记录.png"/>
 		          <p>维修记录</p>
 	          </li>
-            <router-link  tag="li" to="/rescue-map">
-              <img src="../../assets/img/home/救援找我.png"/>
-              <p>救援找我</p>
-            </router-link>
-            <router-link tag="li" to="/school-map">
-              <img src="../../assets/img/home/学车找我.png"/>
-              <p>学驾找我</p>
-            </router-link>
+	          <router-link tag="li" to="/remarkMap">
+		          <img src="../../assets/img/home/维修点评.png"/>
+		          <p>维修点评</p>
+	          </router-link>
+	          <router-link  tag="li" to="/rescue-map">
+		          <img src="../../assets/img/home/救援找我.png"/>
+		          <p>救援找我</p>
+	          </router-link>
 
-	          <router-link tag="li" to="/government-service">
-		          <img src="../../assets/img/home/政务服务.png"/>
-		          <p>政务服务</p>
-	          </router-link>
-	          <router-link tag="li" to="/repair-company">
-		          <img src="../../assets/img/home/汽修企业.png"/>
-		          <p>汽修企业</p>
-	          </router-link>
+
+
 
           </ul>
         </mt-swipe-item>
@@ -69,7 +54,22 @@
               <!--<img src="../../assets/img/home/车主中心.png"/>-->
               <!--<p>车主中心</p>-->
             <!--</router-link>-->
-
+	          <li @click="goYYFW">
+		          <img src="../../assets/img/home/预约服务.png"/>
+		          <p>预约服务</p>
+	          </li>
+	          <router-link tag="li" to="/school-map">
+		          <img src="../../assets/img/home/学车找我.png"/>
+		          <p>学驾找我</p>
+	          </router-link>
+	          <router-link tag="li" to="/repair-company">
+		          <img src="../../assets/img/home/汽修企业.png"/>
+		          <p>汽修企业</p>
+	          </router-link>
+	          <router-link tag="li" to="/government-service">
+		          <img src="../../assets/img/home/政务服务.png"/>
+		          <p>政务服务</p>
+	          </router-link>
 
             <router-link tag="li" to="/association-service">
               <img src="../../assets/img/home/协会服务.png"/>
@@ -105,7 +105,8 @@
 
 
   <div class="adv_and_cdf" style="margin-bottom: 20px;position: relative">
-    <img src="~@/assets/img/home/temp/fast_login.png" alt="" style="width: 100%;" @click="fastLogin">
+    <!--<img src="~@/assets/img/home/temp/fast_login.png" alt="" style="width: 100%;" @click="fastLogin">-->
+	  <router-link tag="a" to="/discounts-list"  style="width: 100%;"><img src="/static/img/temp/activity-315.png" style="width: 100%;"/></router-link>
 
     <div class="cdf">
       <img class="title" src="../../assets/img/home/cdf-title.png"/>
@@ -595,7 +596,7 @@ export default {
        }
      },
     iconBlockChange(index){
-      // index==0?$('.icon .dummy').addClass('on'):$('.icon .dummy').removeClass('on')
+      index==0?$('.icon .dummy').addClass('on'):$('.icon .dummy').removeClass('on')
     }
   },
   components: {
@@ -643,7 +644,7 @@ export default {
         margin-top: 65%;
       }
       .dummy.on{
-        margin-top: 62%;
+        margin-top: 32%;
       }
       .content{
         position:absolute;

@@ -17,7 +17,7 @@
      </div>
 
 	<maintain-list v-if="hasList" ref="maintainList" :location="location" :originalLocation="originalLocation" @renderMap="renderMap" @goMap="goMap"></maintain-list>
-	<maintain-detail v-if="routeName=='maintain'" ref="maintainDetail" ></maintain-detail>
+	<maintain-detail v-if="routeName=='maintain'" ref="maintainDetail" @goMap="goMap"></maintain-detail>
 	  <rescue-list v-if="routeName=='rescue-map'" ref="rescueList" :location="location" :originalLocation="originalLocation" @getCurrentPosition="getCurrentPosition"></rescue-list>
 
 
@@ -121,30 +121,30 @@
     mounted(){
 	    console.log('maintain.mounted')
     	this.bodyNoScoll()
-	    this.getQuery(true)
-
-
+	    this.init()
 	    this.setShowBody()
-
-
     },
 
     methods: {
-	    getQuery( mounted){
-		    if(this.$route.query &&this.$route.query.lng  &&this.$route.query.lat){
-		    	this.location.lng= this.$route.query.lng
-		    	this.location.lat= this.$route.query.lat
-		    }
-		    if(this.$route.query &&this.$route.query.special && !mounted){
-			    this.clearMap()
-			    let center= new AMap.LngLat(this.originalLocation.lng, this.originalLocation.lat)
-			    // this.map.panTo(center)
-			    this.map.add(new AMap.Marker( {
-				    position: center
-			    }))
-		    }
-		    if(mounted){
-			    this.init()
+	    getQuery(){
+	    	if(this.$route.query){
+	    		let query= this.$route.query
+			    if(query.lng  &&query.lat){
+				    this.location.lng= query.lng
+				    this.location.lat= query.lat
+			    }
+			    if(query.special){
+				    this.clearMap()
+				    let center= new AMap.LngLat(this.originalLocation.lng, this.originalLocation.lat)
+				    // this.map.panTo(center)
+				    this.map.add(new AMap.Marker( {
+					    position: center
+				    }))
+			    }
+			    if(query.maintainId){
+				    this.$store.commit('setMaintainDetail', {sid: query.maintainId})
+				    this.$store.commit('setSlideShowBody', 'maintainDetail')
+			    }
 		    }
 	    },
     	init(){
@@ -206,6 +206,8 @@
 					    this.originalLocation.lng= result.position.lng
 					    this.originalLocation.lat= result.position.lat
 					    this.originalLocation.success= true
+
+					    this.getQuery()
 
 					    if(this.hasList){
 						    this.map.add(new AMap.Marker(result.position))

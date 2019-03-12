@@ -596,6 +596,8 @@ export default {
 		      }
 		      default :{
 			      this.$emit('goMap', item)
+			      this.$store.commit('setMaintainListHistory', false)
+			      this.$store.commit('setMaintainListHistory', item)
 			      this.$store.commit('setMaintainDetail', item)
 			      this.$store.commit('setSlideShowBody', 'maintainDetail')
 		      }

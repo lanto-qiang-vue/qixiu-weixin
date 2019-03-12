@@ -13,21 +13,23 @@
 			<div class="info">
 				<span class="level">AAA级</span>
 				<div class="right">距离1.4km <i class="fa fa-location-arrow icon"></i>
-				<div class="goto">前往</div></div>
+					<router-link tag="div" class="goto" to="/maintain?maintainId=3162">前往</router-link>
+				</div>
 			</div>
 			<h4>服务承诺及惠民项目</h4>
 			<div class="items">
 				1、基盘内所有老客户推荐新客户，提前一天报备到售后信息员处备案，新客户消费金额满200元，老客户可获得100元优惠A券，同时新客户也可获得100元优惠A券； 2、客户参加厂方焕新礼活动，领取空气滤8.5折券，可以享受空气滤8.5折优惠；
 			</div>
 		</li>
-		<router-link tag="li" to="/maintain?maintainId=820">
-			<p>上海申海汽车修理有限公司</p>
-			<span>徐汇区龙华西路1号</span>
-		</router-link>
-		<router-link tag="li" to="/maintain?maintainId=3162">
-			<p>上海申海汽车修理有限公司2</p>
-			<span>徐汇区龙华西路1号</span>
-		</router-link>
+
+		<!--<router-link tag="li" to="/maintain?maintainId=820">-->
+			<!--<p>上海申海汽车修理有限公司</p>-->
+			<!--<span>徐汇区龙华西路1号</span>-->
+		<!--</router-link>-->
+		<!--<router-link tag="li" to="/maintain?maintainId=3162">-->
+			<!--<p>上海申海汽车修理有限公司2</p>-->
+			<!--<span>徐汇区龙华西路1号</span>-->
+		<!--</router-link>-->
 	</ul>
 	</mt-loadmore>
 	<mt-popup v-model="showRadio"  style="width: 90%" >
@@ -160,7 +162,13 @@ export default {
 	background-color: white;
 	.head{
 		padding: 10px 15px;
-		/*border-bottom: 10px solid #F3F3F3;*/
+		position: fixed;
+		width: 100%;
+		background-color: white;
+		left: 0;
+		top: 0;
+		z-index: 1;
+		box-shadow:0 0 2px #DDDDDD;
 		.left{
 			display: inline-block;
 			position: relative;
@@ -205,6 +213,7 @@ export default {
 		}
 	}
 	.list{
+		margin-top: 46px;
 		overflow: hidden;
 		li{
 			padding-left: 15px;
