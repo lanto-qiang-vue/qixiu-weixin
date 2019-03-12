@@ -5,6 +5,7 @@
 			<form action="">
 				<input type="search" v-model="search.q" @keydown="key($event)" placeholder="企业名称/优惠内容"/>
 			</form>
+			<i class="fa fa-times-circle close" v-show="search.q" @click="search.q=''"></i>
 			</div>
 		<div class="area" @click="showRadio= true">{{areaName }}</div>
 	</div>
@@ -228,6 +229,14 @@ export default {
 				font-size: 14px;
 				color: #999999;
 				left: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+			}
+			.close{
+				position: absolute;
+				font-size: 18px;
+				color: #999999;
+				right: 5px;
 				top: 50%;
 				transform: translateY(-50%);
 			}
