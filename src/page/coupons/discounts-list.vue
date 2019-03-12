@@ -3,9 +3,9 @@
 	<div class="head">
 		<div class="left"><i class="fa fa-search icon"></i>
 			<form action="">
-				<input type="search" v-model="search.q" @keydown="key($event)" placeholder="企业名称/优惠内容"/>
+				<input type="search" ref="input" v-model="search.q" @keydown="key($event)" placeholder="企业名称/优惠内容"/>
 			</form>
-			<i class="fa fa-times-circle close" v-show="search.q" @click="search.q=''"></i>
+			<i class="fa fa-times-circle close" v-show="search.q" @click="close" ></i>
 			</div>
 		<div class="area" @click="showRadio= true">{{areaName }}</div>
 	</div>
@@ -191,6 +191,12 @@ export default {
 
 				});
 		},
+		close(){
+			this.search.q='';
+			// setTimeout(()=>{
+				this.$refs.input.focus()
+			// },500)
+		}
 	}
 }
 </script>
@@ -216,6 +222,7 @@ export default {
 			width: 70%;
 			input{
 				height: 26px;
+				line-height: 24px;
 				background-color: #EEEEEE;
 				border: 1px solid #DBDBDB;
 				border-radius: 15px;
@@ -272,12 +279,16 @@ export default {
 				color: #333333;
 				line-height: 20px;
 				font-weight: 400;
+				margin: 5px 0 0 0;
+				position: relative;
+				top: 5px;
 			}
 			.info{
 				border-bottom: 1px solid #D9D9D9;
 				font-size: 12px;
 				position: relative;
 				height: 32px;
+				margin-top: 3px;
 				/*margin-top: 2px;*/
 				/*overflow: hidden;*/
 				.level{
