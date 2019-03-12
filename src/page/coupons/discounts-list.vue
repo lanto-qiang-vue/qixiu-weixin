@@ -94,6 +94,12 @@ export default {
 			if (res.data.code == '0') {
 				let arr= res.data.items
 				for(let i in arr){
+					if(arr[i].regionCode=='310000') {
+						this.area.push({
+							label: '全部',
+							value: '310000',
+						})
+					}else
 					this.area.push({
 						label: arr[i].regionName,
 						value: arr[i].regionCode,
@@ -122,7 +128,7 @@ export default {
 			query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
 			if(this.search.lng) query+=('&point='+this.search.lat+','+this.search.lng)
 			let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
-			if(this.search.area && (is164)) fq+= '+AND+areaKey:'+ this.search.area
+			if(this.search.area && this.search.area!='310000' && (is164)) fq+= '+AND+areaKey:'+ this.search.area
 			if(this.search.is4s && is164){
 				is4s= (this.search.is4s=='yes' ? 'kw:4s': '-kw:4s')
 				fq+= '+AND+' + is4s
