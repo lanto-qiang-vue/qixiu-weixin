@@ -260,18 +260,22 @@ export default {
 				font-size: 12px;
 				position: relative;
 				height: 32px;
-				overflow: hidden;
+				/*margin-top: 2px;*/
+				/*overflow: hidden;*/
 				.level{
 					color: #FF7E1E;
 					position: absolute;
 					left: 0;
-					bottom: 5px;
+					bottom: 2px;
 				}
 				.right{
 					position: absolute;
 					right: 15px;
-					bottom: 5px;
+					bottom: 2px;
 					color: #666666;
+					height: auto;
+					padding-top: 2px;
+					overflow: visible;
 					*{
 						vertical-align: text-bottom;
 					}
