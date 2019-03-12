@@ -62,7 +62,10 @@ export default {
 			total: 0,
 			allLoaded: false,
 			showRadio: false,
-			area:[],
+			area:[{
+				label: '全部',
+				value: '310000',
+			}],
 			search:{
 				type: '164',
 				q:'',
@@ -94,7 +97,8 @@ export default {
 	mounted(){
 		console.log('discounts-list.mounted')
 		this.getLocation()
-		this.axios.post('/area/region/list', {areaName: 'shanghai'}).then((res) => {
+		// this.axios.post('/area/region/list', {areaName: 'shanghai'}).then((res) => {
+		this.axios.get('/area/query').then((res) => {
 			if (res.data.code == '0') {
 				let arr= res.data.items
 				for(let i in arr){
@@ -105,8 +109,8 @@ export default {
 						})
 					}else
 					this.area.push({
-						label: arr[i].regionName,
-						value: arr[i].regionCode,
+						label: arr[i].name,
+						value: arr[i].code,
 					})
 				}
 			}
