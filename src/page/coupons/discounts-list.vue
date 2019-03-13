@@ -364,7 +364,7 @@ export default {
 			}
 			.rating{
 				position: relative;
-				top: 3px;
+				/*top: 3px;*/
 				font-size: 12px;
 				color: #999999;
 				img{
@@ -385,6 +385,7 @@ export default {
 				border-bottom: 1px solid #D9D9D9;
 				font-size: 12px;
 				position: relative;
+				top: -8px;
 				height: 32px;
 				.level{
 					color: #FF7E1E;
@@ -429,14 +430,14 @@ export default {
 			h4{
 				font-size: 14px;
 				color: #666666;
-				margin: 10px 0 0 0;
+				margin: 0 0 0 0;
 				font-weight: 400;
 			}
 			.items{
 				color: #9B9B9B;
 				font-size: 12px;
 				line-height: 17px;
-				padding: 10px 15px 10px 0;
+				padding: 6px 15px 6px 0;
 			}
 		}
 
