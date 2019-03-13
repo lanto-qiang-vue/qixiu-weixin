@@ -142,7 +142,7 @@
 				    }))
 			    }
 			    if(query.maintainId){
-				    this.$store.commit('setMaintainDetail', {sid: query.maintainId})
+				    this.$store.commit('setMaintainDetail', {sid: query.maintainId, distance: parseFloat(query.distance|| 0)})
 				    this.$store.commit('setSlideShowBody', 'maintainDetail')
 			    }
 		    }
@@ -404,15 +404,19 @@
 	    }
     },
 	  activated(){
-		  let self=this
 		  this.getQuery()
 		  this.setShowBody()
 		  this.bodyNoScoll()
-		  setTimeout(function () {
-			  self.renderMap()
-			  // self.bodyNoScoll()
-			  // self.toQuery()
-		  },500)
+		  if(this.hasList){
+			  this.getCompList(true, true)
+		  }
+		  // setTimeout( ()=> {
+		  //
+			//   this.renderMap()
+			//   Indicator.close()
+			//   // self.bodyNoScoll()
+			//   // self.toQuery()
+		  // },500)
 	  },
 	  beforeRouteUpdate (to, from, next) {
 		  // 在当前路由改变，但是该组件被复用时调用

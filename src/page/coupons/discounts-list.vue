@@ -15,16 +15,16 @@
 		<li v-for="(item, index) in list" :key="index">
 			<h2>{{item.name}}</h2>
 			<div class="info">
-				<span class="level">{{item.credit?'全国诚信企业 ':''}}{{item.grade?item.grade+'级': ''}}</span>
+				<span class="level">{{item.credit?'全国诚信企业 ':''}}
+					{{item.grade?item.grade+'级': (item.credit? '': '未评级')}}</span>
 				<div class="right">
 					<span v-show="localSuccess">距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
-					<router-link tag="div" class="goto" :to="'/maintain?maintainId='+item.sid">前往</router-link>
+					<router-link tag="div" class="goto"
+					             :to="`/maintain?maintainId=${item.sid}&distance=${item.distance}`">前往</router-link>
 				</div>
 			</div>
 			<h4>服务承诺及惠民项目</h4>
-			<div class="items" v-html="item.promoDetail.replace('\n','</br>')">
-				1、基盘内所有老客户推荐新客户，提前一天报备到售后信息员处备案，新客户消费金额满200元，老客户可获得100元优惠A券，同时新客户也可获得100元优惠A券； 2、客户参加厂方焕新礼活动，领取空气滤8.5折券，可以享受空气滤8.5折优惠；
-			</div>
+			<div class="items" v-html="item.promoDetail.replace(/\n/g,'</br>')"></div>
 		</li>
 
 		<!--<router-link tag="li" to="/maintain?maintainId=820">-->
@@ -72,6 +72,8 @@ export default {
 				area: '',
 				lng: '121.480236',
 				lat: '31.236301',
+				// lng: '121.320209',
+				// lat: '31.279839',
 			},
 			localSuccess: true
 		}
@@ -146,6 +148,7 @@ export default {
 			return query
 		},
 		getList(flag){
+			console.log('getList')
 			this.axios({
 				baseURL: '/repairproxy',
 				url: '/micro/search/promotion'+ this.calcQuery(),
@@ -173,9 +176,7 @@ export default {
 		getLocation(){
 				AMap.plugin('AMap.Geolocation', () => {
 					this.geolocation = new AMap.Geolocation({
-						buttonPosition: 'RT',
-						buttonOffset: new AMap.Pixel(10,40),
-						timeout: 1000,
+						timeout: 2000,
 					});
 					this.geolocation.getCurrentPosition();
 					AMap.event.addListener(this.geolocation, 'complete', (result)=>{
@@ -187,7 +188,7 @@ export default {
 						console.log(this.search.lng, this.search.lat)
 					});//返回定位信息
 					AMap.event.addListener(this.geolocation, 'error', (err)=>{
-						// console.log(err)
+						console.log(err)
 						// Toast('定位失败')
 						this.getList(false)
 					});      //返回定位出错信息

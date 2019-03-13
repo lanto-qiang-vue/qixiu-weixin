@@ -1,7 +1,8 @@
 import router from './router'
-import {Toast} from 'mint-ui'
+import {Toast, Indicator} from 'mint-ui'
 
 router.beforeEach((to, from, next) => {
+	Indicator.close()
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
