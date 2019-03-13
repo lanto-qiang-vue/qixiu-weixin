@@ -12,13 +12,18 @@
 	<mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
 	             bottomPullText="加载更多"   ref="loadmore">
 	<ul class="list">
-		<li v-for="(item, index) in list" :key="index">
+		<li v-for="item in list" :key="item.sid">
 			<h2>{{item.name}}</h2>
+			<div class="rating">
+				<img src="~@/assets/img/maintain/score_yellow.png"  v-for="index in parseInt(item.rating)||0" :key="'yellow'+index">
+				<img src="~@/assets/img/maintain/score_gray.png"  v-for="index in (5-parseInt(item.rating))||0" :key="'gray'+index">
+				{{item.rating?item.rating+'分':'暂无评分'}}
+				<span>点评数：<small>{{item.commentCount}}</small></span></div>
 			<div class="info">
 				<span class="level">{{item.credit?'全国诚信企业 ':''}}
-					{{item.grade?item.grade+'级': (item.credit? '': '未评级')}}</span>
+					{{levelText(item)}}<small v-if="item.grade=='AAA'">（最高评级）</small></span>
 				<div class="right">
-					<span v-show="localSuccess">距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
+					<span>距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
 					<router-link tag="div" class="goto"
 					             :to="`/maintain?maintainId=${item.sid}&distance=${item.distance}`">前往</router-link>
 				</div>
@@ -52,6 +57,7 @@
 
 <script>
 import { Toast} from 'mint-ui'
+import {getwxticket} from '@/util.js'
 export default {
 	name: "discounts-list",
 	data(){
@@ -70,6 +76,7 @@ export default {
 				type: '164',
 				q:'',
 				area: '',
+				distance: 0,
 				lng: '121.480236',
 				lat: '31.236301',
 				// lng: '121.320209',
@@ -117,6 +124,9 @@ export default {
 				}
 			}
 		})
+
+		getwxticket(['onMenuShareTimeline', 'onMenuShareAppMessage'])
+		this.share()
 	},
 	methods:{
 		key(e) {
@@ -135,8 +145,12 @@ export default {
 			let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,promoDetail,credit'+
 				'&q='+ this.search.q +
 				'&page='+ (this.page-1) +','+ (limit ||this.limit)
-			query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
-			if(this.search.lng) query+=('&point='+this.search.lat+','+this.search.lng)
+			query+= ('&sort=gradeLevel asc,distance asc')
+			if(this.search.lng) {
+				let point=('&point='+this.search.lat+','+this.search.lng)
+				if(this.localSuccess && (this.search.area=='310000'||!this.search.area)) point+= ',10'
+				query+= point
+			}
 			let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
 			if(this.search.area && this.search.area!='310000' && (is164)) fq+= '+AND+areaKey:'+ this.search.area
 			if(this.search.is4s && is164){
@@ -156,8 +170,14 @@ export default {
 			}).then(res=>{
 				this.total= res.data.totalElements
 				if(res.data.content&&res.data.content.length){
-					this.list=this.list.concat(res.data.content)
-					// this.list=res.data.comments
+					let arr= res.data.content
+					for(let i in arr){
+						arr[i].rating= 0
+						arr[i].commentCount= 0
+						this.getScore(arr[i].sid)
+					}
+					this.list=this.list.concat(arr)
+
 					if(this.list.length>=res.data.totalElements){
 						this.allLoaded=true
 					}else{
@@ -168,6 +188,30 @@ export default {
 					this.allLoaded=true
 				}
 			})
+		},
+		getScore(id){
+			this.axios({
+				method: 'get',
+				baseURL: '/repairproxy',
+				url: '/micro/search/company/repair/'+ id,
+			}).then(res => {
+				let arr= this.list
+				for(let i in arr){
+					if(arr[i].sid== res.data.sid){
+						arr[i].rating= res.data.rating
+						arr[i].commentCount= res.data.commentCount+1
+					}
+				}
+			})
+		},
+		levelText(item){
+			let text=''
+			if(item.grade){
+				text= item.grade+'级'
+			}else if(!item.credit){
+				text= '未评级'
+			}
+			return text
 		},
 		loadMore(){
 			this.page++
@@ -189,10 +233,10 @@ export default {
 					});//返回定位信息
 					AMap.event.addListener(this.geolocation, 'error', (err)=>{
 						console.log(err)
+						this.localSuccess= false
 						Toast('定位失败')
 						this.getList(false)
 					});      //返回定位出错信息
-
 
 				});
 		},
@@ -201,7 +245,38 @@ export default {
 			// setTimeout(()=>{
 				this.$refs.input.focus()
 			// },500)
-		}
+		},
+		share(){
+			let link= window.location.href
+			let titles= '车主福利大放送'
+			let shareImg= 'https://download.image.shanghaiqixiu.org/2019/03/13/1552468798349.png'
+			// console.log(news[j].headimg)
+
+			wx.ready(function(){
+				//分享到朋友圈
+				wx.onMenuShareTimeline({
+					title: titles, // 分享标题
+					link: link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+					imgUrl: shareImg|| 'https://weixin.shanghaiqixiu.org/static/img/shqxw.jpg', // 分享图标
+					success: function () {
+						// 用户点击了分享后执行的回调函数
+					}
+				})
+				//分享给朋友
+				wx.onMenuShareAppMessage({
+					title: titles, // 分享标题
+					desc: titles, // 分享描述
+					// link: 'https://weixin.shanghaiqixiu.org/#/remarkDetail?id='+self.$route.query.id, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+					link: link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+					imgUrl: shareImg|| 'https://weixin.shanghaiqixiu.org/static/img/shqxw.jpg', // 分享图标
+					type: '', // 分享类型,music、video或link，不填默认为link
+					dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+					success: function () {
+// 用户点击了分享后执行的回调函数
+					}
+				});
+			})
+		},
 	}
 }
 </script>
@@ -285,23 +360,42 @@ export default {
 				color: #333333;
 				line-height: 20px;
 				font-weight: 400;
-				margin: 5px 0 0 0;
+				margin: 10px 0 0 0;
+			}
+			.rating{
 				position: relative;
-				top: 5px;
+				top: 3px;
+				font-size: 12px;
+				color: #999999;
+				img{
+					width: 15px;
+					float: left;
+					margin-right: 3px;
+					margin-top: 3px;
+				}
+				span{
+					margin-left: 10px;
+					font-size: 13px;
+					small{
+						color: #666666;
+					}
+				}
 			}
 			.info{
 				border-bottom: 1px solid #D9D9D9;
 				font-size: 12px;
 				position: relative;
 				height: 32px;
-				margin-top: 3px;
-				/*margin-top: 2px;*/
-				/*overflow: hidden;*/
 				.level{
 					color: #FF7E1E;
 					position: absolute;
 					left: 0;
-					bottom: 2px;
+					bottom: 3px;
+					font-size: 13px;
+					small{
+						font-size: 12px;
+						color: #9B9B9B;
+					}
 				}
 				.right{
 					position: absolute;
