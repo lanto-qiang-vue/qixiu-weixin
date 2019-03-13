@@ -157,7 +157,7 @@ export default new Router({
 		{path: '/my-coupons', name: 'my-coupons', component: resolve => require(['@/page/coupons/my-coupons.vue'], resolve), meta: {requiresAuth: true}},
 		{path: '/coupons-detail', name: 'coupons-detail', component: resolve => require(['@/page//coupons/coupons-detail.vue'], resolve), meta: {requiresAuth: true}},
 		{path: '/coupons-coms', name: 'coupons-coms', component: resolve => require(['@/page/coupons/coupons-coms.vue'], resolve), meta: {requiresAuth: true}},
-		{path: '/coupons-check', name: 'coupons-check', component: resolve => require(['@/page/coupons/coupons-check.vue'], resolve), meta: {requiresAuth: true}},
+		{path: '/coupons-check-list', name: 'coupons-check-list', component: resolve => require(['@/page/coupons/coupons-check-list.vue'], resolve), meta: {requiresAuth: true}},
 		{path: '/discounts-list', name: 'discounts-list', component: resolve => require(['@/page/coupons/discounts-list.vue'], resolve), meta: {requiresAuth: true, keepAlive: true}},
 	]
 })
