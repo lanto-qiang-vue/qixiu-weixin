@@ -120,7 +120,7 @@ export default {
 	    actions: [{
 		    name: '高德地图',
 		    method(){
-			    let name= _this.companyDetail.name
+			    let name= _this.all.name
 			    window.location.href = `http://uri.amap.com/marker?position=${_this.all.lon},${_this.all.lat}&name=${name}&src=上海汽修平台&coordinate=wgs84&callnative=1`
 		    }
 	    }, {
@@ -129,7 +129,8 @@ export default {
 				    let name= _this.all.name
 				    let address= _this.all.addr
 				    // window.location.href = `http://api.map.baidu.com/marker?location=${_this.all.lat},${_this.all.lon}&title=${name}&content=${address}&output=html&src=上海汽修平台`
-				    window.location.href = `http://api.map.baidu.com/geocoder?address=${address}&output=html&src=上海汽修平台`
+				    window.location.href = `http://api.map.baidu.com/marker?location=${_this.all.lat},${_this.all.lon}&title=${name}&content=${address}&output=html&src=webapp.baidu.openAPIdemo`
+				    // window.location.href = `http://api.map.baidu.com/geocoder?address=${address}&output=html&src=上海汽修平台`
 			    }
 		    }],
 	    sheetVisible: false,
