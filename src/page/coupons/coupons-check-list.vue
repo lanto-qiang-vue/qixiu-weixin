@@ -1,5 +1,5 @@
 <template>
-<div class="coupons-check">
+<div class="coupons-check-list">
 	<Form class="common-form" :label-width="90" :model="detail" label-position="left" ref="form">
 		<FormItem label="优惠券兑换码">
 			<Input v-model="detail.code" placeholder="输入优惠券兑换码" style="width: 60%"></Input>
@@ -31,7 +31,7 @@
 
 <script>
 export default {
-	name: "coupons-check",
+	name: "coupons-check-list",
 	data(){
 		return{
 			detail: {
@@ -88,7 +88,7 @@ export default {
 
 <style scoped lang="less">
 
-.coupons-check{
+.coupons-check-list{
 	height: 100vh;
 	overflow: auto;
 	background-color: white;

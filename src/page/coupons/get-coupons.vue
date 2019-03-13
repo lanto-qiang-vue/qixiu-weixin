@@ -16,7 +16,7 @@
 				</div>
 				<i></i>
 				<div class="right">
-					<div class="button on">查看详情</div>
+					<div class="button on">立即领取</div>
 					<!--<div class="tag">-->
 						<!--<p>已领取</p>-->
 					<!--</div>-->
