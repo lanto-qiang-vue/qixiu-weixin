@@ -220,7 +220,7 @@ export default {
 		getLocation(){
 				AMap.plugin('AMap.Geolocation', () => {
 					this.geolocation = new AMap.Geolocation({
-						timeout: 2000,
+						// timeout: 2000,
 					});
 					this.geolocation.getCurrentPosition();
 					AMap.event.addListener(this.geolocation, 'complete', (result)=>{
