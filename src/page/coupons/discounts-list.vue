@@ -243,6 +243,9 @@ export default {
 		close(){
 			this.search.q='';
 			// setTimeout(()=>{
+			this.page=1
+			this.list=[]
+			this.getList()
 				this.$refs.input.focus()
 			// },500)
 		},
