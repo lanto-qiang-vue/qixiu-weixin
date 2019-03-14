@@ -1,9 +1,18 @@
 <template>
 <div class="coupons-check-list">
-	<Form class="common-form" :label-width="90" :model="detail" label-position="left" ref="form">
+	<Form class="common-form" id="common-form" :label-width="85" :model="detail" label-position="left" ref="form">
 		<FormItem label="优惠券兑换码">
-			<Input v-model="detail.code" placeholder="输入优惠券兑换码" style="width: 60%"></Input>
-
+			
+				<Input v-model="detail.code" placeholder="输入优惠券兑换码" class="from-input"></Input>
+				<div class="from-button">
+					提交
+				</div>
+				<div class="scan-button">
+					<img src="/static/img/coupons/scan-code.png" alt="">
+					<p>扫一扫</p>
+				</div>
+			
+			
 		</FormItem>
 	</Form>
 	<mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
@@ -100,7 +109,63 @@ export default {
 		.common-form .ivu-form-item .ivu-form-item-label{
 			color: #333333;
 		}
+
+		.from-input{
+			width: 100%;
+			padding-right:115px;
+			height: 50px;
+			line-height: 50px;
+		}
+		.from-button{
+			width:64px;
+			height:30px;
+			background:linear-gradient(90deg,rgba(67,142,255,1) 0%,rgba(80,204,255,1) 100%);
+			border-radius:15px;
+			position: absolute;
+			top: 10px;
+			right: 55px;
+			text-align: center;
+			line-height: 30px;
+			font-size:14px;
+			font-weight:400;
+			color:rgba(255,255,255,1);
+		}
+		.scan-button{
+			position: absolute;
+			top: 10px;
+			right: 5px;
+			width: 50px;
+			height: 30px;
+			img{
+				width: 15px;
+				height: 15px;
+				margin: 0 auto;
+				display: block;
+			}
+			p{
+				height: 14px;
+				font-size: 10px;
+				font-weight: 400;
+				color: #9b9b9b;
+				line-height: 14px;
+				text-align: center;
+			}
+		}
 	}
 }
+
+
+
+
 @import "./coupons.less";
+
+#common-form{
+	.ivu-form-item-content{
+		height: 50px;
+	}
+}
+.common-form .ivu-form-item .ivu-form-item-content > * {
+    margin-top: 0px;
+}
+
 </style>
