@@ -2,7 +2,7 @@
 <div class="discounts-list">
 	<div class="head">
 		<div class="left"><i class="fa fa-search icon"></i>
-			<form action="">
+			<form action="javascript:return true">
 				<input type="search" ref="input" v-model="search.q" @keydown="key($event)" placeholder="企业名称/优惠内容"/>
 			</form>
 			<i class="fa fa-times-circle close" v-show="search.q" @click="close" ></i>
@@ -21,7 +21,9 @@
 				<span>点评数：<small>{{item.commentCount}}</small></span></div>
 			<div class="info">
 				<span class="level">{{item.credit?'全国诚信企业 ':''}}
-					{{levelText(item)}}<small v-if="item.grade=='AAA'">（最高评级）</small></span>
+					{{levelText(item)}}
+					<!--<small v-if="item.grade=='AAA'">（最高评级）</small>-->
+				</span>
 				<div class="right">
 					<span>距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
 					<router-link tag="div" class="goto"
@@ -82,7 +84,8 @@ export default {
 				// lng: '121.320209',
 				// lat: '31.279839',
 			},
-			localSuccess: true
+			localSuccess: true,
+			action:'',
 		}
 	},
 	computed:{
@@ -127,6 +130,8 @@ export default {
 
 		getwxticket(['onMenuShareTimeline', 'onMenuShareAppMessage'])
 		this.share()
+
+		this.action= window.location.href
 	},
 	methods:{
 		key(e) {
