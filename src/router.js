@@ -160,6 +160,8 @@ export default new Router({
 		{path: '/coupons-check-list', name: 'coupons-check-list', component: resolve => require(['@/page/coupons/coupons-check-list.vue'], resolve), meta: {requiresAuth: true}},
 		{path: '/coupons-employ', name: 'coupons-employ', component: resolve => require(['@/page/coupons/coupons-employ.vue'], resolve), meta: {requiresAuth: true}},
 		{path: '/coupons-use-detail', name: 'coupons-use-detail', component: resolve => require(['@/page/coupons/coupons-use-detail.vue'], resolve), meta: {requiresAuth: true}},
-		{path: '/discounts-list', name: 'discounts-list', component: resolve => require(['@/page/coupons/discounts-list.vue'], resolve), meta: {requiresAuth: true, keepAlive: true}},
+
+		{path: '/discounts-list', name: 'discounts-list', component: resolve => require(['@/page/coupons/discounts-list.vue'], resolve), meta: {requiresAuth: true, keepAlive: true, title:'汽修企业惠民项目'}},
+
 	]
 })

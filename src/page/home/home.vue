@@ -13,7 +13,8 @@
     <div class='content'>
       <mt-swipe :auto="4000">
         <mt-swipe-item v-for="(item, index) in bannerList" :key="index">
-          <router-link :to="item.linkUrl" tag="a"><img :src="item.imageUrl"></router-link>
+          <a v-if="item.linkUrl&& item.linkUrl.indexOf('http')>=0" :href="item.linkUrl"><img :src="item.imageUrl"></a>
+          <router-link v-else :to="item.linkUrl" tag="a"><img :src="item.imageUrl"></router-link>
         </mt-swipe-item>
       </mt-swipe>
     </div>
