@@ -1,167 +1,154 @@
 <template>
   <div id="personUpload">
-      <div style="padding: 20px 15px 15px; margin-bottom: 15px; background-color: #fff;">
-        <div style="display: flex; justify-content: space-between; width: 80%; margin: 0 auto 10px;">
-          <div style="height: 1px; width: calc((100% - 190px) / 2); background-color: #ddd; position: relative; margin-top: 9px;">
-            <i style="position: absolute; bottom: -1.5px; right: 0; width: 4px; height: 4px; border-radius: 2px; background-color: #ddd;"></i>
-          </div>
-          <div style="color: #666; font-size: 17px;">请上传您的身份证照片</div>
-          <div style="height: 1px; width: calc((100% - 190px) / 2); background-color: #ddd; position: relative; margin-top: 9px;">
-            <i style="position: absolute; bottom: -1.5px; left: 0; width: 4px; height: 4px; border-radius: 2px; background-color: #ddd;"></i>
-          </div>
-        </div>
-	      <div id="id123"></div>
-        <p style="font-size: 13px; text-align: center;">若您上传了非本人的身份证, 您将无法绑定您名下的车辆</p>
-        <div style="margin: 25px 15px;">
-          <div id="front_idcard" style="width: 220px; height: 150px; background: #f2f7fd; margin: 0 auto; overflow: hidden; border-radius: 5px; position: relative;">
-            <div style="height: 120px; position: relative;">
-              <img id="IDCARDUP" v-img :src="idPic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
-            </div>
-            <div v-if="showUploadBtn" style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="$refs.idupload.clickBox()">拍摄正面</div>
-          </div>
-	        <upload operate='base64' @done="uploadIDCardUp" ref="idupload"></upload>
-        </div>
 
-        <div style="display: flex; justify-content: space-between; width: 80%; margin: 0 auto 10px;">
-          <div style="height: 1px; width: calc((100% - 190px) / 2); background-color: #ddd; position: relative; margin-top: 9px;">
-            <i style="position: absolute; bottom: -1.5px; right: 0; width: 4px; height: 4px; border-radius: 2px; background-color: #ddd;"></i>
-          </div>
-          <div style="color: #666; font-size: 17px;">请上传行驶证正面</div>
-          <div style="height: 1px; width: calc((100% - 190px) / 2); background-color: #ddd; position: relative; margin-top: 9px;">
-            <i style="position: absolute; bottom: -1.5px; left: 0; width: 4px; height: 4px; border-radius: 2px; background-color: #ddd;"></i>
-          </div>
-        </div>
+	  <div class="upBlock drive">
+		  <div class="title"><i></i>请上传行驶证正面<i></i></div>
 
-        <div style="width: 220px; height: 150px; background: #f2f7fd; margin: 20px auto 0; overflow: hidden; border-radius: 5px; position: relative;">
-          <div style="height: 120px; position: relative;">
-            <img id="drive_license" v-img :src="drivePic" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 60%;" alt="">
-          </div>
-          <div style="position: absolute; width: 100%; left: 0; bottom: 0; font-size: 15px; line-height: 30px; background-color: #5795fc; text-align: center; color: #fff;" @click="$refs.driverUpload.clickBox()">拍摄正面</div>
-	        <upload operate='base64' @done="uploadDriveLicense" ref="driverUpload"></upload>
-        </div>
-      </div>
+		  <div class="imgBlock">
+			  <div :class="['img',{nobg: drivePic}]">
+				  <img v-img v-show="drivePic" :src="drivePic">
+			  </div>
+			  <p v-show="showUploadBtn" @click="$refs.driverUpload.clickBox()">拍摄正面</p>
+		  </div>
+		  <upload operate='base64' @done="uploadDriveLicense" ref="driverUpload"></upload>
+	  </div>
 
-      <div style="margin-bottom: 15px;" v-show="showIDCardUpInfo">
-        <div style="background: rgb(87, 149, 252); font-size: 16px; position: relative;">
-          <span style="line-height: 35px; color: #fff; margin-left: 15px;">身份证正面识别信息</span>
-          <span style="border: 1px solid #fff; position: absolute; right: 15px; top: 50%; background: rgba(0,0,0,.2); transform: translateY(-50%); color: #fff; padding: 1px 15px; border-radius: 3px;" v-if="modify" @click="showPopover('popupVisible1')">修改</span>
-        </div>
-        <div class="mui-input-group">
-          <div class="mui-input-row">
-            <label style="font-size: 16px;">姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</label>
-            <input type="text" disabled readonly placeholder="" v-model.trim="name">
-          </div>
-          <div class="mui-input-row">
-            <label style="font-size: 16px;">身份证号</label>
-            <input type="text" disabled readonly placeholder="" v-model.trim="IDCardNum">
-          </div>
-        </div>
-      </div>
+	<div class="upBlock id">
+		<div class="title"><i></i>请上传您的身份证照片<i></i></div>
+		<p>若您上传了非本人的身份证, 您将无法绑定您名下的车辆</p>
 
-      <div style="margin-bottom: 15px;" v-show="showDriveLicenseInfo">
-        <div style="background: rgb(87, 149, 252); font-size: 16px; position: relative;">
-          <span style="line-height: 35px; color: #fff; margin-left: 15px;">行驶证识别信息</span>
-          <span style="border: 1px solid #fff; position: absolute; right: 15px; top: 50%; background: rgba(0,0,0,.2); transform: translateY(-50%); color: #fff; padding: 1px 15px; border-radius: 3px;"  @click="showPopover('popupVisible2')">修改</span>
-        </div>
-        <div class="mui-input-group">
-          <div class="mui-input-row">
-            <label style="font-size: 16px;">车&nbsp;&nbsp;牌&nbsp;&nbsp;号</label>
-            <input type="text" disabled readonly placeholder="" v-model.trim="vehiclePlateNumber">
-          </div>
-          <div class="mui-input-row">
-            <label style="font-size: 16px;">所&nbsp;&nbsp;有&nbsp;&nbsp;人</label>
-            <input type="text" disabled readonly placeholder="" v-model.trim="ownerName">
-          </div>
-          <div class="mui-input-row">
-            <label style="font-size: 16px;">车架号(VIN)</label>
-            <input type="text" disabled readonly placeholder="" v-model.trim="vin">
-          </div>
-          <div class="mui-input-row">
-            <label style="font-size: 16px;">发动机号</label>
-            <input type="text" disabled readonly placeholder="" v-model.trim="engineNo">
-          </div>
-        </div>
-      </div>
-
-      <div style="background-color: #fff; padding-bottom: 30px;">
-        <div style="display: flex; justify-content: space-around; width: 80%; padding: 25px 15px; margin: 0 auto;">
-          <div style="height: 1px; width: calc((100% - 190px) / 2); background-color: #ddd; position: relative; margin-top: 9px;">
-            <i style="position: absolute; bottom: -1.5px; right: 0; width: 4px; height: 4px; border-radius: 2px; background-color: #ddd;"></i>
-          </div>
-          <div style="color: #666; font-size: 17px;">拍摄证件要求</div>
-          <div style="height: 1px; width: calc((100% - 190px) / 2); background-color: #ddd; position: relative; margin-top: 9px;">
-            <i style="position: absolute; bottom: -1.5px; left: 0; width: 4px; height: 4px; border-radius: 2px; background-color: #ddd;"></i>
-          </div>
-        </div>
-        <p style="color: #999; text-align: center; margin-bottom: 0;">1、大陆公民持有的本人有效二代身份证</p>
-        <p style="color: #999; text-align: center;">2、拍摄时确保证件<span style="color: #fc0;">边框完整，字体清晰，亮度均匀</span></p>
-        <div class="clearfix" style="margin-top: 25px;">
-          <div class="fl" style="width: 25%; text-align: center; position: relative;">
-            <img src="/static/img/carOwner-centre/身份证_标准@3x.png" style="width: 85%;" alt="">
-            <p style="position: absolute; width: 100%; color: #999; left: 0; bottom: -32px; text-align: center;">标准</p>
-          </div>
-          <div class="fl" style="width: 25%; text-align: center; position: relative;">
-            <img src="/static/img/carOwner-centre/身份证_边框缺失@3x.png" style="width: 85%;" alt="">
-            <p style="position: absolute; width: 100%; color: #999; left: 0; bottom: -32px; text-align: center;">边框缺失</p>
-          </div>
-          <div class="fl" style="width: 25%; text-align: center; position: relative;">
-            <img src="/static/img/carOwner-centre/身份证_照片模糊@3x.png" style="width: 85%;" alt="">
-            <p style="position: absolute; width: 100%; color: #999; left: 0; bottom: -32px; text-align: center;">照片模糊</p>
-          </div>
-          <div class="fl" style="width: 25%;  text-align: center; position: relative;">
-            <img src="/static/img/carOwner-centre/身份证_闪光强烈@3x.png" style="width: 85%;" alt="">
-            <p style="position: absolute; width: 100%; color: #999; left: 0; bottom: -32px; text-align: center;">闪光强烈</p>
-          </div>
-        </div>
-      </div>
-
-	<div class="upBlock">
-		<div class="upIdentity">
-			<div class="title"><i></i>请上传您的身份证照片<i></i></div>
-			<p>若您上传了非本人的身份证, 您将无法绑定您名下的车辆</p>
-
-			<div class="imgBlock">
-				<div class="img">
-					<img v-img v-show="idPic" :src="idPic">
-				</div>
-				<p v-show="showUploadBtn" @click="$refs.idupload.clickBox()">拍摄正面</p>
+		<div class="imgBlock">
+			<div :class="['img',{nobg: idPic}]">
+				<img v-img v-show="idPic" :src="idPic">
 			</div>
-			<upload operate='base64' @done="uploadIDCardUp" ref="idupload"></upload>
-
+			<p v-show="showUploadBtn" @click="$refs.idupload.clickBox()">拍摄正面</p>
 		</div>
+		<upload operate='base64' @done="uploadIDCardUp" ref="idupload"></upload>
 	</div>
+
+	  <div class="upBlock business">
+		  <div class="title"><i></i>请上传营业执照正面<i></i></div>
+
+		  <div class="imgBlock">
+			  <div :class="['img',{nobg: drivePic}]">
+				  <img v-img v-show="drivePic" :src="drivePic">
+			  </div>
+			  <p v-show="showUploadBtn" @click="$refs.driverUpload.clickBox()">拍摄正面</p>
+		  </div>
+		  <upload operate='base64' @done="uploadDriveLicense" ref="driverUpload"></upload>
+	  </div>
+
+	  <!--<div class="info" v-show="showDriveLicenseInfo">-->
+	  <div class="info" v-show="true">
+		  <div class="head">
+			  <p>行驶证识别信息</p>
+			  <span @click="showPopover('popupVisible2')">修改</span>
+		  </div>
+		  <ul>
+			  <li>
+				  <label>车牌号</label>
+				  <!--<span>{{vehiclePlateNumber}}</span>-->
+				  <span>行驶证识别信息</span>
+				  <p>行驶证识别信息2</p>
+			  </li>
+			  <li>
+				  <label>车牌号</label>
+				  <span>{{vehiclePlateNumber}}</span>
+			  </li>
+			  <li>
+				  <label>所有人</label>
+				  <span>{{ownerName}}</span>
+			  </li>
+			  <li>
+				  <label>车架号(VIN)</label>
+				  <span>{{vin}}</span>
+			  </li>
+			  <li>
+				  <label>发动机号</label>
+				  <span>{{engineNo}}</span>
+			  </li>
+		  </ul>
+	  </div>
+
+	  <!--<div class="info" v-show="showIDCardUpInfo">-->
+	  <div class="info" v-show="true">
+		  <div class="head">
+			  <p>身份证正面识别信息</p>
+			  <span @click="showPopover('popupVisible1')">修改</span>
+		  </div>
+		  <ul>
+			  <li>
+				  <label>姓名</label>
+				  <span>{{name}}</span>
+			  </li>
+			  <li>
+				  <label>身份证号</label>
+				  <span>{{IDCardNum}}</span>
+			  </li>
+		  </ul>
+	  </div>
+
+	  <div class="upBlock">
+		  <div class="title"><i></i>拍摄证件要求<i></i></div>
+		  <div class="rule">
+			  <p>拍摄时确保证件<span style="color: #fc0;">边框完整，字体清晰，亮度均匀</span></p>
+			  <li>
+				  <img src="/static/img/carOwner-centre/身份证_标准@3x.png">
+				  <p>标准</p>
+			  </li>
+			  <li>
+				  <img src="/static/img/carOwner-centre/身份证_边框缺失@3x.png">
+				  <p>边框缺失</p>
+			  </li>
+			  <li>
+				  <img src="/static/img/carOwner-centre/身份证_照片模糊@3x.png">
+				  <p>照片模糊</p>
+			  </li>
+			  <li>
+				  <img src="/static/img/carOwner-centre/身份证_闪光强烈@3x.png">
+				  <p>闪光强烈</p>
+			  </li>
+		  </div>
+	  </div>
 
 	<div class="submit" @click="Bind">确定</div>
 
-    <mt-popup
-      v-model="popupVisible1"
-      position="right">
-        <div style="width: 100vw; height: 100vh; position: relative;" class="popup">
+    <mt-popup v-model="popupVisible1" position="right" class="popup">
           <div>
             <mt-field label="姓名" placeholder="更改姓名" type="text" v-model.trim="name"></mt-field>
             <mt-field label="身份证号码" placeholder="更改身份证号码" type="text" v-model.trim="IDCardNum"></mt-field>
           </div>
-          <div style="position: absolute; left: 0; bottom: 0; width: 100%;">
-            <mt-button @click="popupVisible1=!popupVisible1" type="danger" size="large" style="float: left; width: 50%; border-radius: 0;">取消</mt-button>
-            <mt-button @click="confirm('IDCard')" type="primary" size="large" style="float: right; width: 50%; border-radius: 0;">确定</mt-button>
+	    <Form :class="['common-form']"
+	          :label-width="100" label-position="left" ref="form">
+		    <FormItem label="姓名" prop="name">
+			    <Input v-model="name"></Input>
+		    </FormItem>
+		    <FormItem label="身份证号码" prop="IDCardNum">
+			    <Input v-model="IDCardNum"></Input>
+		    </FormItem>
+	    </Form>
+
+          <div class="button-block">
+            <mt-button @click="popupVisible1=!popupVisible1" type="danger" size="large"
+                       class="button">取消</mt-button>
+            <mt-button @click="confirm('IDCard')" type="primary" size="large"
+                       class="button">确定</mt-button>
           </div>
-        </div>
     </mt-popup>
-    <mt-popup
-      v-model="popupVisible2"
-      position="right">
-      <div style="width: 100vw; height: 100vh; position: relative;" class="popup">
+    <mt-popup v-model="popupVisible2" position="right" class="popup">
         <div>
           <mt-field label="车牌号" placeholder="更改车牌号" type="text" v-model.trim="vehiclePlateNumber"></mt-field>
           <mt-field label="所有人" placeholder="更改所有人" type="text" v-model.trim="ownerName"></mt-field>
           <mt-field label="车架号(VIN)" placeholder="更改车架号(VIN)" type="text" v-model.trim="vin"></mt-field>
           <mt-field label="发动机号" placeholder="更改发动机号" type="text" v-model.trim="engineNo"></mt-field>
         </div>
-        <div style="position: absolute; left: 0; bottom: 0; width: 100%;">
-          <mt-button @click="popupVisible2=!popupVisible2" type="danger" size="large" style="float: left; width: 50%; border-radius: 0;">取消</mt-button>
-          <mt-button @click="confirm('driveLicense')" type="primary" size="large" style="float: right; width: 50%; border-radius: 0;">确定</mt-button>
+
+        <div class="button-block">
+          <mt-button @click="popupVisible2=!popupVisible2" type="danger" size="large"
+                     class="button">取消</mt-button>
+          <mt-button @click="confirm('driveLicense')" type="primary" size="large"
+                     class="button">确定</mt-button>
         </div>
-      </div>
     </mt-popup>
   </div>
 </template>
@@ -184,7 +171,7 @@
         showIDCardUpInfo: false,
         showDriveLicenseInfo: false,
 
-        popupVisible1: false,
+        popupVisible1: true,
         popupVisible2: false,
 
 	      // idPic:'/static/img/carOwner-centre/身份证_正面@3x.png',
@@ -384,9 +371,17 @@
 
 <style lang='less' scoped>
 #personUpload{
-/*height: 100vh;*/
-/*position: relative;*/
-background-color: #f8f8f8;
+	padding-bottom: 40px;
+	background-color: #f8f8f8;
+	.drive .img{
+		background: #f2f7fd url("/static/img/carOwner-centre/行驶证@3x.png") no-repeat center center;
+	}
+	.id .img{
+		background: #f2f7fd url("/static/img/carOwner-centre/身份证_正面@3x.png") no-repeat center center;
+	}
+	.business .img{
+		background: #f2f7fd url("/static/img/carOwner-centre/营业执照@3x.png") no-repeat center center;
+	}
 	.upBlock{
 		padding: 20px 15px 15px;
 		margin-bottom: 15px;
@@ -431,7 +426,6 @@ background-color: #f8f8f8;
 			.img{
 				height: 120px;
 				text-align: center;
-				background: #f2f7fd url("/static/img/carOwner-centre/身份证_正面@3x.png") no-repeat center center;
 				background-size: 100px auto;
 				img{
 					width: auto;
@@ -440,24 +434,140 @@ background-color: #f8f8f8;
 					max-height: 100%;
 				}
 			}
+			.img.nobg{
+				background: #f2f7fd;
+			}
 			p{
-				
+				font-size: 15px;
+				line-height: 30px;
+				background-color: #5795FC;
+				text-align: center;
+				color: white;
+			}
+		}
+		.rule{
+			margin-top: 25px;
+			overflow: hidden;
+			p{
+				color: #999999;
+			}
+			li{
+				width: 50%;
+				float: left;
+				text-align: center;
+				margin-top: 10px;
+				img{
+					width: 80%;
+				}
+				p{
+
+				}
 			}
 		}
 	}
-  .submit{
-	  width: 100%;
-	  height: 40px;
-	  line-height: 40px;
-	  text-align: center;
-	  color: white;
-	  background-color: #26a2ff;
-	  font-size: 18px;
-	  position: fixed;
-	  left: 0;
-	  bottom: 0;
-  }
-
+	.info{
+		background-color: white;
+		.head{
+			background: #5795FC;
+			font-size: 16px;
+			position: relative;
+			p{
+				font-size: 16px;
+				line-height: 35px;
+				color: white;
+				margin-left: 15px;
+			}
+			span{
+				border: 1px solid white;
+				position: absolute;
+				right: 15px;
+				top: 50%;
+				background: rgba(0, 0, 0, 0.2);
+				transform: translateY(-50%);
+				color: white;
+				padding: 1px 15px;
+				border-radius: 3px;
+			}
+		}
+		ul{
+			padding-left: 15px;
+			font-size: 15px;
+			li{
+				min-height: 41px;
+				overflow: hidden;
+				border-bottom: 1px solid #c8c7cc;
+				position: relative;
+				label{
+					display: inline-block;
+					width: 100px;
+					line-height: 40px;
+					position: absolute;
+					left: 0;
+					top: 0;
+				}
+				span{
+					display: inline-block;
+					width: 100%;
+					padding-left: 110px;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					line-height: 20px;
+					height: 20px;
+					margin-top: 10px;
+				}
+				p{
+					padding-left: 110px;
+					position: relative;
+					line-height: 20px;
+					height: 20px;
+					color: orange;
+					font-size: 15px;
+					margin-bottom: 5px;
+					&:before{
+						content: '修改后';
+						position: absolute;
+						left: 0;
+						line-height: 20px;
+						height: 20px;
+						color: orange;
+						margin-bottom: 5px;
+					}
+				}
+			}
+		}
+	}
+	.submit{
+		width: 100%;
+		height: 40px;
+		line-height: 40px;
+		text-align: center;
+		color: white;
+		background-color: #26a2ff;
+		font-size: 18px;
+		position: fixed;
+		left: 0;
+		bottom: 0;
+	}
+	.popup{
+		width: 100%;
+		height: 100vh;
+		/*position: relative;*/
+		/*padding-bottom: 40px;*/
+		overflow: auto;
+		.button-block{
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			overflow: hidden;
+			.button{
+				float: left;
+				width: 50%;
+				border-radius: 0;
+			}
+		}
+	}
 }
 </style>
 
