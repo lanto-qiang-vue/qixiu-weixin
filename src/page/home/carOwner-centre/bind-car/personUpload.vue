@@ -1,6 +1,5 @@
 <template>
   <div id="personUpload">
-    <div style="height: calc(100vh - 40px); overflow: auto;">
       <div style="padding: 20px 15px 15px; margin-bottom: 15px; background-color: #fff;">
         <div style="display: flex; justify-content: space-between; width: 80%; margin: 0 auto 10px;">
           <div style="height: 1px; width: calc((100% - 190px) / 2); background-color: #ddd; position: relative; margin-top: 9px;">
@@ -115,10 +114,25 @@
           </div>
         </div>
       </div>
-    </div>
-    <div style="position: absolute; width: 100%; bottom: 0; left: 0;" @click="Bind">
-      <mt-button type="primary" size="large" style="width: 100%; border-radius: 0">确定</mt-button>
-    </div>
+
+	<div class="upBlock">
+		<div class="upIdentity">
+			<div class="title"><i></i>请上传您的身份证照片<i></i></div>
+			<p>若您上传了非本人的身份证, 您将无法绑定您名下的车辆</p>
+
+			<div class="imgBlock">
+				<div class="img">
+					<img v-img v-show="idPic" :src="idPic">
+				</div>
+				<p v-show="showUploadBtn" @click="$refs.idupload.clickBox()">拍摄正面</p>
+			</div>
+			<upload operate='base64' @done="uploadIDCardUp" ref="idupload"></upload>
+
+		</div>
+	</div>
+
+	<div class="submit" @click="Bind">确定</div>
+
     <mt-popup
       v-model="popupVisible1"
       position="right">
@@ -173,8 +187,10 @@
         popupVisible1: false,
         popupVisible2: false,
 
-	      idPic:'/static/img/carOwner-centre/身份证_正面@3x.png',
-	      drivePic: '/static/img/carOwner-centre/行驶证@3x.png',
+	      // idPic:'/static/img/carOwner-centre/身份证_正面@3x.png',
+	      // drivePic: '/static/img/carOwner-centre/行驶证@3x.png',
+	      idPic:'',
+	      drivePic: '',
 
         vehiclePlateNumber: '',       // 行驶证车牌号码
         ownerName: '',                // 行驶证持有人
@@ -187,24 +203,24 @@
 
 	  mounted(){
 		  // getwxticket(['chooseImage', 'previewImage', 'getLocalImgData'])
-		  this.axios({
-		    url: '/scan/getCard',
-		    method: 'get'
-		  }).then(res=>{
-		    if(res.data.code==='0'){
-		      if(res.data.item.frontImage){
-			      this.idPic= 'data:image/png;base64,'+res.data.item.frontImage
-		        this.flag1 = true
-		        this.showUploadBtn = false
-		        this.modify = false
-		        this.name = res.data.item.reviseOwnerName
-		        this.IDCardNum = res.data.item.reviseIdCardNo
-		        this.IDCardID = res.data.item.creditId
-		        this.showIDCardUpInfo = true
-			      $('#front_idcard').css({'height': 'auto'})
-		      }
-		    }
-		  })
+		  // this.axios({
+		  //   url: '/scan/getCard',
+		  //   method: 'get'
+		  // }).then(res=>{
+		  //   if(res.data.code==='0'){
+		  //     if(res.data.item.frontImage){
+			//       this.idPic= 'data:image/png;base64,'+res.data.item.frontImage
+		  //       this.flag1 = true
+		  //       this.showUploadBtn = false
+		  //       this.modify = false
+		  //       this.name = res.data.item.reviseOwnerName
+		  //       this.IDCardNum = res.data.item.reviseIdCardNo
+		  //       this.IDCardID = res.data.item.creditId
+		  //       this.showIDCardUpInfo = true
+			//       $('#front_idcard').css({'height': 'auto'})
+		  //     }
+		  //   }
+		  // })
 	  },
     methods: {
       uploadIDCardUp(base64){
@@ -367,11 +383,82 @@
 </script>
 
 <style lang='less' scoped>
-  #personUpload{
-    height: 100vh;
-    position: relative;
-    background-color: #f8f8f8;
+#personUpload{
+/*height: 100vh;*/
+/*position: relative;*/
+background-color: #f8f8f8;
+	.upBlock{
+		padding: 20px 15px 15px;
+		margin-bottom: 15px;
+		background-color: white;
+		.title{
+			text-align: center;
+			color: #666666;
+			i{
+				display: inline-block;
+				width: 30px;
+				height: 2px;
+				background-color: #f1f2f4;
+				padding: 0 5px;
+				margin: 0 10px;
+				position: relative;
+				vertical-align: middle;
+				&:first-child::after, &:last-child::before{
+					content: '';
+					width: 4px;
+					height: 4px;
+					display: block;
+					background-color: #d1d6dc;
+					position: absolute;
+					top: -1px;
+					border-radius: 100%;
+					left: 0;
+				}
+				&:first-child::after{
+					left: auto;
+					right: 0;
+				}
+			}
+		}
+		>p{
+			font-size: 13px;
+		}
+		.imgBlock{
+			width: 220px;
+			margin: 25px auto;
+			overflow: hidden;
+			border-radius: 5px;
+			.img{
+				height: 120px;
+				text-align: center;
+				background: #f2f7fd url("/static/img/carOwner-centre/身份证_正面@3x.png") no-repeat center center;
+				background-size: 100px auto;
+				img{
+					width: auto;
+					height: auto;
+					max-width: 100%;
+					max-height: 100%;
+				}
+			}
+			p{
+				
+			}
+		}
+	}
+  .submit{
+	  width: 100%;
+	  height: 40px;
+	  line-height: 40px;
+	  text-align: center;
+	  color: white;
+	  background-color: #26a2ff;
+	  font-size: 18px;
+	  position: fixed;
+	  left: 0;
+	  bottom: 0;
   }
+
+}
 </style>
 
 <style lang='less'>

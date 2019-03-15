@@ -22,7 +22,7 @@
 			<div class="info">
 				<span class="level">{{item.credit?'全国诚信企业 ':''}}
 					{{levelText(item)}}
-					<!--<small v-if="item.grade=='AAA'">（最高评级）</small>-->
+					<small v-if="item.grade=='AAA'">（最高评级）</small>
 				</span>
 				<div class="right">
 					<span>距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
