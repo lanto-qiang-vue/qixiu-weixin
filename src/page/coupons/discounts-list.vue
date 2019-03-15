@@ -22,7 +22,7 @@
 			<div class="info">
 				<span class="level">{{item.credit?'全国诚信企业 ':''}}
 					{{levelText(item)}}
-					<!--<small v-if="item.grade=='AAA'">（最高评级）</small>-->
+					<small v-if="item.grade=='AAA'">（最高评级）</small>
 				</span>
 				<div class="right">
 					<span>距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
@@ -153,7 +153,7 @@ export default {
 			query+= ('&sort=gradeLevel asc,distance asc')
 			if(this.search.lng) {
 				let point=('&point='+this.search.lat+','+this.search.lng)
-				if(this.localSuccess && (this.search.area=='310000'||!this.search.area)) point+= ',10'
+				if(this.localSuccess && (this.search.area=='310000'||!this.search.area) && !this.search.q) point+= ',10'
 				query+= point
 			}
 			let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
