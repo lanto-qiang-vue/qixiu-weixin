@@ -27,10 +27,10 @@
 
     methods: {
       goBindMy(){
-        this.$router.push('/carOwner-centre/bind-car/personUpload')
+        this.$router.push('/bind-my-car')
       },
       goBindCompany(){
-        this.$router.push('/carOwner-centre/bind-car/companyUpload')
+        this.$router.push('/bind-my-com-car')
       }
     }
   }

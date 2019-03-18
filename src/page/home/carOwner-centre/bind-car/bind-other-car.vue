@@ -153,7 +153,7 @@
           if(resp.data.code==='0'){
             this.popupVisible = !this.popupVisible
             Toast('绑定成功')
-            this.$router.push('/carOwner-centre/carList')
+            this.$router.push('/my-car-list')
           }else if(resp.data.code==='130506'){
             Toast(resp.data.status)
           }else{

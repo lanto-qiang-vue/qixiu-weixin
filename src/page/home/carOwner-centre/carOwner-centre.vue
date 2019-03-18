@@ -158,7 +158,7 @@
       },
       goRenewal(){this.$router.push("/carOwner-centre/renewal")},
       goRoadHelp(){this.$router.push("/carOwner-centre/roadHelp")},
-      goCarList(){this.$router.push("/carOwner-centre/carList?showBtn=false")},
+      goCarList(){this.$router.push("/my-car-list?showBtn=false")},
       goCDF(){this.$router.push("/doctor")},
       goOffenceSearch(){this.$router.push("/carOwner-centre/offenceSearch")},
       goVisitService(){this.$router.push("/carOwner-centre/visitService")},

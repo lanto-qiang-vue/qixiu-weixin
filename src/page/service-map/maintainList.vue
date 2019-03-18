@@ -137,7 +137,7 @@
 			    <!--<div class="head"><span>智能推荐</span></div>-->
 			    <li v-for="(item, index) in list" :key="index" @click="goDetail(item)">
 				    <div class="picWrap">
-					    <img :src="item.pic? item.pic.split(',')[0] :'/static/img/shqxw.jpg'" />
+					    <img :src="item.pic? item.pic.split(',')[0] :'/static/img/drive-school.jpg'" />
 					    <!--<img class="tag" :src="item.is4s?'/static/img/maintain/tag-4s.png':'/static/img/maintain/tag-normal.png'"/>-->
 				    </div>
 				    <div class="info">
