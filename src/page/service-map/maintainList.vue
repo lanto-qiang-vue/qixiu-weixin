@@ -73,7 +73,9 @@
 	</div>
 	</div>
 	<div id="head2" v-show="showHead=='base'||showHead=='baseMap'">
-		<div class="search-input"><p class="base-head">{{search.base}}驾校基地（{{total}}家驾校）</p></div>
+		<div class="search-input"><p class="base-head">{{search.base}}驾校基地（{{total}}家驾校）</p>
+		<p class="base-head" v-if="schoolBrand">{{schoolBrand}}自用基地</p>
+		</div>
 	</div>
   <div class="roll" :style="{height: listHeight+'px'}">
     <mt-loadmore :bottom-method="toQuery" :bottom-all-loaded="allLoaded" :autoFill="false"
@@ -144,7 +146,7 @@
 					    <!--<span>{{businessStatus(item.status)}}</span>-->
 
 					    <!--<span class="orange">{{item.grade=='N' ?'未评级' :item.grade}}</span>-->
-					    <p>{{ item.name.split('(')[0] }}<span style="color: #fa8c16">{{item.grade=='N' ?'未评' :item.grade}}级</span></p>
+					    <p style="margin: 0">{{ item.name.split('(')[0] }}<span style="color: #fa8c16">{{item.grade=='N' ?'未评' :item.grade}}级</span><small>（{{gradeText(item.grade)}}）</small></p>
 					    <div class="address">{{ item.name.substring(item.name.indexOf('('), item.name.length)  }}</div>
 					    <div class="address">
 						    <span class="miles">{{ item.distance.toFixed(1) }}km</span>
@@ -268,7 +270,8 @@ export default {
 	        clearList: true,
 			loading: true,
 			showHead: 'search',
-			inputPlaceholder: '搜索：企业名、地址、品牌、服务内容'
+			inputPlaceholder: '搜索：企业名、地址、品牌、服务内容',
+			schoolBrand: ''
 
         }
     },
@@ -532,7 +535,7 @@ export default {
 			if(this.$route.name=='school-map' && this.search.schoolPoint!= 300){
 				this.axios({
 					baseURL: '/repairproxy',
-					url: '/micro/search/company?fl=sid,type,name,addr,lon,lat&q=&page=0,10&point='+this.location.lat+','+this.location.lng+'&fq=status:1+AND+type:301',
+					url: '/micro/search/company?fl=sid,type,name,addr,lon,lat,brand&q=&page=0,10&point='+this.location.lat+','+this.location.lng+'&fq=status:1+AND+type:301',
 					method: 'get',
 				}).then( (res) => {
 					this.renderMap(res.data.content, true)
@@ -663,6 +666,7 @@ export default {
 						    this.search.sort= 'rating desc,distance asc'
 						    this.search.base= e.target.getExtData().name.replace('驾校基地', '')
 						    this.showHead= 'base'
+						    this.schoolBrand= e.target.getExtData().brand
 						    this.getCompList(true, true, true)
 						    this.$emit('goMap', e.target.getExtData())
 						    // this.$emit('renderMap', []);
@@ -748,9 +752,35 @@ export default {
 		        return this[type][i].name
           }
         }
-      }
+      },
+		gradeText(grade){
+			let text= ''
+			switch (grade){
+				case 'AAA':{
+					text= "质量信誉优良企业"
+					break
+				}
+				case 'AA':{
+					text= "质量信誉合格企业"
+					break
+				}
+				case 'A':{
+					text= "质量信誉基本合格企业"
+					break
+				}
+				case 'B':{
+					text= "质量信誉不合格企业"
+					break
+				}
+				default :{
+					text= "质量信誉未评级企业"
+					break
+				}
+			}
+			return text
+		}
     }
-	}
+}
 </script>
 
 <style scoped lang='less'>
@@ -970,6 +1000,10 @@ export default {
           span {
             /*color: red;*/
           }
+	        small{
+		        color: #9B9B9B;
+		        font-size: 12px;
+	        }
         }
         .stars {
           line-height: 14px;

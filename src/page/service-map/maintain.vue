@@ -11,6 +11,7 @@
 			<div class="fixGuideClick" @click="goLatePoint">{{centerName}}</div>
 		</div>
 
+	    <school-qa v-if="routeName=='base-map' || routeName=='school-map'" ></school-qa>
 
       <div id="container"></div>
 
@@ -29,9 +30,10 @@
   import maintainDetail from '@/page/service-map/maintainDetail.vue'
   import maintainList from '@/page/service-map/maintainList'
   import rescueList from '@/page/service-map/rescueList'
+  import schoolQa from '@/page/service-map/school-qa'
   export default {
     name: 'maintain',
-	  components: {maintainDetail,  maintainList, rescueList},
+	  components: {maintainDetail,  maintainList, rescueList, schoolQa},
     data() {
       return {
 

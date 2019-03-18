@@ -15,9 +15,9 @@
               </div>
               <div class="mui-slider-handle" style="transform: translate(0px, 0px);">
                 <div class="title">
-                  <img style="width: 15px; height: 15px;" src="../../../../assets/img/record/list.png"/>
+                  <img style="width: 15px; height: 15px;" src="~@/assets/img//record/list.png"/>
                   <span>{{ item.vehicleplatenumber }}</span>
-                  <img class="arrow" src="../../../../assets/img/my/right-arrow.png" width="7px" height="14px">
+                  <img class="arrow" src="~@/assets/img//my/right-arrow.png" width="7px" height="14px">
 	                <span class="status" :style="'color:'+showStatus(item.status).color">
 	                    {{ showStatus(item.status).text}}</span>
                 </div>
@@ -268,7 +268,7 @@ export default {
     top: 0;
     form {
       input {
-        background: url(../../../../assets/img/record/search.png) no-repeat 10px 10px;
+        background: url(~@/assets/img//record/search.png) no-repeat 10px 10px;
         font-size: 14px;
         background-color: #eee;
         background-size: 18px 18px;
