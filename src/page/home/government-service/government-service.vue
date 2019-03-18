@@ -63,7 +63,7 @@
           </a>
         </li>
         <li class="mui-col-sm-3 mui-col-xs-3">
-          <a href="/#/carOwner-centre/carList">
+          <a href="/#/my-car-list">
             <div style="width: 40px; height: 40px; margin: 0 auto;"></div>
             <p class="text-one-cut" style="text-align: center; margin: 0; line-height: 35px;">电子健康档案</p>
           </a>

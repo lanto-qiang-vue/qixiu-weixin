@@ -203,7 +203,7 @@
         this.$router.push({path: '/login', query: { redirect: this.$route.fullPath, bindwx: 'yes' }})
       },
       goCarList(){
-        this.$router.push({path: '/carOwner-centre/carList'})
+        this.$router.push({path: '/my-car-list'})
       },
 
       goCarListManager(){

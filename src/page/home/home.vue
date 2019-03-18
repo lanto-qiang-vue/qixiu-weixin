@@ -575,7 +575,7 @@ export default {
         // clearInterval(this.timer)
         return
       }
-      this.$router.push({path: "/carOwner-centre/carList"})
+      this.$router.push({path: "/my-car-list"})
       // clearInterval(this.timer)
     },
     goYYFW() {

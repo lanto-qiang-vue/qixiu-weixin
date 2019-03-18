@@ -42,7 +42,7 @@
 	  <div class="info" v-show="true">
 		  <div class="head">
 			  <p>行驶证识别信息</p>
-			  <span @click="showPopover('popupVisible2')">修改</span>
+			  <span @click="showPopover('carcard')">修改</span>
 		  </div>
 		  <ul>
 			  <li>
@@ -74,7 +74,7 @@
 	  <div class="info" v-show="true">
 		  <div class="head">
 			  <p>身份证正面识别信息</p>
-			  <span @click="showPopover('popupVisible1')">修改</span>
+			  <span @click="showPopover('idcard')">修改</span>
 		  </div>
 		  <ul>
 			  <li>
@@ -83,6 +83,23 @@
 			  </li>
 			  <li>
 				  <label>身份证号</label>
+				  <span>{{IDCardNum}}</span>
+			  </li>
+		  </ul>
+	  </div>
+
+	  <div class="info" v-show="true">
+		  <div class="head">
+			  <p>营业执照识别信息</p>
+			  <span @click="showPopover('licence')">修改</span>
+		  </div>
+		  <ul>
+			  <li>
+				  <label>企业名称</label>
+				  <span>{{companyName}}</span>
+			  </li>
+			  <li>
+				  <label>法定代表人</label>
 				  <span>{{IDCardNum}}</span>
 			  </li>
 		  </ul>
@@ -113,42 +130,49 @@
 
 	<div class="submit" @click="Bind">确定</div>
 
-    <mt-popup v-model="popupVisible1" position="right" class="popup">
-          <div>
-            <mt-field label="姓名" placeholder="更改姓名" type="text" v-model.trim="name"></mt-field>
-            <mt-field label="身份证号码" placeholder="更改身份证号码" type="text" v-model.trim="IDCardNum"></mt-field>
-          </div>
+    <mt-popup v-model="popupShow" position="right" class="popup">
 	    <Form :class="['common-form']"
 	          :label-width="100" label-position="left" ref="form">
+		    <FormItem label="车牌号" prop="name">
+			    <Input v-model.trim="vehiclePlateNumber" placeholder="更改车牌号"></Input>
+		    </FormItem>
+		    <FormItem label="所有人" prop="IDCardNum">
+			    <Input v-model.trim="ownerName" placeholder="更改所有人"></Input>
+		    </FormItem>
+		    <FormItem label="车架号(VIN)" prop="IDCardNum">
+			    <Input v-model.trim="vin" placeholder="更改车架号(VIN)"></Input>
+		    </FormItem>
+		    <FormItem label="发动机号" prop="IDCardNum">
+			    <Input v-model.trim="engineNo" placeholder="更改发动机号"></Input>
+		    </FormItem>
+	    </Form>
+
+	    <Form :class="['common-form']"
+	          :label-width="100" label-position="left" ref="form2">
 		    <FormItem label="姓名" prop="name">
-			    <Input v-model="name"></Input>
+			    <Input v-model.trim="name" placeholder="更改姓名"></Input>
 		    </FormItem>
 		    <FormItem label="身份证号码" prop="IDCardNum">
-			    <Input v-model="IDCardNum"></Input>
+			    <Input v-model.trim="IDCardNum" placeholder="更改身份证号码"></Input>
+		    </FormItem>
+	    </Form>
+
+	    <Form :class="['common-form']"
+	          :label-width="100" label-position="left" ref="form3">
+		    <FormItem label="企业名称" prop="name">
+			    <Input v-model.trim="companyName" placeholder="更改企业名称"></Input>
+		    </FormItem>
+		    <FormItem label="企业法人" prop="IDCardNum">
+			    <Input v-model.trim="name" placeholder="更改企业法人"></Input>
 		    </FormItem>
 	    </Form>
 
           <div class="button-block">
-            <mt-button @click="popupVisible1=!popupVisible1" type="danger" size="large"
+            <mt-button @click="popupShow= false" type="danger" size="large"
                        class="button">取消</mt-button>
-            <mt-button @click="confirm('IDCard')" type="primary" size="large"
+            <mt-button @click="modify" type="primary" size="large"
                        class="button">确定</mt-button>
           </div>
-    </mt-popup>
-    <mt-popup v-model="popupVisible2" position="right" class="popup">
-        <div>
-          <mt-field label="车牌号" placeholder="更改车牌号" type="text" v-model.trim="vehiclePlateNumber"></mt-field>
-          <mt-field label="所有人" placeholder="更改所有人" type="text" v-model.trim="ownerName"></mt-field>
-          <mt-field label="车架号(VIN)" placeholder="更改车架号(VIN)" type="text" v-model.trim="vin"></mt-field>
-          <mt-field label="发动机号" placeholder="更改发动机号" type="text" v-model.trim="engineNo"></mt-field>
-        </div>
-
-        <div class="button-block">
-          <mt-button @click="popupVisible2=!popupVisible2" type="danger" size="large"
-                     class="button">取消</mt-button>
-          <mt-button @click="confirm('driveLicense')" type="primary" size="large"
-                     class="button">确定</mt-button>
-        </div>
     </mt-popup>
   </div>
 </template>
@@ -160,9 +184,7 @@
     name: "personUpload",
     components: {Upload},
     data(){
-      return {
-        flag1: false,
-        flag2: false,
+	    return {
         showUploadBtn: true,
         modify: true,                 // 修改按钮
         name: '',                     // 身份证姓名
@@ -171,24 +193,26 @@
         showIDCardUpInfo: false,
         showDriveLicenseInfo: false,
 
-        popupVisible1: true,
-        popupVisible2: false,
 
 	      // idPic:'/static/img/carOwner-centre/身份证_正面@3x.png',
 	      // drivePic: '/static/img/carOwner-centre/行驶证@3x.png',
 	      idPic:'',
 	      drivePic: '',
 
+
         vehiclePlateNumber: '',       // 行驶证车牌号码
         ownerName: '',                // 行驶证持有人
         vin: '',                      // 行驶证车架号
         engineNo: '',                 // 行驶证发动机号
-        licenseId: ''                 // 行驶证id
+        licenseId: '',                 // 行驶证id
+	    popType: 'carcard',
+		    popupShow: true
       }
     },
 
 
 	  mounted(){
+
 		  // getwxticket(['chooseImage', 'previewImage', 'getLocalImgData'])
 		  // this.axios({
 		  //   url: '/scan/getCard',
@@ -295,14 +319,10 @@
         })
       },
 
-      showPopover(target){
-        let _this = this
+      showPopover(type){
         MessageBox.confirm('修改后需要审核通过才能查看汽车档案').then(action => {
-          if(target==='popupVisible1'){
-            _this.popupVisible1 = true
-          }else{
-            _this.popupVisible2 = true
-          }
+          this.popType= type
+
         })
       },
 
@@ -310,60 +330,15 @@
         $(target).hide()
       },
 
-      confirm(param){
-        let data = null
-        if(param==='IDCard'){
-          let regIdNo = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-          if(this.name===''){
-            return Toast('姓名不能为空')
-          }else if(this.IDCardNum===''){
-            return Toast('身份证号不能为空')
-          }else if(!regIdNo.test(this.IDCardNum)){
-            return Toast('身份证号输入有误')
-          }
-          data = {
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
-            idcardId: this.IDCardID,
-            new_owner_name: this.name,
-            new_id_card_no: this.IDCardNum,
-            property: 1
-          }
-        }else{
-          if(this.vehiclePlateNumber===''){
-            return Toast('车牌号码不能为空')
-          }else if(this.ownerName===''){
-            return Toast('持有人不能为空')
-          }else if(this.vin===''){
-            return Toast('车架号不能为空')
-          }else if(this.engineNo===''){
-            return Toast('发动机号不能为空')
-          }
-          data = {
-            accessToken: localStorage.getItem("ACCESSTOKEN"),
-            licenseId: this.licenseId,
-            new_vehicle_plate_number: this.vehiclePlateNumber,
-            new_engine_no: this.engineNo,
-            new_vin: this.vin,
-            new_license_owner_name: this.ownerName,
-            property: 2
-          }
-        }
+	    modify(){
+		    let regIdNo = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+		    let url= ''
+		    switch (this.popType){
+			    case '':{
 
+			    }
+		    }
 
-        this.axios({
-          url: '/scan/update',
-          method: 'post',
-          headers: {'Content-type': 'application/json'},
-          data: JSON.stringify(data)
-        }).then(res=>{
-          if(res.data.code==='0'){
-            Toast('修改成功')
-            this.popupVisible1 = false
-            this.popupVisible2 = false
-          }else{
-            Toast(res.data.status)
-          }
-        })
       }
     }
   }

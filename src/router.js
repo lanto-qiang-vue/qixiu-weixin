@@ -73,13 +73,13 @@ export default new Router({
 		{path: '/carOwner-centre/appointment', name: 'appointment', component: resolve => require(['@/page/home/carOwner-centre/appointment/appointment'], resolve), meta: {requiresAuth: true, index: 40}},
 		{path: '/carOwner-centre/visitService', name: 'visitService', component: resolve => require(['@/page/home/carOwner-centre/visitService/visitService'], resolve), meta: {requiresAuth: true}},
 		{path: '/carOwner-centre/bind-car/bindCar', name: 'bindCar', component: resolve => require(['@/page/home/carOwner-centre/bind-car/bindCar'], resolve)},
-		{path: '/carOwner-centre/bind-car/personUpload', name: 'personUpload', component: resolve => require(['@/page/home/carOwner-centre/bind-car/personUpload'], resolve), meta: {requiresAuth: true, index: 50}},
+		{path: '/bind-my-car', name: 'bind-my-car', component: resolve => require(['@/page/carRecord/bind-my-car'], resolve), meta: {requiresAuth: true, index: 50}},
 		{path: '/carOwner-centre/bind-car/companyUpload', name: 'companyUpload', component: resolve => require(['@/page/home/carOwner-centre/bind-car/companyUpload'], resolve), meta: {requiresAuth: true, index: 40}},
 		{path: '/carOwner-centre/bind-car/bind-other-car', name: 'bindOtherCar', component: resolve => require(['@/page/home/carOwner-centre/bind-car/bind-other-car'], resolve), meta: {requiresAuth: true, index: 40}},
 
 
 
-		{path: '/carOwner-centre/carList', name: 'carList', component: resolve => require(['@/page/home/carOwner-centre/carList/carList'], resolve), meta: {requiresAuth: true}},
+		{path: '/my-car-list', name: 'my-car-list', component: resolve => require(['@/page/carRecord/my-car-list'], resolve), meta: {requiresAuth: true}},
 		// {path: '/carOwner-centre/newCarList', name: 'newCarList', component: resolve => require(['@/page/home/carOwner-centre/carList/newCarList'], resolve), meta: {requiresAuth: true, keepAlive: true}},//新版维修记录
 		{path: '/carOwner-centre/carList-manager', name: 'carListManager', component: resolve => require(['@/page/home/carOwner-centre/carList/company-list'], resolve), meta: {requiresAuth: true}},
 		{path: '/record-list-manager', name: 'record-list-manager', component: resolve => require(['@/page/home/carOwner-centre/carList/record-list-manager'], resolve), meta: {requiresAuth: true}},

@@ -18,6 +18,8 @@
                   <img style="width: 15px; height: 15px;" src="../../../../assets/img/record/list.png"/>
                   <span>{{ item.vehicleplatenumber }}</span>
                   <img class="arrow" src="../../../../assets/img/my/right-arrow.png" width="7px" height="14px">
+	                <span class="status" :style="'color:'+showStatus(item.status).color">
+	                    {{ showStatus(item.status).text}}</span>
                 </div>
                 <div class="info">
                   <p>
@@ -100,10 +102,14 @@ export default {
 
   methods: {
     goRecordList(id, status, vehicleplatenumber) {
-      if(status == '1'){
-        MessageBox.alert('绑定车辆信息正在审核中, 请审核通过后再查看').then(action => {
-          return
-        })
+      if(status != '2'){
+        // MessageBox.alert('绑定车辆信息正在审核中, 请审核通过后再查看').then(action => {
+        //   return
+        // })
+	      this.$router.push({
+		      path: '/carRecord/bind-my-car',
+		      query: {id:id}
+	      })
         return
       }
       if(id) {
@@ -156,6 +162,27 @@ export default {
       this.getData(1)
     },
 
+	  showStatus(status){
+    	let obj={}, sta= status? parseInt(status): null
+		  switch (sta){
+			  case 1: {
+				  obj.text= '待审核'
+				  obj.color= 'orange'
+				  break
+			  }
+			  case 2: {
+				  obj.text= '审核通过'
+				  obj.color= 'green'
+				  break
+			  }
+			  case 3: {
+				  obj.text= '审核不通过'
+				  obj.color= 'red'
+				  break
+			  }
+		  }
+		  return obj
+	  },
     // 输入车牌号进行搜索
 
     deleteVehicle(id) {
@@ -281,7 +308,6 @@ export default {
       }
       .arrow {
         float: right;
-        margin-right: 10px;
       }
       span {
         font-size: 16px;
@@ -290,6 +316,11 @@ export default {
         line-height: 30px;
         margin-left: 5px;
       }
+	    .status{
+			font-size: 12px;
+		    margin-right: 5px;
+		    float: right;
+	    }
     }
     .info {
       padding: 10px 0;
