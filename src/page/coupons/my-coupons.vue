@@ -1,25 +1,25 @@
 <template>
 <div class="my-coupons">
 	<mt-navbar v-model="selected" class="tab">
-		<mt-tab-item id="can">可使用</mt-tab-item>
-		<mt-tab-item id="yet">已使用</mt-tab-item>
-		<mt-tab-item id="past">已过期</mt-tab-item>
-		<mt-tab-item id="all">全部</mt-tab-item>
+		<mt-tab-item id="can-1">可使用</mt-tab-item>
+		<mt-tab-item id="yet-2">已使用</mt-tab-item>
+		<mt-tab-item id="past-3">已过期</mt-tab-item>
+		<mt-tab-item id="all-0">全部</mt-tab-item>
 	</mt-navbar>
 	<mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
 	             bottomPullText="加载更多"   ref="loadmore">
 	<ul class="coupons-list">
-		<li>
+		<li v-for="item in list">
 			<div class="content">
 				<div class="left">
-					<p>修车抵用券</p>
-					<span>有效期：2019.03.15-2019.03.15</span>
+					<p>{{item.name}}</p>
+					<span>有效期：{{item.startDate}}-{{item.endDate}}</span>
 				</div>
 				<i></i>
 				<div class="right">
-					<router-link tag="div" to="/coupons-detail" class="button">查看详情</router-link>
+					<router-link tag="div" :to="'/coupons-detail?code='+item.code+'&use='+item.isuse" class="button">查看详情</router-link>
 					<!--<div class="tag">-->
-						<!--<p>已领取</p>-->
+					<!--<p>已领取</p>-->
 					<!--</div>-->
 					<!--<div class="times">-->
 						<!--<p>已核销数</p>-->
@@ -38,7 +38,7 @@ export default {
 	name: "my-coupons",
 	data(){
 		return{
-			selected: 'can',
+			selected: 'can-1',
 			list:[],
 			page: 1,
 			total: 0,
@@ -61,10 +61,11 @@ export default {
 		getList(flag){
 			let params={
 				page: this.page-1,
-				size: 10
+				size: 10,
+                status:parseInt(this.selected[this.selected.length - 1])
 			}
-			if(this.selected) params.hasRead= this.selected
-			this.axios.get('/monitoring/message/company-docking/query/companyCode',{params: params}).then(res=>{
+			// if(this.selected) params.hasRead= this.selected
+			this.axios.get('/promotion/user_coupon/query',{params: params}).then(res=>{
 				this.total= res.data.totalElements
 				if(res.data.content&&res.data.content.length){
 					this.list=this.list.concat(res.data.content)

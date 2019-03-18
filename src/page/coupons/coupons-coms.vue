@@ -3,9 +3,9 @@
 	<mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
 	             bottomPullText="加载更多"   ref="loadmore">
 	<ul class="list">
-		<li>
-			<p>上海申海汽车修理有限公司</p>
-			<span>徐汇区龙华西路1号</span>
+		<li v-for="item in list">
+			<p>{{item.name}}</p>
+			<span>{{item.address}}</span>
 		</li>
 	</ul>
 	</mt-loadmore>
@@ -21,18 +21,17 @@ export default {
 			page: 1,
 			total: 0,
 			allLoaded: false,
+			companyId:[],
 		}
 	},
 	watch:{
-		selected(val){
-			// console.log(val)
-			// this.allLoaded= false
-			this.page=1
-			this.list=[]
-			this.getList()
-		}
+
 	},
 	mounted(){
+	    this.companyId = this.$route.query.id.split(',');
+	    this.companyId = this.companyId.map(function(i){
+	        return parseInt(i);
+		});
 		this.getList(false)
 	},
 	methods:{
@@ -41,21 +40,23 @@ export default {
 				page: this.page-1,
 				size: 10
 			}
+			console.log(this.companyId);
 			if(this.selected) params.hasRead= this.selected
-			this.axios.get('/monitoring/message/company-docking/query/companyCode',{params: params}).then(res=>{
-				this.total= res.data.totalElements
-				if(res.data.content&&res.data.content.length){
-					this.list=this.list.concat(res.data.content)
-					// this.list=res.data.comments
-					if(this.list.length>=res.data.totalElements){
-						this.allLoaded=true
-					}else{
-						this.allLoaded=false
-					}
-					if(flag) this.$refs.loadmore.onBottomLoaded()
-				}else{
-					this.allLoaded=true
-				}
+			this.axios.post('/corp/info/list',this.companyId).then(res=>{
+			    if(res.data.code == 0) this.list = res.data.items;
+				// this.total= res.data.totalElements
+				// if(res.data.content&&res.data.content.length){
+				// 	this.list=this.list.concat(res.data.content)
+				// 	// this.list=res.data.comments
+				// 	if(this.list.length>=res.data.totalElements){
+				// 		this.allLoaded=true
+				// 	}else{
+				// 		this.allLoaded=false
+				// 	}
+				// 	if(flag) this.$refs.loadmore.onBottomLoaded()
+				// }else{
+				// 	this.allLoaded=true
+				// }
 			})
 		},
 		loadMore(){

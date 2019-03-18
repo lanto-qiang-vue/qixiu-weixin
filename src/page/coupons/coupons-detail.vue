@@ -11,7 +11,7 @@
 				<div class="right">
 					<!--<div class="button on">查看详情</div>-->
 					<div class="tag">
-					<p>已领取</p>
+					<p>{{useList[use - 1]}}</p>
 					</div>
 					<!--<div class="times">-->
 					<!--<p>已核销数</p>-->
@@ -29,19 +29,19 @@
 			</div>
 		</FormItem>
 		<FormItem label="优惠券兑换码">
-			<Input v-model="detail.name" :readonly="true"></Input>
+			<Input v-model="detail.code" :readonly="true"></Input>
 		</FormItem>
-		<FormItem label="使用日期">
-			<Input v-model="detail.name" :readonly="true"></Input>
+		<FormItem label="使用日期" v-show="use == 2">
+			<Input v-model="detail.spendingDate" :readonly="true"></Input>
 		</FormItem>
-		<FormItem label="使用门店">
-			<Input v-model="detail.name" :readonly="true"></Input>
+		<FormItem label="使用门店" v-show="use == 2">
+			<Input v-model="detail.spendingCompanyName" :readonly="true"></Input>
 		</FormItem>
-		<FormItem label="门店地址">
-			<Input v-model="detail.name" :readonly="true"></Input>
+		<FormItem label="门店地址" v-show="use == 2">
+			<Input v-model="detail.spendingCompanyAddress" :readonly="true"></Input>
 		</FormItem>
 		<FormItem label="适用门店">
-			<router-link tag="span" to="/coupons-coms" class="ivu-input half select"></router-link>
+			<router-link tag="span" :to="'/coupons-coms?id='+detail.companyIds" class="ivu-input half select"></router-link>
 		</FormItem>
 	</Form>
 	<Form class="common-form" :label-width="100" label-position="left" ref="form">
@@ -57,25 +57,40 @@
 	</Form>
 </div>
 </template>
-
 <script>
 import qrcode from '~/public/static/lib/qrcode.js'
 export default {
 	name: "coupons-detail",
 	data(){
 		return{
+		    code:'',
+			use:1,
+			// 1 已领取 2 已使用 3 已过期
+			useList:['已领取','已使用','已过期'],
 			detail:{
 				name: 'ssssxxxx',
+				code:'',
+                companyIds:'',
 			},
 			img: ''
 		}
 	},
+	methods:{
+	    getList(code){
+            this.axios.get('/promotion/user_coupon/'+code).then(res=>{
+                  this.detail = res.data;
+			});
+		}
+	},
 	mounted(){
+		this.detail.code = this.$route.query.code || '';
+		this.use = this.$route.query.use;
 		let qr = new qrcode({
-			text: window.location.origin+'/#'+'/check-coupons'
+            text: window.location.origin+'/#'+'/check-coupons?code='+this.detail.code
 		});
-		this.img =  qr.toDataURL("image/png");
-	}
+        this.img =  qr.toDataURL("image/png");
+        this.getList(this.detail.code);
+	},
 }
 </script>
 

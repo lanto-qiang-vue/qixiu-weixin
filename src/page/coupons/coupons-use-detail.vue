@@ -1,48 +1,39 @@
 <template>
 <div class="discounts-list">
+    <mt-datetime-picker
+            ref="picker"
+            type="date"
+            @confirm="callback"
+            v-model="pickerValue">
+    </mt-datetime-picker>
     <div class="head">
-		<div class="area" >核销日期</div>
+		<div class="area" @click="openPicker">核销日期&nbsp;&nbsp;{{time}}</div><div v-show="time!= ''" @click="time = '',list = [],page = 1,getList(false)">x</div>
 	</div>
-    <div class="menu">
+    <mt-loadmore :bottom-method="loadMore" :bottom-all-loaded="allLoaded" :autoFill="false"
+                 bottomPullText="加载更多"   ref="loadmore">
+        <div style="clear:both;"></div>
+    <div class="menu" v-for="item in list">
         <div class="use-header">
-            <span class="use-header-left">修车抵用券</span>
+            <span class="use-header-left">{{item.name}}</span>
         </div>
-        <Form class="common-form " :label-width="90" :model="detail" label-position="left" ref="form">
+        <Form class="common-form " :label-width="90"  label-position="left" ref="form">
             <FormItem label="有效期">
-                <Input v-model="detail.date" placeholder="" :readonly="true"></Input>
+                <Input :value="item.startDate + '-' + item.endDate" placeholder="" :readonly="true"></Input>
             </FormItem>
             <FormItem label="优惠券兑换码">
-                <Input v-model="detail.code" placeholder="输入优惠券兑换码" class="form-input"></Input>
+                <Input :value="item.code" :readonly="true" placeholder="输入优惠券兑换码" class="form-input"></Input>
             </FormItem>
             <FormItem label="核销时间">
-                <Input v-model="detail.date" placeholder="" :readonly="true"></Input>
+                <Input :value="item.spendingDate" placeholder="" :readonly="true"></Input>
             </FormItem>
         </Form>
     </div>
-    <div class="menu">
-        <div class="use-header">
-            <span class="use-header-left">修车抵用券</span>
-        </div>
-        <Form class="common-form" :label-width="90" :model="detail" label-position="left" ref="form">
-            <FormItem label="有效期">
-                <Input v-model="detail.date" placeholder="" :readonly="true"></Input>
-            </FormItem>
-            <FormItem label="优惠券兑换码">
-                <Input v-model="detail.code" placeholder="输入优惠券兑换码" class="form-input"></Input>
-            </FormItem>
-            <FormItem label="核销时间">
-                <Input v-model="detail.date" placeholder="" :readonly="true"></Input>
-            </FormItem>
-        </Form>
-    </div>
-	
-
-
+    </mt-loadmore>
 </div>
 </template>
 
 <script>
-import { MessageBox } from 'mint-ui';
+import { MessageBox,DatetimePicker } from 'mint-ui';
 export default {
 	name: "coupons-use-detail",
 	data(){
@@ -51,7 +42,10 @@ export default {
 				code: '',
                 date:'2019.03.15-2019.03.18'
 			},
+            pickerValue:new Date(),
+            time:'',
 			list:[],
+            id:'',
 			page: 1,
 			total: 0,
 			allLoaded: false,
@@ -61,10 +55,54 @@ export default {
 		
 	},
 	mounted(){
-		
+		this.id = this.$route.query.id || "";
+		this.getList(false);
 	},
 	methods:{
-		
+        loadMore(){
+            this.page++;
+            this.getList(true);
+        },
+	    getList(flag){
+            let params={
+                page: this.page-1,
+                size: 10,
+                type:this.id,
+                spendingDate:this.time,
+            }
+            // /promotion/consume/coupon/query/company
+            this.axios.get('/promotion/consume/coupon/query/company',{params:params}).then(res=>{
+                this.total = res.data.totalElements
+                if (res.data.content && res.data.content.length) {
+                    this.list = this.list.concat(res.data.content)
+                    if (this.list.length >= res.data.totalElements) {
+                        this.allLoaded = true
+                    } else {
+                        this.allLoaded = false
+                    }
+                    if (flag) this.$refs.loadmore.onBottomLoaded()
+                } else {
+                    this.allLoaded = true
+                }
+            });
+        },
+        callback(value){
+            this.time = this.toString(value);
+            this.list = [];
+            this.page = 1;
+            this.getList(false);
+        },
+        toString(date){
+            if(date == "") return "";
+            return date.getFullYear() + "-" + this.fill((date.getMonth() + 1)) + "-" + this.fill(date.getDate());
+        },
+        fill(val){
+	        if(parseInt(val) < 10) return '0'+val;
+	        return val;
+        },
+        openPicker() {
+            this.$refs.picker.open();
+        }
 	}
 }
 </script>
@@ -105,7 +143,7 @@ export default {
 		}
 	}
     .menu{
-        background: #fff;
+        background: white;
         margin-bottom: 8px;
         .common-form{
             border-bottom: 0;

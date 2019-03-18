@@ -4,8 +4,8 @@ import router from './router'
 import { Toast, Indicator, Popup } from 'mint-ui'
 import { isWeixn} from './util'
 
-// axios 配置
-axios.defaults.timeout = 60000;
+// axios 配置;
+axios.defaults.timeout = 60000
 
 // console.log(process.env.NODE_ENV)
 let doing= false
