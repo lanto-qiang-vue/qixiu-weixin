@@ -386,5 +386,8 @@ export default {
 	  }
 
   }
+	  .mui-table-view-cell:after{
+		  height: 0;
+	  }
 }
 </style>
