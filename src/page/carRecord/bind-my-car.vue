@@ -564,6 +564,7 @@ export default{
 			if(!this.travelLicense.id) return Toast('请上传行驶证')
 			if(!this.travelLicenseChange){
 				for(let key in this.travelLicense){
+					if(key=='binding') continue
 					if(!this.travelLicense[key]) return Toast('行驶证有空值，请修改')
 				}
 			}
