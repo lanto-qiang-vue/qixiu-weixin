@@ -119,7 +119,7 @@
 		  </ul>
 	  </div>
 
-	  <div class="info" v-show="business.id">
+	  <div class="info" v-show="business.businessId || business.id">
 		  <div class="head">
 			  <p>营业执照识别信息</p>
 			  <span @click="showPopover('business')" v-show="editable">修改</span>
@@ -341,6 +341,12 @@ export default{
 
 					this.travelLicense= item.travelLicense
 					this.travelLicenseRevise= item.travelLicenseRevise
+
+				    this.travelLicense.issueDate= item.travelLicense.issueDateStr
+				    this.travelLicense.registerDate= item.travelLicense.registerDateStr
+				    this.travelLicenseRevise.issueDate= item.travelLicenseRevise.issueDateStr
+				    this.travelLicenseRevise.registerDate= item.travelLicenseRevise.registerDateStr
+
 				    this.drivePic= item.travelLicense.frontImageUrl
 				    if(item.ownerType==1 && item.idCard){
 					    this.idCard= item.idCard
@@ -357,7 +363,7 @@ export default{
 	    },
     	getId(){
 			this.axios.get('/scan/getCard').then(res=>{
-				if(res.data.code==='0'){
+				if(res.data.code==='0' && res.data.item){
 					this.hasId= true
 					let item= res.data.item
 					this.idCard= item
@@ -473,6 +479,7 @@ export default{
 						Toast('此行驶证已被绑定，请上传营业执照')
 						this.needOthers= true
 					}
+					document.body.scrollTop = document.documentElement.scrollTop = 0
 				}
 			})
 		},
@@ -505,6 +512,7 @@ export default{
 				case 'business':{
 					url= '/businesslicense/update'
 					data= this.businessRevise
+					data.id= this.businessRevise.businessId
 					break
 				}
 			}
