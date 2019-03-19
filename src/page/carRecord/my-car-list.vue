@@ -9,10 +9,10 @@
         <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
           <ul>
             <li @click="goRecordList(item.vin, item.status, item.vehicleplatenumber, item.id, item.ownerType)" class="block mui-table-view-cell mui-transitioning" v-for='(item, index) in carList' :key='index'>
-              <div class="mui-slider-right mui-disabled">
-                <a class="mui-btn mui-btn-red" style="transform: translate(0px, 0px);" v-if="item.binds&&item.binds.length" @click.stop.prevent="removeAuthorize(item.binds)">解除授权</a>
-                <a class="mui-btn mui-btn-yellow" style="transform: translate(0px, 0px);" @click.stop="deleteVehicle(item.vehicleId)">解绑车辆</a>
-              </div>
+              <!--<div class="mui-slider-right mui-disabled">-->
+                <!--<a class="mui-btn mui-btn-red" style="transform: translate(0px, 0px);" v-if="item.binds&&item.binds.length" @click.stop.prevent="removeAuthorize(item.binds)">解除授权</a>-->
+                <!--<a class="mui-btn mui-btn-yellow" style="transform: translate(0px, 0px);" @click.stop="deleteVehicle(item.vehicleId)">解绑车辆</a>-->
+              <!--</div>-->
               <div class="mui-slider-handle" style="transform: translate(0px, 0px);">
                 <div class="title">
                   <img style="width: 15px; height: 15px;" src="~@/assets/img//record/list.png"/>
@@ -29,7 +29,7 @@
                 </div>
               </div>
 	            <div class="remove">
-		            <div class="button" @click.stop.prevent="deleteVehicle(item.vehicleId)">解绑</div>
+		            <div class="button" @click.stop.prevent="deleteVehicle(item.id)">解绑</div>
 		            <div class="button" v-if="item.self &&item.binds && item.binds.length"
 		                 @click.stop.prevent="removeAuthorize(item.binds, item.vehicleplatenumber)">解除授权</div>
 	            </div>
@@ -208,7 +208,7 @@ export default {
         }).then(res => {
             if(res.data.code === '0') {
               Toast('解绑成功!');
-              this.getData({keyCode: '13'})
+	            this.getData(1)
             } else {
               Toast(res.data.status);
             }

@@ -6,10 +6,10 @@
 		  <div class="title"><i></i>行驶证正面照片<i></i></div>
 
 		  <div class="imgBlock">
-			  <div :class="['img',{nobg: drivePic}]">
+			  <div :class="['img',{nobg: drivePic}]" @click="clickImg('upTravelLicense',drivePic)">
 				  <img v-img v-show="drivePic" :src="drivePic">
 			  </div>
-			  <p @click="$refs.upTravelLicense.clickBox()" v-show="editable">拍摄正面</p>
+			  <p @click.stop.prevent="$refs.upTravelLicense.clickBox()" v-show="editable">拍摄正面</p>
 		  </div>
 		  <upload operate='base64' @done="upTravelLicense" ref="upTravelLicense"></upload>
 	  </div>
@@ -18,11 +18,11 @@
 		<div class="title"><i></i>身份证正面照片<i></i></div>
 		<p>若您上传了非本人的身份证, 您将无法绑定您名下的车辆</p>
 
-		<div class="imgBlock">
-			<div :class="['img',{nobg: idPic}]">
+		<div class="imgBlock" >
+			<div :class="['img',{nobg: idPic}]" @click="clickImg('upIdCard', idPic)">
 				<img v-img v-show="idPic" :src="idPic">
 			</div>
-			<p @click="$refs.upIdCard.clickBox()" v-show="editable &&!hasId">拍摄正面</p>
+			<p @click.stop.prevent="$refs.upIdCard.clickBox()" v-show="editable &&!hasId">拍摄正面</p>
 		</div>
 		<upload operate='base64' @done="upIdCard" ref="upIdCard"></upload>
 	</div>
@@ -31,10 +31,10 @@
 		  <div class="title"><i></i>营业执照正面照片<i></i></div>
 
 		  <div class="imgBlock">
-			  <div :class="['img',{nobg: businessPic}]">
+			  <div :class="['img',{nobg: businessPic}]" @click="clickImg('upBusiness', businessPic)">
 				  <img v-img v-show="businessPic" :src="businessPic">
 			  </div>
-			  <p @click="$refs.upBusiness.clickBox()" v-show="editable">拍摄正面</p>
+			  <p @click.stop.prevent="$refs.upBusiness.clickBox()" v-show="editable">拍摄正面</p>
 		  </div>
 		  <upload operate='base64' @done="upBusiness" ref="upBusiness"></upload>
 	  </div>
@@ -165,7 +165,7 @@
 
     <mt-popup v-model="popupShow" position="right" class="popup">
 	    <Form :class="['common-form']" v-show="popType=='travelLicense'" :model="travelLicenseRevise"
-	          :label-width="100" label-position="left" ref="travelLicenseRevise">
+	          :label-width="100" label-position="left" ref="travelLicenseRevise" :rules="travelLicenseReviseRule">
 		    <FormItem label="所有人" prop="ownerName">
 			    <Input v-model.trim="travelLicenseRevise.ownerName" placeholder="更改所有人"></Input>
 		    </FormItem>
@@ -199,7 +199,7 @@
 	    </Form>
 
 	    <Form :class="['common-form']" v-show="popType=='idCard'" :model="idCardRevise"
-	          :label-width="100" label-position="left" ref="idCardRevise">
+	          :label-width="100" label-position="left" ref="idCardRevise" :rules="idCardReviseRule">
 		    <FormItem label="姓名" prop="ownerName">
 			    <Input v-model.trim="idCardRevise.ownerName" placeholder="更改姓名"></Input>
 		    </FormItem>
@@ -209,7 +209,7 @@
 	    </Form>
 
 	    <Form :class="['common-form']" v-show="popType=='business'" :model="businessRevise"
-	          :label-width="100" label-position="left" ref="businessRevise">
+	          :label-width="100" label-position="left" ref="businessRevise" :rules="businessReviseRule">
 		    <FormItem label="企业名称" prop="corpName">
 			    <Input v-model.trim="businessRevise.corpName" placeholder="更改企业名称"></Input>
 		    </FormItem>
@@ -219,7 +219,7 @@
 	    </Form>
 
           <div class="button-block">
-            <mt-button @click="popupShow= false" type="danger" size="large"
+            <mt-button @click="modifyCancel" type="danger" size="large"
                        class="button">取消</mt-button>
             <mt-button @click="modify" type="primary" size="large"
                        class="button">确定</mt-button>
@@ -256,20 +256,41 @@ export default{
     name: "personUpload",
     components: {Upload},
     data(){
+	    let rule= { required: true, message:'必填项不能为空'}
+	    let travelLicenseReviseRule={}, idCardReviseRule={}, businessReviseRule={}
+	    for(let key in travelLicense){
+		    travelLicenseReviseRule[key]= [rule]
+	    }
+	    for(let key in idCard){
+		    idCardReviseRule[key]= [rule]
+	    }
+	    for(let key in business){
+		    businessReviseRule[key]= [rule]
+	    }
 	    return {
 		    status: '4',
 		    auditFailInfo: '',
 	        popType: 'travelLicense',
 		    popupShow: false,
+
 		    travelLicense: {},
 		    travelLicenseRevise: deepClone(travelLicense),
 		    idCard: {},
 		    idCardRevise: deepClone(idCard),
 		    business: {},
 		    businessRevise: deepClone(business),
+
+		    travelLicenseReviseRule: travelLicenseReviseRule,
+		    idCardReviseRule: idCardReviseRule,
+		    businessReviseRule: businessReviseRule,
+
 		    drivePic:'',
 		    idPic:'',
 		    businessPic:'',
+
+		    travelLicenseChange: false,
+		    idCardChange: false,
+		    businessChange: false,
 
 		    needOthers: false,
 		    hasId: false
@@ -374,6 +395,11 @@ export default{
 				}
 			})
 	    },
+		clickImg(ref, img){
+    		if(!img){
+			    this.$refs[ref].clickBox()
+		    }
+		},
 		upTravelLicense(base64){
 			this.identifyDriveLicense(base64)
 		},
@@ -443,50 +469,6 @@ export default{
 			})
 		},
 
-		Bind(){
-			if(!this.travelLicense.id) return Toast('请上传行驶证')
-			let data={
-				licenseId: this.travelLicense.id,
-			}
-			if(this.isPerson){
-				data.ownerType= 1
-				if(this.needOthers){
-					if(!this.idCard.creditId){
-						return Toast('请上传身份证正面')
-					}
-				}
-				if(this.idCard.creditId) data.idCardId= this.idCard.creditId
-			}else{
-				data.ownerType= 2
-				if(this.needOthers){
-					if(!this.business.id){
-						return Toast('请上传营业执照')
-					}else{
-						data.businessId= this.business.id
-					}
-				}
-			}
-			if(this.pageId) data.vehicleId= this.pageId
-			this.axios({
-				url: '/scan/newBind',
-				method: 'post',
-				data: data}).then(res=>{
-				if(res.data.code==='0'){
-					Toast('绑定成功')
-					this.$router.go(-1)
-				}else if(res.data.code==='10002'){
-					if(this.isPerson){
-						Toast('此行驶证已被绑定，请上传身份证')
-						this.needOthers= true
-					}else{
-						Toast('此行驶证已被绑定，请上传营业执照')
-						this.needOthers= true
-					}
-					document.body.scrollTop = document.documentElement.scrollTop = 0
-				}
-			})
-		},
-
 		showPopover(type){
 			MessageBox.confirm('修改后需要审核通过才能查看汽车档案').then(action => {
 				this.popType= type
@@ -497,7 +479,22 @@ export default{
 		cancel(target){
 			$(target).hide()
 		},
-
+		modifyCancel(){
+			switch (this.popType){
+				case 'travelLicense':{
+					this.travelLicenseRevise= deepClone(this.idCard)
+					break
+				}
+				case 'idCard':{
+					this.idCardRevise= deepClone(this.idCard)
+					break
+				}
+				case 'business':{
+					this.businessRevise= deepClone(this.business)
+					break
+				}
+			}
+		},
 		modify(){
 			let url= '', data= null
 			switch (this.popType){
@@ -523,10 +520,84 @@ export default{
 				if(res.data.code==='0'){
 					Toast('修改成功')
 					this.popupShow= false
+
+					switch (this.popType){
+						case 'travelLicense':{
+							this.travelLicenseChange= true
+							break
+						}
+						case 'idCard':{
+							this.idCardChange= true
+							break
+						}
+						case 'business':{
+							this.businessChange= true
+							break
+						}
+					}
 				}
 			})
 		},
 
+		Bind(){
+			if(!this.travelLicense.id) return Toast('请上传行驶证')
+			if(!this.travelLicenseChange){
+				for(let key in this.travelLicense){
+					if(!this.travelLicense[key]) return Toast('行驶证有空值，请修改')
+				}
+			}
+			let data={
+				licenseId: this.travelLicense.id,
+			}
+			if(this.isPerson){
+				data.ownerType= 1
+				if(this.needOthers){
+					if(!this.idCard.creditId){
+						return Toast('请上传身份证正面')
+					}
+				}
+				if(!this.idCardChange){
+					if(!this.idCard.ownerName || !this.idCard.idCardNo) return Toast('身份证有空值，请修改')
+				}
+				if(this.idCard.creditId) data.idCardId= this.idCard.creditId
+			}else{
+				data.ownerType= 2
+				if(this.needOthers){
+					if(!this.business.id){
+						return Toast('请上传营业执照')
+					}else{
+						data.businessId= this.business.id
+					}
+				}
+				if(!this.businessChange){
+					if(!this.business.corpName || !this.business.legalPerson) return Toast('营业执照有空值，请修改')
+				}
+			}
+			if(this.pageId) data.vehicleId= this.pageId
+
+
+
+
+
+			this.axios({
+				url: '/scan/newBind',
+				method: 'post',
+				data: data}).then(res=>{
+				if(res.data.code==='0'){
+					Toast('绑定成功')
+					this.$router.go(-1)
+				}else if(res.data.code==='10002'){
+					if(this.isPerson){
+						Toast('此行驶证已被绑定，请上传身份证')
+						this.needOthers= true
+					}else{
+						Toast('此行驶证已被绑定，请上传营业执照')
+						this.needOthers= true
+					}
+					document.body.scrollTop = document.documentElement.scrollTop = 0
+				}
+			})
+		},
 	}
 }
 </script>
