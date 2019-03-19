@@ -146,7 +146,7 @@
 					    <!--<span>{{businessStatus(item.status)}}</span>-->
 
 					    <!--<span class="orange">{{item.grade=='N' ?'未评级' :item.grade}}</span>-->
-					    <p style="margin: 0">{{ item.name.split('(')[0] }}<span style="color: #fa8c16">{{item.grade=='N' ?'未评' :item.grade}}级</span><small>（{{gradeText(item.grade)}}）</small></p>
+					    <p style="margin: 0;overflow: visible;">{{ item.name.split('(')[0] }}<span style="color: #fa8c16;margin-left: 5px">{{item.grade=='N' ?'未评' :item.grade}}级</span><small>（{{gradeText(item.grade)}}）</small></p>
 					    <div class="address">{{ item.name.substring(item.name.indexOf('('), item.name.length)  }}</div>
 					    <div class="address">
 						    <span class="miles">{{ item.distance.toFixed(1) }}km</span>
