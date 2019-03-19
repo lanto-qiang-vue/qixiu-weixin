@@ -176,7 +176,7 @@
 			    <Input v-model.trim="travelLicenseRevise.vin" placeholder="更改车架号(VIN)"></Input>
 		    </FormItem>
 		    <FormItem label="发证日期" prop="issueDate">
-			    <Input v-model.trim="travelLicenseRevise.issueDate"></Input>
+			    <Input v-model.trim="travelLicenseRevise.issueDate" @on-focus="showDate('issueDate')"></Input>
 		    </FormItem>
 		    <FormItem label="发动机号" prop="engineNo">
 			    <Input v-model.trim="travelLicenseRevise.engineNo"></Input>
@@ -188,7 +188,7 @@
 			    <Input v-model.trim="travelLicenseRevise.brandModel"></Input>
 		    </FormItem>
 		    <FormItem label="注册日期" prop="registerDate">
-			    <Input v-model.trim="travelLicenseRevise.registerDate"></Input>
+			    <Input v-model.trim="travelLicenseRevise.registerDate" @on-focus="showDate('registerDate')"></Input>
 		    </FormItem>
 		    <FormItem label="使用性质" prop="useNature">
 			    <Input v-model.trim="travelLicenseRevise.useNature"></Input>
@@ -225,13 +225,23 @@
                        class="button">确定</mt-button>
           </div>
     </mt-popup>
+
+	  <mt-datetime-picker
+			  v-model="dateVal"
+			  ref="picker"
+			  type="date"
+			  year-format="{value} 年"
+			  month-format="{value} 月"
+			  date-format="{value} 日"
+			  @confirm="dateSelect">
+	  </mt-datetime-picker>
   </div>
 </template>
 
 <script>
 import { Field, Button, Toast, MessageBox, Popup } from 'mint-ui'
 import Upload from '@/page/components/compress-upload.vue'
-import {deepClone} from '@/util.js'
+import {deepClone, formatDate} from '@/util.js'
 let travelLicense= {
 	ownerName: '',
 	vehiclePlateNumber: '',
@@ -293,7 +303,10 @@ export default{
 		    businessChange: false,
 
 		    needOthers: false,
-		    hasId: false
+		    hasId: false,
+
+		    dateVal: new Date(),
+		    dateField: ''
 		}
     },
 	computed:{
@@ -475,14 +488,21 @@ export default{
 				this.popupShow= true
 			})
 		},
-
-		cancel(target){
-			$(target).hide()
+		showDate(field){
+    		let data= this.travelLicenseRevise[field]
+			this.dateField= field
+    		if(data) this.dateVal= new Date(this.travelLicenseRevise[field].replace(/-/g,'/'))
+			else this.dateVal= new Date()
+			this.$refs.picker.open();
+		},
+		dateSelect(val){
+			console.log(val)
+			this.travelLicenseRevise[this.dateField]= formatDate(val, 'yyyy-MM-dd')
 		},
 		modifyCancel(){
 			switch (this.popType){
 				case 'travelLicense':{
-					this.travelLicenseRevise= deepClone(this.idCard)
+					this.travelLicenseRevise= deepClone(this.travelLicense)
 					break
 				}
 				case 'idCard':{
@@ -494,6 +514,7 @@ export default{
 					break
 				}
 			}
+			this.popupShow= false
 		},
 		modify(){
 			let url= '', data= null
@@ -555,9 +576,9 @@ export default{
 					if(!this.idCard.creditId){
 						return Toast('请上传身份证正面')
 					}
-				}
-				if(!this.idCardChange){
-					if(!this.idCard.ownerName || !this.idCard.idCardNo) return Toast('身份证有空值，请修改')
+					if(!this.idCardChange){
+						if(!this.idCard.ownerName || !this.idCard.idCardNo) return Toast('身份证有空值，请修改')
+					}
 				}
 				if(this.idCard.creditId) data.idCardId= this.idCard.creditId
 			}else{
@@ -568,10 +589,11 @@ export default{
 					}else{
 						data.businessId= this.business.id
 					}
+					if(!this.businessChange){
+						if(!this.business.corpName || !this.business.legalPerson) return Toast('营业执照有空值，请修改')
+					}
 				}
-				if(!this.businessChange){
-					if(!this.business.corpName || !this.business.legalPerson) return Toast('营业执照有空值，请修改')
-				}
+
 			}
 			if(this.pageId) data.vehicleId= this.pageId
 
