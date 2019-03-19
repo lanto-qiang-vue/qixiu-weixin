@@ -230,6 +230,8 @@
 			  v-model="dateVal"
 			  ref="picker"
 			  type="date"
+			  :startDate="new Date('1990/01/01')"
+			  :endDate="new Date('2050/01/01')"
 			  year-format="{value} 年"
 			  month-format="{value} 月"
 			  date-format="{value} 日"
