@@ -153,7 +153,7 @@ export default {
 			query+= ('&sort=gradeLevel asc,distance asc')
 			if(this.search.lng) {
 				let point=('&point='+this.search.lat+','+this.search.lng)
-				if(this.localSuccess && (this.search.area=='310000'||!this.search.area)) point+= ',10'
+				if(this.localSuccess && (this.search.area=='310000'||!this.search.area) && !this.search.q) point+= ',10'
 				query+= point
 			}
 			let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
