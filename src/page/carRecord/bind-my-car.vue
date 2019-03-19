@@ -401,17 +401,20 @@ export default{
 				"property": type
 			}}).then(res => {
 				if(res.data.code==='0'){
+					let item= res.data.item
 					switch (type){
 						case 1:{
 							this.idPic= base64
-							this.idCard= res.data.item
-							this.idCardRevise= deepClone(res.data.item)
+							item.id= item.creditId
+							this.idCard= item
+							this.idCardRevise= deepClone(item)
 							break
 						}
 						case 3:{
 							this.businessPic= base64
-							this.business= res.data.item
-							this.businessRevise= deepClone(res.data.item)
+							item.id= item.businessId
+							this.business= item
+							this.businessRevise= deepClone(item)
 							break
 						}
 					}
