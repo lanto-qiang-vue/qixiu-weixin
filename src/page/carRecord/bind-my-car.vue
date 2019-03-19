@@ -1,49 +1,49 @@
 <template>
   <div id="personUpload">
 	  <div :class="['status', 'statu'+status]" v-show="statusText">{{statusText}}</div>
-	  <div class="err-info" v-show="status==3">不通过原因：{{status}}</div>
+	  <div class="err-info" v-show="status==3">不通过原因：{{auditFailInfo}}</div>
 	  <div class="upBlock drive">
-		  <div class="title"><i></i>请上传行驶证正面<i></i></div>
+		  <div class="title"><i></i>行驶证正面照片<i></i></div>
 
 		  <div class="imgBlock">
 			  <div :class="['img',{nobg: drivePic}]">
 				  <img v-img v-show="drivePic" :src="drivePic">
 			  </div>
-			  <p @click="$refs.upTravelLicense.clickBox()">拍摄正面</p>
+			  <p @click="$refs.upTravelLicense.clickBox()" v-show="editable">拍摄正面</p>
 		  </div>
 		  <upload operate='base64' @done="upTravelLicense" ref="upTravelLicense"></upload>
 	  </div>
 
-	<div class="upBlock id">
-		<div class="title"><i></i>请上传您的身份证照片<i></i></div>
+	<div class="upBlock id" v-if="isPerson" v-show="needOthers || idCard.id">
+		<div class="title"><i></i>身份证正面照片<i></i></div>
 		<p>若您上传了非本人的身份证, 您将无法绑定您名下的车辆</p>
 
 		<div class="imgBlock">
 			<div :class="['img',{nobg: idPic}]">
 				<img v-img v-show="idPic" :src="idPic">
 			</div>
-			<p @click="$refs.upIdCard.clickBox()">拍摄正面</p>
+			<p @click="$refs.upIdCard.clickBox()" v-show="editable &&!hasId">拍摄正面</p>
 		</div>
 		<upload operate='base64' @done="upIdCard" ref="upIdCard"></upload>
 	</div>
 
-	  <div class="upBlock business">
-		  <div class="title"><i></i>请上传营业执照正面<i></i></div>
+	  <div class="upBlock business" v-if="!isPerson" v-show="needOthers || business.id">
+		  <div class="title"><i></i>营业执照正面照片<i></i></div>
 
 		  <div class="imgBlock">
 			  <div :class="['img',{nobg: businessPic}]">
 				  <img v-img v-show="businessPic" :src="businessPic">
 			  </div>
-			  <p @click="$refs.upBusiness.clickBox()">拍摄正面</p>
+			  <p @click="$refs.upBusiness.clickBox()" v-show="editable">拍摄正面</p>
 		  </div>
 		  <upload operate='base64' @done="upBusiness" ref="upBusiness"></upload>
 	  </div>
 
 	  <!--<div class="info" v-show="showDriveLicenseInfo">-->
-	  <div class="info" v-show="true">
+	  <div class="info" v-show="travelLicense.id">
 		  <div class="head">
 			  <p>行驶证识别信息</p>
-			  <span @click="showPopover('travelLicense')">修改</span>
+			  <span @click="showPopover('travelLicense')" v-show="editable">修改</span>
 		  </div>
 		  <ul>
 			  <li>
@@ -100,10 +100,10 @@
 	  </div>
 
 	  <!--<div class="info" v-show="showIDCardUpInfo">-->
-	  <div class="info" v-show="true">
+	  <div class="info" v-show="idCard.creditId || idCard.id">
 		  <div class="head">
 			  <p>身份证正面识别信息</p>
-			  <span @click="showPopover('idCard')">修改</span>
+			  <span @click="showPopover('idCard')" v-show="editable &&!hasId">修改</span>
 		  </div>
 		  <ul>
 			  <li>
@@ -119,10 +119,10 @@
 		  </ul>
 	  </div>
 
-	  <div class="info" v-show="true">
+	  <div class="info" v-show="business.id">
 		  <div class="head">
 			  <p>营业执照识别信息</p>
-			  <span @click="showPopover('business')">修改</span>
+			  <span @click="showPopover('business')" v-show="editable">修改</span>
 		  </div>
 		  <ul>
 			  <li>
@@ -161,7 +161,7 @@
 		  </div>
 	  </div>
 
-	<div class="submit" @click="Bind">确定</div>
+	<div class="submit" @click="Bind" v-show="editable">提交绑定</div>
 
     <mt-popup v-model="popupShow" position="right" class="popup">
 	    <Form :class="['common-form']" v-show="popType=='travelLicense'" :model="travelLicenseRevise"
@@ -257,6 +257,8 @@ export default{
     components: {Upload},
     data(){
 	    return {
+		    status: '4',
+		    auditFailInfo: '',
 	        popType: 'travelLicense',
 		    popupShow: false,
 		    travelLicense: {},
@@ -265,10 +267,12 @@ export default{
 		    idCardRevise: deepClone(idCard),
 		    business: {},
 		    businessRevise: deepClone(business),
-		    status: '2',
 		    drivePic:'',
 		    idPic:'',
 		    businessPic:'',
+
+		    needOthers: false,
+		    hasId: false
 		}
     },
 	computed:{
@@ -278,6 +282,9 @@ export default{
 		// status(){
 		// 	return this.status.toString()
 		// },
+		editable(){
+			return this.status!='1' && this.status!='2'
+		},
 		statusText(){
 			let text= ''
 			switch (this.status){
@@ -291,35 +298,76 @@ export default{
 					text= '审核不通过';break
 				}
 				default :{
-					text= '新建';break
+					text= '新增';break
 				}
 			}
 			return text
 		},
+		showChangeCar(){
+    		return (field)=>{
+    			return this.travelLicenseRevise[field]!= this.travelLicense[field]? this.travelLicenseRevise[field]: false
+		    }
+		},
+		showChangeId(){
+    		return (field)=>{
+    			return this.idCardRevise[field]!= this.idCard[field]? this.idCardRevise[field]: false
+		    }
+		},
+		showChangeBus(){
+    		return (field)=>{
+    			return this.businessRevise[field]!= this.business[field]? this.businessRevise[field]: false
+		    }
+		},
+		pageId(){
+    		return this.$route.query&& this.$route.query.id? this.$route.query.id: null
+		}
 	},
 	mounted(){
+		if(this.isPerson){
+			this.getId()
+		}
 
-	// getwxticket(['chooseImage', 'previewImage', 'getLocalImgData'])
-	// this.axios({
-	//   url: '/scan/getCard',
-	//   method: 'get'
-	// }).then(res=>{
-	//   if(res.data.code==='0'){
-	//     if(res.data.item.frontImage){
-	//       this.idPic= 'data:image/png;base64,'+res.data.item.frontImage
-	//       this.flag1 = true
-	//       this.showUploadBtn = false
-	//       this.modify = false
-	//       this.name = res.data.item.reviseOwnerName
-	//       this.IDCardNum = res.data.item.reviseIdCardNo
-	//       this.IDCardID = res.data.item.creditId
-	//       this.showIDCardUpInfo = true
-	//       $('#front_idcard').css({'height': 'auto'})
-	//     }
-	//   }
-	// })
+		if(this.pageId){
+			this.getInfo(this.pageId)
+		}
 	},
 	methods: {
+    	getInfo(id){
+		    this.axios.get('/scan/auditDetail/'+ id).then(res=>{
+			    if(res.data.code==='0'){
+			    	let item= res.data.item
+			    	this.status= item.status.toString()
+			    	this.auditFailInfo= item.auditFailInfo
+
+					this.travelLicense= item.travelLicense
+					this.travelLicenseRevise= item.travelLicenseRevise
+				    this.drivePic= item.travelLicense.frontImageUrl
+				    if(item.ownerType==1 && item.idCard){
+					    this.idCard= item.idCard
+					    this.idCardRevise= item.idCardRevise
+					    this.idPic=  item.idCard.frontImageUrl
+				    }
+				    if(item.ownerType==2 && item.business){
+					    this.business= item.business
+					    this.businessRevise= item.businessRevise
+					    this.businessPic= item.business.frontImageUrl
+				    }
+			    }
+		    })
+	    },
+    	getId(){
+			this.axios.get('/scan/getCard').then(res=>{
+				if(res.data.code==='0'){
+					this.hasId= true
+					let item= res.data.item
+					this.idCard= item
+					this.idCard.id= this.idCard.creditId= this.idCardRevise.id= this.idCardRevise.creditId= item.creditId
+					this.idCardRevise.ownerName= item.reviseOwnerName
+					this.idCardRevise.idCardNo= item.reviseIdCardNo
+					this.idPic=item.frontImageUrl
+				}
+			})
+	    },
 		upTravelLicense(base64){
 			this.identifyDriveLicense(base64)
 		},
@@ -387,27 +435,45 @@ export default{
 		},
 
 		Bind(){
-			let _this = this
-			if(this.name==='' || this.IDCardNum===''){
-			return Toast('请上传身份证正面')
-			}else if(this.vehiclePlateNumber==='' || this.ownerName==='' || this.vin==='' || this.engineNo===''){
-			return Toast('请上传行驶证')
+			if(!this.travelLicense.id) return Toast('请上传行驶证')
+			let data={
+				licenseId: this.travelLicense.id,
 			}
-			if(this.name!= this.ownerName){
-			return Toast('身份证与行驶证持有人不一致')
+			if(this.isPerson){
+				data.ownerType= 1
+				if(this.needOthers){
+					if(!this.idCard.creditId){
+						return Toast('请上传身份证正面')
+					}
+				}
+				if(this.idCard.creditId) data.idCardId= this.idCard.creditId
+			}else{
+				data.ownerType= 2
+				if(this.needOthers){
+					if(!this.business.id){
+						return Toast('请上传营业执照')
+					}else{
+						data.businessId= this.business.id
+					}
+				}
 			}
+			if(this.pageId) data.vehicleId= this.pageId
 			this.axios({
-			url: '/scan/newBind',
-			method: 'post',
-			data: {
-			idCardId: this.IDCardID,
-			licenseId: this.licenseId
-			}
-			}).then(res=>{
-			if(res.data.code==='0'){
-			Toast('绑定成功')
-			this.$router.go(-2)
-			}
+				url: '/scan/newBind',
+				method: 'post',
+				data: data}).then(res=>{
+				if(res.data.code==='0'){
+					Toast('绑定成功')
+					this.$router.go(-1)
+				}else if(res.data.code==='10002'){
+					if(this.isPerson){
+						Toast('此行驶证已被绑定，请上传身份证')
+						this.needOthers= true
+					}else{
+						Toast('此行驶证已被绑定，请上传营业执照')
+						this.needOthers= true
+					}
+				}
 			})
 		},
 
@@ -423,24 +489,33 @@ export default{
 		},
 
 		modify(){
-			let regIdNo = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-			let url= ''
+			let url= '', data= null
 			switch (this.popType){
-				case '':{
-
+				case 'travelLicense':{
+					url= '/travellicense/update'
+					data= this.travelLicenseRevise
+					break
+				}
+				case 'idCard':{
+					url= '/idcard/update'
+					data= this.idCardRevise
+					data.id= this.idCardRevise.creditId
+					break
+				}
+				case 'business':{
+					url= '/businesslicense/update'
+					data= this.businessRevise
+					break
 				}
 			}
-
+			this.axios.post(url, data).then(res=>{
+				if(res.data.code==='0'){
+					Toast('修改成功')
+					this.popupShow= false
+				}
+			})
 		},
-		showChangeCar(field){
 
-		},
-		showChangeId(field){
-
-		},
-		showChangeBus(field){
-
-		},
 	}
 }
 </script>
@@ -612,8 +687,8 @@ export default{
 					display: inline-block;
 					width: 100%;
 					padding-left: 110px;
-					white-space: nowrap;
-					overflow: hidden;
+					/*white-space: nowrap;*/
+					/*overflow: hidden;*/
 					text-overflow: ellipsis;
 					line-height: 20px;
 					height: 20px;
@@ -673,23 +748,3 @@ export default{
 	}
 }
 </style>
-
-<!--<style lang='less'>-->
-  <!--#personUpload {-->
-    <!--.popup {-->
-      <!--a {-->
-        <!--&:active {-->
-          <!--color: #000;-->
-        <!--}-->
-        <!--.mint-cell-title {-->
-          <!--width: 80px;-->
-        <!--}-->
-        <!--input {-->
-          <!--border: none;-->
-          <!--margin-bottom: 0;-->
-        <!--}-->
-      <!--}-->
-
-    <!--}-->
-  <!--}-->
-<!--</style>-->

@@ -73,7 +73,8 @@ export default new Router({
 		{path: '/carOwner-centre/appointment', name: 'appointment', component: resolve => require(['@/page/home/carOwner-centre/appointment/appointment'], resolve), meta: {requiresAuth: true, index: 40}},
 		{path: '/carOwner-centre/visitService', name: 'visitService', component: resolve => require(['@/page/home/carOwner-centre/visitService/visitService'], resolve), meta: {requiresAuth: true}},
 		{path: '/carOwner-centre/bind-car/bindCar', name: 'bindCar', component: resolve => require(['@/page/home/carOwner-centre/bind-car/bindCar'], resolve)},
-		{path: '/bind-my-car', name: 'bind-my-car', component: resolve => require(['@/page/carRecord/bind-my-car'], resolve), meta: {requiresAuth: true, index: 50}},
+		{path: '/bind-my-car', name: 'bind-my-car', component: resolve => require(['@/page/carRecord/bind-my-car'], resolve), meta: {requiresAuth: true}},
+		{path: '/bind-my-car-com', name: 'bind-my-car-com', component: resolve => require(['@/page/carRecord/bind-my-car'], resolve), meta: {requiresAuth: true}},
 		{path: '/carOwner-centre/bind-car/companyUpload', name: 'companyUpload', component: resolve => require(['@/page/home/carOwner-centre/bind-car/companyUpload'], resolve), meta: {requiresAuth: true, index: 40}},
 		{path: '/carOwner-centre/bind-car/bind-other-car', name: 'bindOtherCar', component: resolve => require(['@/page/home/carOwner-centre/bind-car/bind-other-car'], resolve), meta: {requiresAuth: true, index: 40}},
 

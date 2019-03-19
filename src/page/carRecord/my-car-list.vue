@@ -8,7 +8,7 @@
       <div class="carList">
         <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
           <ul>
-            <li @click="goRecordList(item.vin, item.status, item.vehicleplatenumber)" class="block mui-table-view-cell mui-transitioning" v-for='(item, index) in carList' :key='index'>
+            <li @click="goRecordList(item.vin, item.status, item.vehicleplatenumber, item.id, item.ownerType)" class="block mui-table-view-cell mui-transitioning" v-for='(item, index) in carList' :key='index'>
               <div class="mui-slider-right mui-disabled">
                 <a class="mui-btn mui-btn-red" style="transform: translate(0px, 0px);" v-if="item.binds&&item.binds.length" @click.stop.prevent="removeAuthorize(item.binds)">解除授权</a>
                 <a class="mui-btn mui-btn-yellow" style="transform: translate(0px, 0px);" @click.stop="deleteVehicle(item.vehicleId)">解绑车辆</a>
@@ -29,8 +29,9 @@
                 </div>
               </div>
 	            <div class="remove">
-		            <mt-button type="danger" size="small" class="but" @click.stop.prevent="deleteVehicle(item.vehicleId)">解绑</mt-button>
-		            <mt-button type="danger" size="small" class="but" v-if="item.self &&item.binds && item.binds.length" @click.stop.prevent="removeAuthorize(item.binds, item.vehicleplatenumber)">解除授权</mt-button>
+		            <div class="button" @click.stop.prevent="deleteVehicle(item.vehicleId)">解绑</div>
+		            <div class="button" v-if="item.self &&item.binds && item.binds.length"
+		                 @click.stop.prevent="removeAuthorize(item.binds, item.vehicleplatenumber)">解除授权</div>
 	            </div>
 
             </li>
@@ -44,6 +45,10 @@
       :actions="actions"
       v-model="sheetVisible">
     </mt-actionsheet>
+	  <mt-actionsheet
+			  :actions="actions2"
+			  v-model="sheetVisible2">
+	  </mt-actionsheet>
     <mt-popup
       v-model="popupVisible">
       <div style="width: 80vw; border-radius: 3px; max-height: calc(80vh - 40px);">
@@ -81,10 +86,11 @@ export default {
       userRoleId: null,
       allLoaded: false,
       sheetVisible: false,
+      sheetVisible2: false,
       actions: [{
         name: '绑定本人车辆',
         method(){
-          _this.$router.push('/carOwner-centre/bind-car/bindCar')
+          _this.sheetVisible2= true
         }
       }, {
         name: '绑定他人车辆',
@@ -92,6 +98,17 @@ export default {
           _this.$router.push('/carOwner-centre/bind-car/bind-other-car')
         }
       }],
+	    actions2: [{
+		    name: '个人车辆',
+		    method(){
+			    _this.$router.push('/bind-my-car')
+		    }
+	    }, {
+		    name: '企业车辆',
+		    method(){
+			    _this.$router.push('/bind-my-car-com')
+		    }
+	    }],
       popupVisible: false,
       checkedWho: '',
       authorizers: [],
@@ -101,21 +118,19 @@ export default {
   },
 
   methods: {
-    goRecordList(id, status, vehicleplatenumber) {
-      if(status != '2'){
-        // MessageBox.alert('绑定车辆信息正在审核中, 请审核通过后再查看').then(action => {
-        //   return
-        // })
+    goRecordList(vin, status, vehicleplatenumber, id, ownerType) {
+      if(status != 2){
+
 	      this.$router.push({
-		      path: '/carRecord/bind-my-car',
+		      path: ownerType==1? '/bind-my-car': '/bind-my-car-com',
 		      query: {id:id}
 	      })
         return
       }
-      if(id) {
+      if(vin) {
         this.$router.push({
           path: '/recordList',
-          query: {id:id, vehicleplatenumber: vehicleplatenumber}
+          query: {id:vin, vehicleplatenumber: vehicleplatenumber}
         })
       } else {
         Toast('该车暂无维修记录')
@@ -358,9 +373,15 @@ export default {
 		  position: absolute;
 		  right: 10px;
 		  bottom: 10px;
-		  .but{
-			  float: right;
+		  .button{
+			  font-size: 12px;
+			  height: 26px;
+			  line-height: 26px;
+			  padding: 0 6px;
 			  margin-left: 5px;
+			  border-radius: 5px;
+			  color: white;
+			  background-color: #ed4014;
 		  }
 	  }
 
