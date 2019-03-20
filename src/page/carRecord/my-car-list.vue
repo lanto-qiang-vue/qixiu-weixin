@@ -142,7 +142,7 @@ export default {
 	  key(e){
 		  if ( e.keyCode == 13 || e=='search') {
 			  this.page=1
-			  this.list=[]
+			  this.carList=[]
 			  this.getData()
 		  }
 	  },
@@ -208,7 +208,7 @@ export default {
             if(res.data.code === '0') {
               Toast('解绑成功!');
 	            this.page=1
-	            this.list=[]
+	            this.carList=[]
 	            this.getData()
             } else {
               Toast(res.data.status);
@@ -252,7 +252,7 @@ export default {
         if(res.data.code==='0'){
           Toast('取消授权成功')
 	        this.page=1
-	        this.list=[]
+	        this.carList=[]
 	        this.getData()
         }else {
           Toast(res.data.status)

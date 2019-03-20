@@ -375,17 +375,17 @@ export default{
 		},
 		showChangeCar(){
     		return (field)=>{
-    			return this.travelLicenseRevise[field]!= this.travelLicense[field]? this.travelLicenseRevise[field]: false
+    			return this.travelLicenseAfter[field]!= this.travelLicense[field]? this.travelLicenseAfter[field]: false
 		    }
 		},
 		showChangeId(){
     		return (field)=>{
-    			return this.idCardRevise[field]!= this.idCard[field]? this.idCardRevise[field]: false
+    			return this.idCardAfter[field]!= this.idCard[field]? this.idCardAfter[field]: false
 		    }
 		},
 		showChangeBus(){
     		return (field)=>{
-    			return this.businessRevise[field]!= this.business[field]? this.businessRevise[field]: false
+    			return this.businessAfter[field]!= this.business[field]? this.businessAfter[field]: false
 		    }
 		},
 		pageId(){
@@ -432,17 +432,22 @@ export default{
 				    this.travelLicense.registerDate= item.travelLicense.registerDateStr
 				    this.travelLicenseRevise.issueDate= item.travelLicenseRevise.issueDateStr
 				    this.travelLicenseRevise.registerDate= item.travelLicenseRevise.registerDateStr
+				    this.travelLicenseAfter= deepClone(this.travelLicenseRevise)
 
 				    this.drivePic= item.travelLicense.frontImageUrl
 				    if(item.ownerType==1 && item.idCard){
 					    this.idCard= item.idCard
 					    this.idCardRevise= item.idCardRevise
 					    this.idPic=  item.idCard.frontImageUrl
+
+					    this.idCardAfter= deepClone(this.idCardRevise)
 				    }
 				    if(item.ownerType==2 && item.business){
 					    this.business= item.business
 					    this.businessRevise= item.businessRevise
 					    this.businessPic= item.business.frontImageUrl
+
+					    this.businessAfter= deepClone(this.businessRevise)
 				    }
 			    }
 		    })
@@ -538,6 +543,8 @@ export default{
 			MessageBox.confirm('修改后需要审核通过才能查看汽车档案').then(action => {
 				this.popType= type
 				this.popupShow= true
+
+
 			})
 		},
 		showDate(field){
@@ -554,15 +561,15 @@ export default{
 		modifyCancel(){
 			switch (this.popType){
 				case 'travelLicense':{
-					this.travelLicenseRevise= deepClone(this.travelLicense)
+					this.travelLicenseRevise= deepClone(this.travelLicenseAfter)
 					break
 				}
 				case 'idCard':{
-					this.idCardRevise= deepClone(this.idCard)
+					this.idCardRevise= deepClone(this.idCardAfter)
 					break
 				}
 				case 'business':{
-					this.businessRevise= deepClone(this.business)
+					this.businessRevise= deepClone(this.businessAfter)
 					break
 				}
 			}
@@ -597,14 +604,20 @@ export default{
 					switch (this.popType){
 						case 'travelLicense':{
 							this.travelLicenseChange= true
+
+							this.travelLicenseAfter = deepClone(this.travelLicenseRevise)
 							break
 						}
 						case 'idCard':{
 							this.idCardChange= true
+
+							this.idCardAfter = deepClone(this.idCardRevise)
 							break
 						}
 						case 'business':{
 							this.businessChange= true
+
+							this.businessAfter = deepClone(this.businessRevise)
 							break
 						}
 					}
