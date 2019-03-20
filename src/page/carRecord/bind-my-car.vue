@@ -71,31 +71,31 @@
 				  <span>{{travelLicense.engineNo}}</span>
 				  <p v-show="showChangeCar('engineNo')">{{showChangeCar('engineNo')}}</p>
 			  </li>
-			  <li>
-				  <label>地址</label>
-				  <span>{{travelLicense.address}}</span>
-				  <p v-show="showChangeCar('address')">{{showChangeCar('address')}}</p>
-			  </li>
-			  <li>
-				  <label>车辆品牌</label>
-				  <span>{{travelLicense.brandModel}}</span>
-				  <p v-show="showChangeCar('brandModel')">{{showChangeCar('brandModel')}}</p>
-			  </li>
-			  <li>
-				  <label>注册日期</label>
-				  <span>{{travelLicense.registerDate}}</span>
-				  <p v-show="showChangeCar('registerDate')">{{showChangeCar('registerDate')}}</p>
-			  </li>
-			  <li>
-				  <label>使用性质</label>
-				  <span>{{travelLicense.useNature}}</span>
-				  <p v-show="showChangeCar('useNature')">{{showChangeCar('useNature')}}</p>
-			  </li>
-			  <li>
-				  <label>车辆类型</label>
-				  <span>{{travelLicense.vehicleType}}</span>
-				  <p v-show="showChangeCar('vehicleType')">{{showChangeCar('vehicleType')}}</p>
-			  </li>
+			  <!--<li>-->
+				  <!--<label>地址</label>-->
+				  <!--<span>{{travelLicense.address}}</span>-->
+				  <!--<p v-show="showChangeCar('address')">{{showChangeCar('address')}}</p>-->
+			  <!--</li>-->
+			  <!--<li>-->
+				  <!--<label>车辆品牌</label>-->
+				  <!--<span>{{travelLicense.brandModel}}</span>-->
+				  <!--<p v-show="showChangeCar('brandModel')">{{showChangeCar('brandModel')}}</p>-->
+			  <!--</li>-->
+			  <!--<li>-->
+				  <!--<label>注册日期</label>-->
+				  <!--<span>{{travelLicense.registerDate}}</span>-->
+				  <!--<p v-show="showChangeCar('registerDate')">{{showChangeCar('registerDate')}}</p>-->
+			  <!--</li>-->
+			  <!--<li>-->
+				  <!--<label>使用性质</label>-->
+				  <!--<span>{{travelLicense.useNature}}</span>-->
+				  <!--<p v-show="showChangeCar('useNature')">{{showChangeCar('useNature')}}</p>-->
+			  <!--</li>-->
+			  <!--<li>-->
+				  <!--<label>车辆类型</label>-->
+				  <!--<span>{{travelLicense.vehicleType}}</span>-->
+				  <!--<p v-show="showChangeCar('vehicleType')">{{showChangeCar('vehicleType')}}</p>-->
+			  <!--</li>-->
 		  </ul>
 	  </div>
 
@@ -182,22 +182,21 @@
 		    <FormItem label="发动机号" prop="engineNo">
 			    <Input v-model.trim="travelLicenseRevise.engineNo"></Input>
 		    </FormItem>
-		    <FormItem label="地址" prop="address">
-			    <Input v-model.trim="travelLicenseRevise.address"></Input>
-		    </FormItem>
-		    <FormItem label="车辆品牌" prop="brandModel">
-			    <Input v-model.trim="travelLicenseRevise.brandModel"></Input>
-		    </FormItem>
-		    <FormItem label="注册日期" prop="registerDate">
-			    <span class="ivu-input select" @click="showDate('registerDate')">{{travelLicenseRevise.registerDate}}</span>
-			    <!--<Input v-model.trim="travelLicenseRevise.registerDate" @on-focus="showDate('registerDate')"></Input>-->
-		    </FormItem>
-		    <FormItem label="使用性质" prop="useNature">
-			    <Input v-model.trim="travelLicenseRevise.useNature"></Input>
-		    </FormItem>
-		    <FormItem label="车辆类型" prop="vehicleType">
-			    <Input v-model.trim="travelLicenseRevise.vehicleType"></Input>
-		    </FormItem>
+		    <!--<FormItem label="地址" prop="address">-->
+			    <!--<Input v-model.trim="travelLicenseRevise.address"></Input>-->
+		    <!--</FormItem>-->
+		    <!--<FormItem label="车辆品牌" prop="brandModel">-->
+			    <!--<Input v-model.trim="travelLicenseRevise.brandModel"></Input>-->
+		    <!--</FormItem>-->
+		    <!--<FormItem label="注册日期" prop="registerDate">-->
+			    <!--<span class="ivu-input select" @click="showDate('registerDate')">{{travelLicenseRevise.registerDate}}</span>-->
+		    <!--</FormItem>-->
+		    <!--<FormItem label="使用性质" prop="useNature">-->
+			    <!--<Input v-model.trim="travelLicenseRevise.useNature"></Input>-->
+		    <!--</FormItem>-->
+		    <!--<FormItem label="车辆类型" prop="vehicleType">-->
+			    <!--<Input v-model.trim="travelLicenseRevise.vehicleType"></Input>-->
+		    <!--</FormItem>-->
 	    </Form>
 
 	    <Form :class="['common-form']" v-show="popType=='idCard'" :model="idCardRevise"
@@ -568,8 +567,15 @@ export default{
 			if(!this.travelLicense.id) return Toast('请上传行驶证')
 			if(!this.travelLicenseChange){
 				for(let key in this.travelLicense){
-					if(key=='binding') continue
-					if(!this.travelLicense[key]) return Toast('行驶证有空值，请修改')
+					switch (key){
+						case 'ownerName':
+						case 'vehiclePlateNumber':
+						case 'vin':
+						case 'issueDate':
+						case 'engineNo':{
+							if(!this.travelLicense[key]) return Toast('行驶证有空值，请修改')
+						}
+					}
 				}
 			}
 			let data={
