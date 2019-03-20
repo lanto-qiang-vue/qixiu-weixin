@@ -170,10 +170,10 @@
 			    <Input v-model.trim="travelLicenseRevise.ownerName" placeholder="更改所有人"></Input>
 		    </FormItem>
 		    <FormItem label="车牌号" prop="vehiclePlateNumber">
-			    <Input v-model.trim="travelLicenseRevise.vehiclePlateNumber" placeholder="更改车牌号"></Input>
+			    <Input v-model.trim="travelLicenseReviseVehiclePlateNumber" placeholder="更改车牌号"></Input>
 		    </FormItem>
 		    <FormItem label="车架号(VIN)" prop="vin">
-			    <Input v-model.trim="travelLicenseRevise.vin" placeholder="更改车架号(VIN)"></Input>
+			    <Input v-model.trim="travelLicenseReviseVin" placeholder="更改车架号(VIN)"></Input>
 		    </FormItem>
 		    <FormItem label="发证日期" prop="issueDate">
 			    <span class="ivu-input select" @click="showDate('issueDate')">{{travelLicenseRevise.issueDate}}</span>
@@ -244,7 +244,7 @@
 <script>
 import { Field, Button, Toast, MessageBox, Popup } from 'mint-ui'
 import Upload from '@/page/components/compress-upload.vue'
-import {deepClone, formatDate} from '@/util.js'
+import {deepClone, formatDate, reg} from '@/util.js'
 let travelLicense= {
 	ownerName: '',
 	vehiclePlateNumber: '',
@@ -293,8 +293,41 @@ export default{
 		    business: {},
 		    businessRevise: deepClone(business),
 
-		    travelLicenseReviseRule: travelLicenseReviseRule,
-		    idCardReviseRule: idCardReviseRule,
+		    travelLicenseReviseRule: {
+			    ownerName: [rule],
+			    issueDate: [rule],
+			    engineNo: [rule],
+			    vehiclePlateNumber:[rule, {
+				    validator: (rules, value, callback) => {
+					    if (!reg.vehicle.test(value)) {
+						    callback(new Error('车牌格式不正确'));
+					    } else {
+						    callback();
+					    }
+				    }
+			    }],
+			    vin:[rule, {
+				    validator: (rules, value, callback) => {
+					    if (!reg.vin.test(value)) {
+						    callback(new Error('请输入17位VIN'));
+					    } else {
+						    callback();
+					    }
+				    }
+			    }],
+		    },
+		    idCardReviseRule: {
+			    ownerName: [rule],
+			    idCardNo: [rule, {
+				    validator: (rules, value, callback) => {
+					    if (!reg.idcard.test(value)) {
+						    callback(new Error('身份证格式不正确'));
+					    } else {
+						    callback();
+					    }
+				    }
+			    }],
+		    },
 		    businessReviseRule: businessReviseRule,
 
 		    drivePic:'',
@@ -316,9 +349,6 @@ export default{
     	isPerson(){
     		return this.$route.path=='/bind-my-car'
 	    },
-		// status(){
-		// 	return this.status.toString()
-		// },
 		editable(){
 			return this.status!='1' && this.status!='2'
 		},
@@ -357,6 +387,22 @@ export default{
 		},
 		pageId(){
     		return this.$route.query&& this.$route.query.id? this.$route.query.id: null
+		},
+		travelLicenseReviseVehiclePlateNumber:{
+			get(){
+				return this.travelLicenseRevise.vehiclePlateNumber;
+			},
+			set(val){
+				this.travelLicenseRevise.vehiclePlateNumber = val.toUpperCase();
+			}
+		},
+		travelLicenseReviseVin:{
+			get(){
+				return this.travelLicenseRevise.vin;
+			},
+			set(val){
+				this.travelLicenseRevise.vin = val.toUpperCase();
+			}
 		}
 	},
 	mounted(){
@@ -567,13 +613,22 @@ export default{
 			if(!this.travelLicense.id) return Toast('请上传行驶证')
 			if(!this.travelLicenseChange){
 				for(let key in this.travelLicense){
+					let val= this.travelLicense[key]
 					switch (key){
 						case 'ownerName':
-						case 'vehiclePlateNumber':
-						case 'vin':
+						case 'vehiclePlateNumber': {
+							if(reg.vehicle.test(val)){
+								return Toast('车牌号格式不正确，请修改')
+							}
+						}
+						case 'vin': {
+							if(reg.vin.test(val)){
+								return Toast('vin格式不正确，请修改')
+							}
+						}
 						case 'issueDate':
 						case 'engineNo':{
-							if(!this.travelLicense[key]) return Toast('行驶证有空值，请修改')
+							if(!val) return Toast('行驶证有空值，请修改')
 						}
 					}
 				}
@@ -589,6 +644,9 @@ export default{
 					}
 					if(!this.idCardChange){
 						if(!this.idCard.ownerName || !this.idCard.idCardNo) return Toast('身份证有空值，请修改')
+						if(reg.idcard.test(this.idCard.idCardNo)){
+							return Toast('身份证格式不正确，请修改')
+						}
 					}
 				}
 				if(this.idCard.creditId) data.idCardId= this.idCard.creditId
