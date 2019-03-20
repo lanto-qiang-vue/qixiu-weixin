@@ -2,11 +2,11 @@
   <div id="carList">
     <div class='search'>
       <form action="javascript:return true;">
-        <input type="search" placeholder="搜索车牌号码" class="mui-input-clear" v-model='vehicleplatenumber' @keydown="getData($event)" style="padding-left: 35px; text-indent: 0;">
+        <input type="search" placeholder="搜索车牌号码" class="mui-input-clear" v-model='vehicleplatenumber' @keydown="key($event)" style="padding-left: 35px; text-indent: 0;">
       </form>
     </div>
       <div class="carList">
-        <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="上拉加载更多"  topLoadingText="更新中" ref="loadmore">
+        <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="加载更多"  ref="loadmore">
           <ul>
             <li @click="goRecordList(item.vin, item.status, item.vehicleplatenumber, item.id, item.ownerType)" class="block mui-table-view-cell mui-transitioning" v-for='(item, index) in carList' :key='index'>
               <!--<div class="mui-slider-right mui-disabled">-->
@@ -80,7 +80,9 @@ export default {
     return {
       carList: [],
       lastPage: false,
-      pageNo: 1,
+	    page: 1,
+	    limit: 10,
+	    total: 0,
       vehicleplatenumber: '',
       loadMoreBtn: false,
       userRoleId: null,
@@ -137,44 +139,41 @@ export default {
       }
 
     },
-
-    getData(e){
-	    if (e &&e.keyCode == '13') {
-		    e.target.blur()
-		    this.pageNo=1
-		    if (this.vehicleplatenumber.trim() == '') {
-			    Toast('请输入车牌号')
-			    return
-		    }
-	    }
+	  key(e){
+		  if ( e.keyCode == 13 || e=='search') {
+			  this.page=1
+			  this.list=[]
+			  this.getData()
+		  }
+	  },
+    getData(flag){
 	    this.axios.post('/vehicle/owner/queryVehicelist', {
 		    "cartype": "",
-		    "pageNo": this.pageNo,
+		    "page": this.page,
 		    "pageSize": 10,
 		    "vehiclePlateNumber": this.vehicleplatenumber,
 	    }).then( (res) => {
-		    this.allLoaded=true
-		    if(arguments.length==2){
-			    this.carList=[...this.carList, ...res.data.items]
-			    this.$refs.loadmore.onBottomLoaded();
-		    }else {
-			    this.carList = res.data.items
-		    }
-		    if(arguments.length==1){
-			    this.$refs.loadmore.onTopLoaded()
+		    this.total= res.data.total
+		    if(res.data.items&&res.data.items.length){
+			    let arr= res.data.items
+			    this.carList=this.carList.concat(arr)
+
+			    if(this.carList.length>=res.data.total){
+				    this.allLoaded=true
+			    }else{
+				    this.allLoaded=false
+			    }
+			    if(flag) this.$refs.loadmore.onBottomLoaded()
+		    }else{
+			    this.allLoaded=true
 		    }
 	    })
     },
 
     // 上拉加载更多
     loadBottom() {
-      this.pageNo+=1
-      this.getData(1,2)
-    },
-
-    // 下拉刷新
-    loadTop(){
-      this.getData(1)
+	    this.page++
+	    this.getData(true)
     },
 
 	  showStatus(status){
@@ -208,7 +207,9 @@ export default {
         }).then(res => {
             if(res.data.code === '0') {
               Toast('解绑成功!');
-	            this.getData(1)
+	            this.page=1
+	            this.list=[]
+	            this.getData()
             } else {
               Toast(res.data.status);
             }
@@ -250,6 +251,8 @@ export default {
       }).then(res=>{
         if(res.data.code==='0'){
           Toast('取消授权成功')
+	        this.page=1
+	        this.list=[]
 	        this.getData()
         }else {
           Toast(res.data.status)

@@ -287,10 +287,13 @@ export default{
 		    popupShow: false,
 
 		    travelLicense: {},
+		    travelLicenseAfter: {},
 		    travelLicenseRevise: deepClone(travelLicense),
 		    idCard: {},
+		    idCardAfter: {},
 		    idCardRevise: deepClone(idCard),
 		    business: {},
+		    businessAfter: {},
 		    businessRevise: deepClone(business),
 
 		    travelLicenseReviseRule: {
@@ -576,7 +579,7 @@ export default{
 				case 'idCard':{
 					url= '/idcard/update'
 					data= this.idCardRevise
-					data.id= this.idCardRevise.creditId
+					// data.id= this.idCardRevise.creditId
 					break
 				}
 				case 'business':{
@@ -870,10 +873,10 @@ export default{
 					margin-top: 10px;
 				}
 				p{
+					height: auto;
 					padding-left: 110px;
 					position: relative;
 					line-height: 20px;
-					height: 20px;
 					color: orange;
 					font-size: 15px;
 					margin-bottom: 5px;
