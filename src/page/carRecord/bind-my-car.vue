@@ -464,6 +464,9 @@ export default{
 					this.idCard.id= this.idCard.creditId= this.idCardRevise.id= this.idCardRevise.creditId= item.creditId
 					this.idCardRevise.ownerName= item.reviseOwnerName
 					this.idCardRevise.idCardNo= item.reviseIdCardNo
+
+					this.idCardAfter.ownerName= item.reviseOwnerName
+					this.idCardAfter.idCardNo= item.reviseIdCardNo
 					this.idPic=item.frontImageUrl
 				}
 			})
