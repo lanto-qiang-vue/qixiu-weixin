@@ -617,12 +617,12 @@ export default{
 					switch (key){
 						case 'ownerName':
 						case 'vehiclePlateNumber': {
-							if(reg.vehicle.test(val)){
+							if(!reg.vehicle.test(val)){
 								return Toast('车牌号格式不正确，请修改')
 							}
 						}
 						case 'vin': {
-							if(reg.vin.test(val)){
+							if(!reg.vin.test(val)){
 								return Toast('vin格式不正确，请修改')
 							}
 						}
@@ -644,7 +644,7 @@ export default{
 					}
 					if(!this.idCardChange){
 						if(!this.idCard.ownerName || !this.idCard.idCardNo) return Toast('身份证有空值，请修改')
-						if(reg.idcard.test(this.idCard.idCardNo)){
+						if(!reg.idcard.test(this.idCard.idCardNo)){
 							return Toast('身份证格式不正确，请修改')
 						}
 					}
