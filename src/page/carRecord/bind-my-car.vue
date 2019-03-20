@@ -434,12 +434,14 @@ export default{
 				    this.travelLicenseRevise.registerDate= item.travelLicenseRevise.registerDateStr
 				    this.travelLicenseAfter= deepClone(this.travelLicenseRevise)
 
+				    this.travelLicenseChange= true
 				    this.drivePic= item.travelLicense.frontImageUrl
 				    if(item.ownerType==1 && item.idCard){
 					    this.idCard= item.idCard
 					    this.idCardRevise= item.idCardRevise
 					    this.idPic=  item.idCard.frontImageUrl
 
+					    this.idCardChange= true
 					    this.idCardAfter= deepClone(this.idCardRevise)
 				    }
 				    if(item.ownerType==2 && item.business){
@@ -447,6 +449,7 @@ export default{
 					    this.businessRevise= item.businessRevise
 					    this.businessPic= item.business.frontImageUrl
 
+					    this.businessChange= true
 					    this.businessAfter= deepClone(this.businessRevise)
 				    }
 			    }
@@ -657,7 +660,7 @@ export default{
 			if(this.isPerson){
 				data.ownerType= 1
 				if(this.needOthers){
-					if(!this.idCard.creditId){
+					if(!this.idCard.creditId && !this.idCard.id){
 						return Toast('请上传身份证正面')
 					}
 					if(!this.idCardChange){
@@ -667,11 +670,11 @@ export default{
 						}
 					}
 				}
-				if(this.idCard.creditId) data.idCardId= this.idCard.creditId
+				if(this.idCard.creditId|| this.idCard.id) data.idCardId= this.idCard.creditId|| this.idCard.id
 			}else{
 				data.ownerType= 2
 				if(this.needOthers){
-					if(!this.business.id){
+					if(!this.business.id && !this.business.businessId){
 						return Toast('请上传营业执照')
 					}else{
 						data.businessId= this.business.id
@@ -680,7 +683,7 @@ export default{
 						if(!this.business.corpName || !this.business.legalPerson) return Toast('营业执照有空值，请修改')
 					}
 				}
-
+				if(this.business.businessId|| this.business.id) data.businessId= this.business.businessId|| this.business.id
 			}
 			if(this.pageId) data.vehicleId= this.pageId
 
