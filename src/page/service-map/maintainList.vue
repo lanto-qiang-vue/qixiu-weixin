@@ -223,7 +223,7 @@ export default {
 	        area: [{name: '全部', value: ''}],
 	        sort:[
 				{name: '默认', value: ''},
-				{name: '距离优先', value: 'distance'},
+				{name: '距离优先', value: 'score asc,distance asc'},
 				{name: sotrName, value: '_score asc,rating desc,distance asc'},
 	        ],
 	        hot:[
@@ -392,7 +392,8 @@ export default {
 		    let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,rating,openHours'+
 			    '&q='+ this.search.q +
 			    '&page='+ (this.page-1) +','+ (limit ||this.limit)
-		    query+= ('&sort='+ (this.search.sort||'distance'))
+		    let defaultSort= is300?'_score asc,rating desc,distance asc': '_score asc,distance asc'
+		    query+= ('&sort='+ (this.search.sort|| defaultSort))
 		    if(this.location.lng) query+=('&point='+this.location.lat+','+this.location.lng)
 		    let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
 		    if(is300 && this.search.biz) fq+= ('+AND+kw:'+  this.search.biz)
@@ -664,7 +665,7 @@ export default {
 							this.search= deepClone(search)
 						    this.search.schoolPoint= temp.schoolPoint
 						    this.search.type= '300'
-						    this.search.sort= '_score,rating desc,distance asc'
+						    this.search.sort= '_score asc,rating desc,distance asc'
 						    this.search.base= e.target.getExtData().name.replace('驾校基地', '')
 						    this.showHead= 'base'
 						    this.schoolBrand= e.target.getExtData().brand
