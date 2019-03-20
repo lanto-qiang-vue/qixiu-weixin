@@ -615,17 +615,19 @@ export default{
 				for(let key in this.travelLicense){
 					let val= this.travelLicense[key]
 					switch (key){
-						case 'ownerName':
 						case 'vehiclePlateNumber': {
 							if(!reg.vehicle.test(val)){
 								return Toast('车牌号格式不正确，请修改')
 							}
+							break
 						}
 						case 'vin': {
 							if(!reg.vin.test(val)){
 								return Toast('vin格式不正确，请修改')
 							}
+							break
 						}
+						case 'ownerName':
 						case 'issueDate':
 						case 'engineNo':{
 							if(!val) return Toast('行驶证有空值，请修改')
