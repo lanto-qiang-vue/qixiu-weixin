@@ -579,13 +579,13 @@ export default{
 				case 'idCard':{
 					url= '/idcard/update'
 					data= this.idCardRevise
-					// data.id= this.idCardRevise.creditId
+					if(this.idCardRevise.creditId) data.id= this.idCardRevise.creditId
 					break
 				}
 				case 'business':{
 					url= '/businesslicense/update'
 					data= this.businessRevise
-					data.id= this.businessRevise.businessId
+					if(this.businessRevise.businessId) data.id= this.businessRevise.businessId
 					break
 				}
 			}

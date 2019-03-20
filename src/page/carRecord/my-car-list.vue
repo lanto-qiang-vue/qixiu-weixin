@@ -266,13 +266,14 @@ export default {
 <style scoped lang='less'>
   #carList {
   background-color: #f8f8f8;
+  height: 100vh;
   overflow: auto;
-  position: relative;
+  /*position: relative;*/
     .add_car{
       position: fixed; left: 0;bottom: 0; border-radius: 0; border: none; width: 100%;
     }
     .carList{
-      height: 100vh;
+	    height: 100vh;
       padding: 50px 0 40px 0;
       overflow: auto;
     }
