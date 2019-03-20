@@ -6,7 +6,10 @@
 	</ul>
 	<ul class="maintain-type" v-if="mapType=='300' && showHead!='baseMap'">
 		<li v-for="(item, index) in schoolPoint" :class="{on : tagIsOn('schoolPoint', item.value)}"
-		    @click="select('schoolPoint', item.value)" :key="index">{{item.name}}</li>
+		    @click="select('schoolPoint', item.value)" :key="index">{{item.name}}
+			<img v-if="item.value=='300'" src="/static/img/maintain/icon-school.png"/>
+			<img v-if="item.value=='301'" src="/static/img/maintain/icon-base.png"/>
+		</li>
 	</ul>
 <slide-bar v-show="show=='maintainList'" :minHeight="45" :toLocation="toLocation" @bodyHeight="height= $event;calcHeight">
 <div class="maintainList">
@@ -624,16 +627,16 @@ export default {
 			    imageSize: new AMap.Size(30, 30),
 		    });
 		    let iconSchool = new AMap.Icon({
-			    image: "/static/img/maintain/icon-school.png",
-			    size: new AMap.Size(30, 30),
+			    image: "/static/img/maintain/point-school.png",
+			    size: new AMap.Size(30, 37),
 			    // imageOffset: new AMap.Size(11, 11),
-			    imageSize: new AMap.Size(30, 30),
+			    imageSize: new AMap.Size(30, 37),
 		    });
 		    let iconBase = new AMap.Icon({
-			    image: "/static/img/maintain/icon-base.png",
-			    size: new AMap.Size(30, 30),
+			    image: "/static/img/maintain/point-base.png",
+			    size: new AMap.Size(30, 37),
 			    // imageOffset: new AMap.Size(11, 11),
-			    imageSize: new AMap.Size(30, 30),
+			    imageSize: new AMap.Size(30, 37),
 		    });
 
 		    let markers= []
@@ -804,6 +807,10 @@ export default {
 		  text-align: center;
 		  color:  #9d9d9d;
 		  display: inline-block;
+		  img{
+			  width: 20px;
+			  vertical-align: middle;
+		  }
 	  }
 	  li.on{
 		  color: black;
