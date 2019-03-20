@@ -74,7 +74,8 @@
 	</div>
 	<div id="head2" v-show="showHead=='base'||showHead=='baseMap'">
 		<div class="search-input"><p class="base-head">{{search.base}}驾校基地（{{total}}家驾校）</p>
-		<p class="base-head" v-if="schoolBrand">{{schoolBrand}}自用基地</p>
+			<p class="base-head" v-if="schoolBrand">{{schoolBrand}}自用基地</p>
+			<p class="base-head" v-else>合用基地</p>
 		</div>
 	</div>
   <div class="roll" :style="{height: listHeight+'px'}">
@@ -223,7 +224,7 @@ export default {
 	        sort:[
 				{name: '默认', value: ''},
 				{name: '距离优先', value: 'distance'},
-				{name: sotrName, value: 'rating desc,distance asc'},
+				{name: sotrName, value: '_score asc,rating desc,distance asc'},
 	        ],
 	        hot:[
 				{name: '默认', value: ''},
@@ -289,7 +290,7 @@ export default {
 			    	this.showHead= 'baseMap'
 			    }
 			    case 'school-map':{
-			    	this.search.sort= 'rating desc,distance asc'
+			    	this.search.sort= '_score asc,rating desc,distance asc'
 			    	this.inputPlaceholder= '搜索：驾校名、驾校地址'
 				    type= '300'
 				    break
@@ -364,7 +365,7 @@ export default {
 
 						this.search= deepClone(search)
 						this.search.type= '300'
-						this.search.sort= 'rating desc,distance asc'
+						this.search.sort= '_score asc,rating desc,distance asc'
 						this.search.base= query.item.name.replace('驾校基地', '')
 						this.showHead= 'base'
 						this.getCompList(true, true, true)
@@ -391,7 +392,7 @@ export default {
 		    let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,rating,openHours'+
 			    '&q='+ this.search.q +
 			    '&page='+ (this.page-1) +','+ (limit ||this.limit)
-		    query+= ('&sort=_score desc,'+ (this.search.sort||'distance'))
+		    query+= ('&sort='+ (this.search.sort||'distance'))
 		    if(this.location.lng) query+=('&point='+this.location.lat+','+this.location.lng)
 		    let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
 		    if(is300 && this.search.biz) fq+= ('+AND+kw:'+  this.search.biz)
@@ -663,7 +664,7 @@ export default {
 							this.search= deepClone(search)
 						    this.search.schoolPoint= temp.schoolPoint
 						    this.search.type= '300'
-						    this.search.sort= 'rating desc,distance asc'
+						    this.search.sort= '_score,rating desc,distance asc'
 						    this.search.base= e.target.getExtData().name.replace('驾校基地', '')
 						    this.showHead= 'base'
 						    this.schoolBrand= e.target.getExtData().brand

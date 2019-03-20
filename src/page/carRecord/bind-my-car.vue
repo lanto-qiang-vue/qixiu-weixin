@@ -176,7 +176,8 @@
 			    <Input v-model.trim="travelLicenseRevise.vin" placeholder="更改车架号(VIN)"></Input>
 		    </FormItem>
 		    <FormItem label="发证日期" prop="issueDate">
-			    <Input v-model.trim="travelLicenseRevise.issueDate" @on-focus="showDate('issueDate')"></Input>
+			    <span class="ivu-input select" @click="showDate('issueDate')">{{travelLicenseRevise.issueDate}}</span>
+			    <!--<Input v-model.trim="travelLicenseRevise.issueDate" @on-focus="showDate('issueDate')"></Input>-->
 		    </FormItem>
 		    <FormItem label="发动机号" prop="engineNo">
 			    <Input v-model.trim="travelLicenseRevise.engineNo"></Input>
@@ -188,7 +189,8 @@
 			    <Input v-model.trim="travelLicenseRevise.brandModel"></Input>
 		    </FormItem>
 		    <FormItem label="注册日期" prop="registerDate">
-			    <Input v-model.trim="travelLicenseRevise.registerDate" @on-focus="showDate('registerDate')"></Input>
+			    <span class="ivu-input select" @click="showDate('registerDate')">{{travelLicenseRevise.registerDate}}</span>
+			    <!--<Input v-model.trim="travelLicenseRevise.registerDate" @on-focus="showDate('registerDate')"></Input>-->
 		    </FormItem>
 		    <FormItem label="使用性质" prop="useNature">
 			    <Input v-model.trim="travelLicenseRevise.useNature"></Input>
