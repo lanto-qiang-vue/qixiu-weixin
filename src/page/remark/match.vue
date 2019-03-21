@@ -410,8 +410,6 @@
           } else if(res.data.code=='000004'){
             self.$router.go(-1)
             Toast('此车牌近期已有点评');
-          } else {
-            Toast(res.data.status);
           }
         })
       }
