@@ -165,7 +165,7 @@
 
     <mt-popup v-model="popupShow" position="right" class="popup">
 	    <Form :class="['common-form']" v-show="popType=='travelLicense'" :model="travelLicenseRevise"
-	          :label-width="100" label-position="left" ref="travelLicenseRevise" :rules="travelLicenseReviseRule">
+	          :label-width="100" label-position="left" ref="travelLicense" :rules="travelLicenseReviseRule">
 		    <FormItem label="所有人" prop="ownerName">
 			    <Input v-model.trim="travelLicenseRevise.ownerName" placeholder="更改所有人"></Input>
 		    </FormItem>
@@ -200,7 +200,7 @@
 	    </Form>
 
 	    <Form :class="['common-form']" v-show="popType=='idCard'" :model="idCardRevise"
-	          :label-width="100" label-position="left" ref="idCardRevise" :rules="idCardReviseRule">
+	          :label-width="100" label-position="left" ref="idCard" :rules="idCardReviseRule">
 		    <FormItem label="姓名" prop="ownerName">
 			    <Input v-model.trim="idCardRevise.ownerName" placeholder="更改姓名"></Input>
 		    </FormItem>
@@ -210,7 +210,7 @@
 	    </Form>
 
 	    <Form :class="['common-form']" v-show="popType=='business'" :model="businessRevise"
-	          :label-width="100" label-position="left" ref="businessRevise" :rules="businessReviseRule">
+	          :label-width="100" label-position="left" ref="business" :rules="businessReviseRule">
 		    <FormItem label="企业名称" prop="corpName">
 			    <Input v-model.trim="businessRevise.corpName" placeholder="更改企业名称"></Input>
 		    </FormItem>
@@ -583,26 +583,28 @@ export default{
 		},
 		modify(){
 			let url= '', data= null
-			switch (this.popType){
-				case 'travelLicense':{
-					url= '/travellicense/update'
-					data= this.travelLicenseRevise
-					break
-				}
-				case 'idCard':{
-					url= '/idcard/update'
-					data= this.idCardRevise
-					if(this.idCardRevise.creditId) data.id= this.idCardRevise.creditId
-					break
-				}
-				case 'business':{
-					url= '/businesslicense/update'
-					data= this.businessRevise
-					if(this.businessRevise.businessId) data.id= this.businessRevise.businessId
-					break
-				}
-			}
-			this.axios.post(url, data).then(res=>{
+			this.$refs[this.popType].validate((valid) => {
+				if(valid){
+					switch (this.popType){
+						case 'travelLicense':{
+							url= '/travellicense/update'
+							data= this.travelLicenseRevise
+							break
+						}
+						case 'idCard':{
+							url= '/idcard/update'
+							data= this.idCardRevise
+							if(this.idCardRevise.creditId) data.id= this.idCardRevise.creditId
+							break
+						}
+						case 'business':{
+							url= '/businesslicense/update'
+							data= this.businessRevise
+							if(this.businessRevise.businessId) data.id= this.businessRevise.businessId
+							break
+						}
+					}
+				this.axios.post(url, data).then(res=>{
 				if(res.data.code==='0'){
 					Toast('修改成功')
 					this.popupShow= false
@@ -628,7 +630,8 @@ export default{
 						}
 					}
 				}
-			})
+				})
+			}})
 		},
 
 		Bind(){
