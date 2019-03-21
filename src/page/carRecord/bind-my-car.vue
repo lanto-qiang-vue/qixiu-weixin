@@ -567,15 +567,21 @@ export default{
 		modifyCancel(){
 			switch (this.popType){
 				case 'travelLicense':{
-					this.travelLicenseRevise= deepClone(this.travelLicenseAfter)
+					if(this.travelLicenseAfter.id)
+						this.travelLicenseRevise= deepClone(this.travelLicenseAfter)
+					else this.travelLicenseRevise= deepClone(this.travelLicense)
 					break
 				}
 				case 'idCard':{
-					this.idCardRevise= deepClone(this.idCardAfter)
+					if(this.idCardAfter.id || this.idCardAfter.creditId)
+						this.idCardRevise= deepClone(this.idCardAfter)
+					else this.idCardRevise= deepClone(this.idCard)
 					break
 				}
 				case 'business':{
-					this.businessRevise= deepClone(this.businessAfter)
+					if(this.businessAfter.id || this.businessAfter.businessId)
+						this.businessRevise= deepClone(this.businessAfter)
+					else this.businessRevise= deepClone(this.business)
 					break
 				}
 			}
