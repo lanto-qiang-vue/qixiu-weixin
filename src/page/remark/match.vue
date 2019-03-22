@@ -239,6 +239,9 @@
         return flag
       },
       next(){
+      	// for(let key in MessageBox){
+      	// 	console.log('MessageBox', key)
+        // }
         if(!this.checkval()) return
 	      this.axios.get('/comment/maintain/checkUserVehicle?vehicleNum='+this.area+ this.cardno.trim()).then(res => {
 			console.log('res.data', res.data)
@@ -407,8 +410,11 @@
         })
       }
     },
-
-	}
+		beforeRouteLeave (to, from, next) {
+			MessageBox.close()
+			next()
+		}
+}
 </script>
 
 <style scoped lang='less'>
