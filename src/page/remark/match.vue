@@ -248,7 +248,7 @@
 			if(Boolean(res.data)){
 				this.$router.push({path: '/remarkMatch', query: { corpId: this.$route.query.corpId, show: 'yes' }})
 			}else{
-				MessageBox({message: '您还未绑定此车辆，请先绑定或修改车牌号。',
+				MessageBox({message: '为保证点评真实性，请绑定该车辆后进行点评！', closeOnClickModal: false,
 				   confirmButtonText: '前往绑定', cancelButtonText: '修改车牌', showCancelButton: true}).then(action => {
 				// console.log('action', action)
 				   switch (action){
