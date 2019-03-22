@@ -72,9 +72,6 @@
 import { Toast, Loadmore, Button, MessageBox, Actionsheet, Popup, Radio } from 'mint-ui'
 export default {
   name: 'carList',
-  mounted() {
-    this.getData()
-  },
   data() {
     let _this = this
     return {
@@ -118,7 +115,13 @@ export default {
 	    removeAuthNo: ''
     }
   },
-
+	mounted() {
+		this.getData()
+		if(this.$route.query && this.$route.query.showBind){
+			this.sheetVisible= true
+			history.replaceState(null, null, window.location.origin + window.location.hash.split('?')[0])
+		}
+	},
   methods: {
     goRecordList(vin, status, vehicleplatenumber, id, ownerType) {
       if(status != 2){

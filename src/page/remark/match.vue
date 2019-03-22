@@ -16,7 +16,7 @@
       <div class="input">
         <div class="area" style="display: inline-block;font-size: 16px;position: absolute;height: 22px;width: 45px;border-right: 1px solid #bdbdbd" @click="areavisible= true">{{area}}
           <b style="width: 0;height: 0;border-width: 5px;border-style: solid;border-color: black transparent transparent transparent;position: absolute;left: 25px;top: 7px;"></b></div>
-        <input placeholder="请输入车牌号" v-model="cardno" @blur="bodyScroll" style="padding-left: 50px"/>
+        <input placeholder="请输入车牌号" v-model="cardno" @blur="bodyScroll" ref="input" style="padding-left: 50px"/>
       </div>
     </div>
     <!--<div class="row">-->
@@ -239,36 +239,29 @@
         return flag
       },
       next(){
-        let self=this
         if(!this.checkval()) return
-        // if(!this.islogin){
-        //   let data = {
-        //     captcha: this.code,   // 验证码
-        //     loginMethod: 'code',
-        //     systemToken: localStorage.getItem('SYSTEMTOKEN'),
-        //     usertel: this.tel
-        //   }
-        //   this.axios({
-        //     method: 'post',
-        //     url: '/user/useraccount/register/login',
-        //     headers: {'Content-type': 'application/json'},
-        //     data: JSON.stringify(data)
-        //   }).then(res => {
-        //     if(res.data.code=='0'){
-        //       localStorage.setItem("ACCESSTOKEN",res.data.data.accessToken);
-        //       localStorage.setItem("USERINFO",JSON.stringify(res.data.data));
-        //       // Toast("登录成功")
-        //       self.remarkvisible=true
-        //       self.checklogin()
-        //     } else{
-        //       Toast(res.data.status);
-        //     }
-        //   })
-        // }else{
-        //   this.remarkvisible=true
-        // }
-        // this.remarkvisible=true
-        this.$router.push({path: '/remarkMatch', query: { corpId: this.$route.query.corpId, show: 'yes' }})
+	      this.axios.get('/comment/maintain/checkUserVehicle?vehicleNum='+this.area+ this.cardno.trim()).then(res => {
+			console.log('res.data', res.data)
+			if(Boolean(res.data)){
+				this.$router.push({path: '/remarkMatch', query: { corpId: this.$route.query.corpId, show: 'yes' }})
+			}else{
+				MessageBox({message: '您还未绑定此车辆，请先绑定或修改车牌号。',
+				   confirmButtonText: '前往绑定', cancelButtonText: '修改车牌', showCancelButton: true}).then(action => {
+				// console.log('action', action)
+				   switch (action){
+				      case 'confirm':{
+					      this.$router.push({path: '/my-car-list', query: {showBind: true}})
+				      	break
+				      }
+				      case 'cancel':{
+					      this.cardno= ''
+					      this.$refs.input.focus()
+					      break
+				      }
+				   }
+				})
+			}
+	      })
 	      this.bodyScroll()
       },
 	    bodyScroll(){

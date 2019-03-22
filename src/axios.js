@@ -38,7 +38,7 @@ axios.interceptors.response.use(
   response => {
     Indicator.close()
     switch (response.data.code){
-	    case '0': break
+        case '0': break
       case '401':
       case '2000':
       case '100':
@@ -104,7 +104,8 @@ axios.interceptors.response.use(
 
 function weixinLogin() {
   if(isWeixn() &&localStorage.getItem('UNIONID')){
-    Toast('登录过期,正在自动重新登录!')
+	  Indicator.close()
+    Toast('登录中')
 
     axios({
       url: '/user/useraccount/login',
