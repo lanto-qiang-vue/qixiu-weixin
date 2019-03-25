@@ -22,10 +22,16 @@ export default {
 		},
 		maintainDetail: {},
 		maintainListHistory: maintainListHistory(),
-		nowRole: 'chezhu'
+		nowRole: 'chezhu',
+		location:{
+			lng: '',
+			lat: ''
+		}
 	},
 	getters: {
-
+		// getLocation: state => {
+		// 	return state.location
+		// }
 	},
 	mutations: {
 		changeYZM(state,YZM) {
@@ -77,7 +83,11 @@ export default {
 		},
 		setNowRole(state, val){
 			state.nowRole= val
-		}
+		},
+		setLocation(state, obj){
+			state.location.lng= obj.lng
+			state.location.lat= obj.lat
+		},
 	},
 	actions:{
 
