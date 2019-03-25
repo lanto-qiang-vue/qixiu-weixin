@@ -170,7 +170,9 @@
       let userinfo = JSON.parse(localStorage.getItem("USERINFO"))
       if (userinfo) {
         this.name = userinfo.nickname ? userinfo.nickname : userinfo.mobileNo
-        this.tel = userinfo.mobileNo.substr(0, 3) + "****" + userinfo.mobileNo.substr(7)
+        if(userinfo.mobileNo){
+	        this.tel = userinfo.mobileNo.substr(0, 3) + "****" + userinfo.mobileNo.substr(7)
+        }
         this.picURL = userinfo.photo
         this.roles= JSON.stringify(userinfo.roles)
 
