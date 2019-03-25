@@ -81,11 +81,7 @@
 				localSuccess: true,
 				action:'',
 
-				label:{
-					input: '企业名称/优惠内容',
-					items: '服务承诺及惠民项目',
-					shareText: '车主福利大放送'
-				}
+				label:{}
 			}
 		},
 		computed:{
@@ -119,7 +115,8 @@
 					this.label={
 						input: '企业名称/优惠内容',
 						items: '服务承诺及惠民项目',
-						shareText: '车主福利大放送'
+						shareText: '车主福利大放送',
+						sort: 'gradeLevel asc,distance asc'
 					}
 					break
 				}
@@ -128,7 +125,8 @@
 					this.label={
 						input: '企业名称',
 						items: '服务声明',
-						shareText: '免费洗车活动'
+						shareText: '免费洗车活动',
+						sort: 'distance asc'
 					}
 					break
 				}
@@ -197,7 +195,7 @@
 				let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,promoDetail,credit'+
 					'&q='+ this.search.q +
 					'&page='+ (this.page-1) +','+ (limit ||this.limit)
-				query+= ('&sort=gradeLevel asc,distance asc')
+				query+= ('&sort='+this.label.sort)
 				if(this.search.lng) {
 					let point=('&point='+this.search.lat+','+this.search.lng)
 					if(this.show10km) point+= ',10'
