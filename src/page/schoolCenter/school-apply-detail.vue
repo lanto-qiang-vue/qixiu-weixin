@@ -19,7 +19,7 @@
 		</FormItem>
 	</Form>
 
-	<div class="common-submit"><a :href="'tel:'+ form.phoneNo">一键拨打</a></div>
+	<div class="common-submit"><a :href="'tel:'+ form.phoneNo" @click="change(false)">一键拨打</a></div>
 </div>
 </template>
 
@@ -39,7 +39,7 @@ export default {
 	methods:{
 		change(val){
 			console.log(val)
-			this.form.contact= !this.form.contact
+			this.form.contact= val
 			this.axios.post('/training/center/driving/contact_status', this.form).then( (res) => {
 				this.form= res.data
 			})
