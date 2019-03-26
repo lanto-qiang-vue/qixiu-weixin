@@ -35,6 +35,8 @@
 				</li>
 
 				<p class="show-rule" v-show="show10km && allLoaded">默认显示10公里内，通过筛选区域获得更多门店信息</p>
+				<p class="show-rule" v-show="!show10km&& allLoaded">没有更多了</p>
+				<p class="show-rule" v-show="allLoaded&& !list.length">此区域没有活动门店</p>
 			</ul>
 		</mt-loadmore>
 		<mt-popup v-model="showRadio"  style="width: 90%" >
