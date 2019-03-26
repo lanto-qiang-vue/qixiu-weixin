@@ -397,11 +397,11 @@
 			.area{
 				color: #333333;
 				font-size: 14px;
-				position: relative;
-				float: right;
+				position: absolute;
+				top: 10px;
+				right: 20px;
 				padding-right: 12px;
 				line-height: 26px;
-				margin-right: 20px;
 				&:after{
 					position: absolute;
 					right: 0;
