@@ -25,7 +25,7 @@
 					<small v-if="item.grade=='AAA'">（最高评级）</small>
 				</span>
 						<div class="right">
-							<span v-show="localSuccess">距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
+							<span v-show="localSuccess">距离{{item.distance.toFixed(2)}}km <i class="fa fa-location-arrow icon"></i></span>
 							<router-link tag="div" class="goto"
 							             :to="`/maintain?maintainId=${item.sid}&distance=${item.distance}`">前往</router-link>
 						</div>
