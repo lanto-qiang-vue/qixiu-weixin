@@ -25,7 +25,7 @@
 					<small v-if="item.grade=='AAA'">（最高评级）</small>
 				</span>
 						<div class="right">
-							<span>距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
+							<span v-show="localSuccess">距离{{item.distance.toFixed(1)}}km <i class="fa fa-location-arrow icon"></i></span>
 							<router-link tag="div" class="goto"
 							             :to="`/maintain?maintainId=${item.sid}&distance=${item.distance}`">前往</router-link>
 						</div>
@@ -195,7 +195,7 @@
 				let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,promoDetail,credit'+
 					'&q='+ this.search.q +
 					'&page='+ (this.page-1) +','+ (limit ||this.limit)
-				query+= ('&sort='+this.label.sort)
+				query+= ('&sort='+ (this.localSuccess?this.label.sort:'gradeLevel asc,distance asc'))
 				if(this.search.lng) {
 					let point=('&point='+this.search.lat+','+this.search.lng)
 					if(this.show10km) point+= ',10'
