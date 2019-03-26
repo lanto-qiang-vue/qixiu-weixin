@@ -126,7 +126,7 @@
 						input: '企业名称',
 						items: '服务声明',
 						shareText: '免费洗车活动',
-						sort: 'distance asc'
+						sort: 'distance asc,gradeLevel asc'
 					}
 					break
 				}
