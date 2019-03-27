@@ -165,6 +165,7 @@ export default new Router({
 		{path: '/free-wash', name: 'free-wash', component: resolve => require(['@/page/activity/free-wash.vue'], resolve), meta: {requiresAuth: true, keepAlive: true, title:'免费洗车活动'}},
 		{path: '/discounts-list', name: 'discounts-list', component: resolve => require(['@/page/activity/discounts-list.vue'], resolve), meta: {requiresAuth: true, keepAlive: true, title:'汽修企业惠民项目'}},
 		{path: '/school-apply-detail', name: 'school-apply-detail', component: resolve => require(['@/page/schoolCenter/school-apply-detail.vue'], resolve), meta: {requiresAuth: true,}},
+		{path: '/extra-page', name: 'extra-page', component: resolve => require(['@/page/extra-page.vue'], resolve),},
 
 	]
 })
