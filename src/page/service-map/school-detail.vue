@@ -10,7 +10,7 @@
 			</mt-swipe>
 		</div>
 	</div>
-	<img v-else style="width: 100%" src="~@/assets/img/maintain/暂无图片.png"/>
+	<img v-else style="width: 100%" src="/static/img/jiapei.jpg"/>
 	<div class="head">
 		<div class="title">{{info.simpleName}}({{info.name}})</div>
 		<div class="level">{{info.creditLevel=="N" ? "未评" :info.creditLevel}}级</div>

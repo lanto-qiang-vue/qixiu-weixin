@@ -198,13 +198,14 @@
 					    buttonPosition: 'RT',
 					    buttonOffset: new AMap.Pixel(10,40),
 					    timeout: 2000,
+					    panToLocation: this.$route.query&&this.$route.query.special=='base'? false: true
 				    });
 				    this.map.addControl(this.geolocation);
 				    this.geolocation.getCurrentPosition();
 				    AMap.event.addListener(this.geolocation, 'complete', (result)=>{
 				    	// console.log('result', result)
 					    this.map.clearMap()
-					    this.map.setCenter(result.position)
+					    // this.map.setCenter(result.position)
 					    this.originalLocation.lng= result.position.lng
 					    this.originalLocation.lat= result.position.lat
 					    this.originalLocation.success= true
