@@ -30,7 +30,7 @@
 		<p v-if="info.about"><a class="more" @click="showMore= true">了解更多</a></p>
 	</div>
 	<div class="bottom">
-		<div class="call" @click="toCall"><span>拨打电话</span></div>
+		<!--<div class="call" @click="toCall"><span>拨打电话</span></div>-->
 		<div class="sign-up" @click="showForm= true">学车报名</div>
 	</div>
 
@@ -333,7 +333,8 @@ export default {
 			}
 		}
 		.sign-up{
-			width: 60%;
+			/*width: 60%;*/
+			width: 100%;
 			float: left;
 			height: 50px;
 			line-height: 50px;
