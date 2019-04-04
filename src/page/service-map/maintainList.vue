@@ -227,7 +227,7 @@ export default {
 	        sort:[
 				{name: '默认', value: ''},
 				{name: '距离优先', value: 'score asc,distance asc'},
-				{name: sotrName, value: '_score asc,rating desc,distance asc'},
+				{name: sotrName, value: '_score desc,rating desc,distance asc'},
 	        ],
 	        hot:[
 				{name: '默认', value: ''},
@@ -293,7 +293,7 @@ export default {
 			    	this.showHead= 'baseMap'
 			    }
 			    case 'school-map':{
-			    	this.search.sort= '_score asc,rating desc,distance asc'
+			    	this.search.sort= '_score desc,rating desc,distance asc'
 			    	this.inputPlaceholder= '搜索：驾校名、驾校地址'
 				    type= '300'
 				    break
@@ -368,7 +368,7 @@ export default {
 
 						this.search= deepClone(search)
 						this.search.type= '300'
-						this.search.sort= '_score asc,rating desc,distance asc'
+						this.search.sort= '_score desc,rating desc,distance asc'
 						this.search.base= query.item.name.replace('驾校基地', '')
 						this.showHead= 'base'
 						this.getCompList(true, true, true)
@@ -395,7 +395,7 @@ export default {
 		    let query='?fl=pic,type,sid,name,addr,tel,distance,kw,lon,lat,bizScope,brand,category,grade,tag,rating,openHours'+
 			    '&q='+ this.search.q +
 			    '&page='+ (this.page-1) +','+ (limit ||this.limit)
-		    let defaultSort= is300?'_score asc,rating desc,distance asc': '_score asc,distance asc'
+		    let defaultSort= is300?'_score desc,rating desc,distance asc': '_score desc,distance asc'
 		    query+= ('&sort='+ (this.search.sort|| defaultSort))
 		    if(this.location.lng) query+=('&point='+this.location.lat+','+this.location.lng)
 		    let fq='&fq=status:1+AND+type:'+ this.search.type, is4s=''
@@ -668,7 +668,7 @@ export default {
 							this.search= deepClone(search)
 						    this.search.schoolPoint= temp.schoolPoint
 						    this.search.type= '300'
-						    this.search.sort= '_score asc,rating desc,distance asc'
+						    this.search.sort= '_score desc,rating desc,distance asc'
 						    this.search.base= e.target.getExtData().name.replace('驾校基地', '')
 						    this.showHead= 'base'
 						    this.schoolBrand= e.target.getExtData().brand

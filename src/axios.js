@@ -8,7 +8,7 @@ import { isWeixn} from './util'
 axios.defaults.timeout = 60000
 
 // console.log(process.env.NODE_ENV)
-let doing= false
+
 
 axios.defaults.baseURL = '/proxy/';
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
