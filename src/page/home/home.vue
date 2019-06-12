@@ -107,8 +107,8 @@
 
   <div class="adv_and_cdf" style="margin-bottom: 20px;position: relative">
     <!--<img src="~@/assets/img/home/temp/fast_login.png" alt="" style="width: 100%;" @click="fastLogin">-->
-	  <router-link tag="a" to="/infoDetail?infoId=Agbank-mCredit-card"  style="width: 100%;"><img src="/static/img/temp/activity-bank.jpg" style="width: 100%;"/></router-link>
-
+	  <!--<router-link tag="a" to="/infoDetail?infoId=Agbank-mCredit-card"  style="width: 100%;"><img src="/static/img/temp/activity-bank.jpg" style="width: 100%;"/></router-link>-->
+	<a href="https://weixin.hoxiuxiu.com/#/obu" style="width: 100%;"><img src="/static/img/temp/activity-bank.png" style="width: 100%;"/></a>
     <div class="cdf">
       <img class="title" src="../../assets/img/home/cdf-title.png"/>
       <img class="cdf-pic" src="../../assets/img/home/cdf-pic.png" />
