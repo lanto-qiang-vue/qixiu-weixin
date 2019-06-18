@@ -1,10 +1,9 @@
 <template>
-<div class="work-card" v-show="info.work_number">
+<div class="work-card" v-show="info.work_number || info.nickname || info.work_number">
 	<h1>上海汽修平台</h1>
 	<img src="/static/img/hxx-logo.png"/>
 	<div class="content">
 		<img :src="info.pic"/>
-
 		<p><label>姓名：</label><span>{{info.nickname}}</span></p>
 		<p><label>工号：</label><span>{{info.work_number}}</span></p>
 	</div>
@@ -12,7 +11,7 @@
 		<img src="/static/img/qixiu-logo.png"/>
 		<div class="text">
 			<h2>上海市机动车维修公共服务平台</h2>
-			<p>Shanghai Automobile Maintenance Public Service Platfor</p>
+			<p>Shanghai Automobile Maintenance Public Service Platform</p>
 		</div>
 	</div>
 </div>
@@ -29,7 +28,6 @@ export default {
 	mounted(){
 		this.axios.get('/promotion/hxx_ground/person/card',{params:{
 				accountNo: this.$route.query.accountNo,
-				userId: JSON.parse(localStorage.getItem("USERINFO")).userId
 		}}).then(res=>{
 				this.info=res.data
 		})
