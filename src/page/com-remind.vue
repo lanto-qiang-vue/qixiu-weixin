@@ -21,7 +21,7 @@ export default {
 	mounted(){
 		this.axios.put('/monitoring/message/company-docking/'+this.$route.query.id).then(res=>{
 			this.info= res.data
-			if(res.data.type= 'COMPANY_DEPT_COUNT'){
+			if(res.data.type== 'COMPANY_DEPT_COUNT'){
 				this.show= false
 			}
 		})
