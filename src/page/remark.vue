@@ -170,7 +170,7 @@ export default {
           if(res.data.code=='130412'){
             Toast('提交评论失败,用户票据失效,请重新登录')
           }else if(res.data.code=='120513'){
-            Toast('提交评论失败,您还未绑定车辆')
+            Toast('提交评论失败,您还未添加车辆')
           }else if(res.data.code=='120509'){
             Toast('提交评论失败,评论内容过长')
           }else if(res.data.code=='120500'){

@@ -253,7 +253,7 @@
             licenseId: this.licenseId
           }
         }).then(res=>{
-	        Toast('绑定成功')
+	        Toast('添加成功')
 	        this.$router.go(-2)
         })
       },

@@ -40,7 +40,7 @@
       </div>
 
 
-    <mt-button @click="sheetVisible=!sheetVisible" type="primary" class="add_car" size="large">新增绑定车辆</mt-button>
+    <mt-button @click="sheetVisible=!sheetVisible" type="primary" class="add_car" size="large">添加车辆</mt-button>
     <mt-actionsheet
       :actions="actions"
       v-model="sheetVisible">
@@ -87,12 +87,12 @@ export default {
       sheetVisible: false,
       sheetVisible2: false,
       actions: [{
-        name: '绑定本人车辆',
+        name: '添加本人车辆',
         method(){
           _this.sheetVisible2= true
         }
       }, {
-        name: '绑定他人车辆',
+        name: '添加他人车辆',
         method(){
           _this.$router.push('/carOwner-centre/bind-car/bind-other-car')
         }

@@ -3,13 +3,13 @@
     <ul>
       <li>
         <h4>个人车辆</h4>
-        <span>绑定您自己的车辆</span>
-        <div @click="goBindMy">去绑定</div>
+        <span>添加您自己的车辆</span>
+        <div @click="goBindMy">去添加</div>
       </li>
       <li>
         <h4>企业车辆</h4>
-        <span>绑定您企业的车辆</span>
-        <div @click="goBindCompany">去绑定</div>
+        <span>添加您企业的车辆</span>
+        <div @click="goBindCompany">去添加</div>
       </li>
     </ul>
   </div>

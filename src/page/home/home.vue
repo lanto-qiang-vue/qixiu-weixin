@@ -241,13 +241,13 @@ export default {
       totalCount: null,
       sheetVisible: false,
       actions: [{
-        name: '绑定本人车辆',
+        name: '添加本人车辆',
         method(){
           _this.$router.push('/carOwner-centre/bind-car/bindCar')
         }
       },
       {
-        name: '绑定他人车辆',
+        name: '添加他人车辆',
         method(){
           _this.$router.push('/carOwner-centre/bind-car/bind-other-car')
         }

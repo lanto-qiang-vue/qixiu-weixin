@@ -66,7 +66,7 @@ export default {
     },
     goRecordList(id, status, vehicleplatenumber,evaluate) {
         if(status == '1'){
-          MessageBox.alert('绑定车辆信息正在审核中, 请审核通过后再查看').then(action => {
+          MessageBox.alert('车辆信息正在审核中, 请审核通过后再查看').then(action => {
             return
           })
           return
@@ -107,7 +107,7 @@ export default {
           this.carList = res.data.data
         }
         if (this.carList == null || this.carList.length == 0) {
-          Toast('您还未绑定车辆')
+          Toast('您还未添加车辆')
         }
         if(arguments.length==1){
          this.$refs.loadmore.onTopLoaded()
