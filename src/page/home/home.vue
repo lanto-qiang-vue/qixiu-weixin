@@ -104,6 +104,10 @@
     </div>
   </div>
 
+	<router-link to="/to-remark" tag="div" class="to-remark" v-show="showToRemark">
+		<i class="fa fa-volume-up"></i>为提升维修门店服务质量，请为您的维修记录点评！
+		<span>去点评</span>
+	</router-link>
 
   <div class="adv_and_cdf" style="margin-bottom: 20px;position: relative">
     <!--<img src="~@/assets/img/home/temp/fast_login.png" alt="" style="width: 100%;" @click="fastLogin">-->
@@ -305,7 +309,8 @@ export default {
         },
       },
       tipsData:[],
-      showSwiper: false
+      showSwiper: false,
+	    showToRemark: false,
     }
   },
 
@@ -317,6 +322,7 @@ export default {
     // window.clearInterval(this.snews1.timer)
     // window.clearInterval(this.snews2.timer)
     // window.clearInterval(this.snews3.timer)
+	  this.everyCall()
 
     this.axios.post('/banner/query',{terminal: 'W'}).then(res=>{
       if(res.data.code==='0'){
@@ -461,6 +467,7 @@ export default {
   activated(){
     // console.log(this.questionList)
     // console.log(this.questionList.length)
+	  this.everyCall()
     if(this.questionList.length){
       this.autoroll('cdf1', this.questionList.length-2, false, 3000)
       this.autoroll('snews1', this.news1.length-2, false, 3800)
@@ -497,6 +504,18 @@ export default {
         if (!this.translateY) event.preventDefault();
       }
     },
+	  everyCall(){
+		  this.axios.get('/vehicle/to/comment/list', {hxxtoken: true}).then((res) => {
+			  if (res.data.code == '0') {
+				  if(res.data.items.length){
+					  this.showToRemark= true
+				  }else{
+					  this.showToRemark= false
+				  }
+			  }
+		  })
+	  },
+
     getNews(category, callback){
       let data = {
 	      infoType: category,
@@ -1173,6 +1192,35 @@ export default {
         }
       }
     }
+	  .to-remark{
+		  margin-bottom: 10px;
+		  padding: 5px 55px 5px 5px;
+		  white-space: nowrap;
+		  overflow: hidden;
+		  text-overflow: ellipsis;
+		  position: relative;
+		  line-height: 22px;
+		  background-color: white;
+		  font-size: 12px;
+		  i{
+			  font-size: 14px;
+			  margin-right: 3px;
+			  color: #FF6D0E;
+		  }
+		  span{
+			  font-size: 12px;
+			  width: 56px;
+			  line-height: 22px;
+			  text-align: center;
+			  display: block;
+			  position: absolute;
+			  top: 5px;
+			  right: 5px;
+			  background-color: #F2F2F2;
+			  color: #FF6D0E;
+			  border-radius: 10px;
+		  }
+	  }
   }
   #home.nosroll{
     overflow: hidden;

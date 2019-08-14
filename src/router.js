@@ -139,6 +139,7 @@ export default new Router({
 		{path: '/myAppointment', name: 'myAppointment', component: resolve => require(['@/page/myAppointment'], resolve), meta: {requiresAuth: true, index: 20}},
 		{path: '/myOrder', name: 'myOrder', component: resolve => require(['@/page/myOrder'], resolve), meta: {requiresAuth: true, index: 20}},
 		{path: '/myRemark', name: 'myRemark', component: resolve => require(['@/page/remark/myRemark'], resolve), meta: {requiresAuth: true}},
+		{path: '/to-remark', name: 'to-remark', component: resolve => require(['@/page/remark/to-remark'], resolve), meta: {requiresAuth: true}},
 		{path: '/remarkMap', name: 'remark-map', component: resolve => require(['@/page/service-map/maintain'], resolve), meta: {keepAlive: false,  requiresAuth: true}},
 		{path: '/remarkMatch', name: 'remark-match', component: resolve => require(['@/page/remark/match'], resolve),meta: {requiresAuth: true}},
 		{path: '/remarkDetail', name: 'remark-detail', component: resolve => require(['@/page/remark/newRemarkDetail'], resolve)},

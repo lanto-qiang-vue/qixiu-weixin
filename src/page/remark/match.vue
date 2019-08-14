@@ -160,6 +160,12 @@
 		    })
 	    }
 
+	    let vehicleNum= this.$route.query.vehicleNum
+	    if(vehicleNum){
+      	    this.area= vehicleNum[0]
+		    this.cardno= vehicleNum.substring(1, vehicleNum.length)
+	    }
+
       // this.checklogin()
     },
     methods:{
