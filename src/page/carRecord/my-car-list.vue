@@ -8,7 +8,7 @@
       <div class="carList">
         <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :autoFill="false" bottomPullText="加载更多"  ref="loadmore">
           <ul>
-            <li @click="goRecordList(item.vin, item.status, item.vehicleplatenumber, item.id, item.ownerType)" class="block mui-table-view-cell mui-transitioning" v-for='(item, index) in carList' :key='index'>
+            <li @click="goRecordList(item)" class="block mui-table-view-cell mui-transitioning" v-for='(item, index) in carList' :key='index'>
               <!--<div class="mui-slider-right mui-disabled">-->
                 <!--<a class="mui-btn mui-btn-red" style="transform: translate(0px, 0px);" v-if="item.binds&&item.binds.length" @click.stop.prevent="removeAuthorize(item.binds)">解除授权</a>-->
                 <!--<a class="mui-btn mui-btn-yellow" style="transform: translate(0px, 0px);" @click.stop="deleteVehicle(item.vehicleId)">解绑车辆</a>-->
@@ -123,7 +123,7 @@ export default {
 		}
 	},
   methods: {
-    goRecordList(vin, status, vehicleplatenumber, id, ownerType) {
+    goRecordList({vin, status, vehicleplatenumber, id, ownerType}) {
       if(status != 2){
 
 	      this.$router.push({

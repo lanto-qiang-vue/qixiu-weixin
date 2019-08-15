@@ -226,9 +226,11 @@ export default {
       // })
 
       this.$router.push({path: '/remarkMatch',
-        query: { corpId: this.$route.query.companyId,
-          repairId: this.$route.query.repairbasicinfoId,
-	        vehicleplatenumber: this.$route.query.vehicleplatenumber,
+        query: {
+	        ...this.$route.query,
+      	    // corpId: this.$route.query.companyId,
+            // repairId: this.$route.query.repairbasicinfoId,
+	        vehicleNum: this.$route.query.vehicleplatenumber,
 	        show: 'yes',
 	        compName: this.repairInfo.companyName
       }})

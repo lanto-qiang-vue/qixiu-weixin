@@ -41,7 +41,7 @@ export default {
 				}
 			})
 		},
-		goto({corpId, uniqueId, companyCode, vpn}){
+		goto({corpId, uniqueId, companyCode, vpn, id, companyName}){
 			// this.$router.push({
 			// 	path: '/remark',
 			// 	query:{
@@ -51,7 +51,18 @@ export default {
 			// 		corpId,
 			// 	}
 			// })
-			this.$router.push({path: '/remarkMatch', query: { corpId, vehicleNum: vpn }})
+			// this.$router.push({path: '/remarkMatch', query: { corpId, vehicleNum: vpn }})
+
+			this.$router.push({path: '/remarkMatch',
+				query: {
+					corpId,
+					uniqueId,
+					vehicleNum: vpn,
+					show: 'yes',
+					compName: companyName,
+					// uniqueId,
+					companyCode,
+				}})
 		}
 	}
 }

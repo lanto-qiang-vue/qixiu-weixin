@@ -10,8 +10,8 @@
           <li><span>维修企业</span><p>{{ item.companyName }}</p></li>
           <li><span>送修日期</span><p>{{ item.repairDate }}</p></li>
           <li><span>送修里程</span><p>{{ item.repairMileage }}公里</p></li>
-          <div class="more" @click="goVehicleDetail(item.id, item.companyId, item.plateNumber)"><span>详情</span><i></i></div>
-          <span v-show="!item.gray" @click="goRemark(item.id, item.companyId, item.plateNumber)">我要评价</span>
+          <div class="more" @click="goVehicleDetail(item)"><span>详情</span><i></i></div>
+          <span v-show="!item.gray" @click="goRemark(item)">我要评价</span>
           <span v-show="item.gray" class="gray" @click="goRemarkDetail(item.commentId)">查看评价</span>
         </ul>
         <div class="more_loading" v-show="showLoading">
@@ -80,7 +80,8 @@
       goRemarkDetail(id){
         this.$router.push({path:'/remarkDetail', query:{id: id}})
       },
-      goRemark(repairbasicinfoId, companyId, vehicleplatenumber){
+      // goRemark(repairbasicinfoId, companyId, vehicleplatenumber){
+      goRemark({id, companyId, plateNumber,    corpId, uniqueId, companyCode}){
         // this.axios({
         //   url: '/company/review/isExistUnreviewRepairBasicInfo',
         //   method: 'post',
@@ -106,12 +107,12 @@
         // })
 
         // this.$router.push({path: '/remarkMatch', query: { corpId: companyId, repairId: repairbasicinfoId, vehicleplatenumber: vehicleplatenumber,show: 'yes'}})
-        this.$router.push({path: '/vehicleDetail-carOwner', query: { repairbasicinfoId, companyId ,vehicleplatenumber,show: 'yes'}})
+        this.$router.push({path: '/vehicleDetail-carOwner', query: { repairbasicinfoId: id, companyId ,vehicleplatenumber: plateNumber,show: 'yes'}})
       },
-      goVehicleDetail(repairbasicinfoId, companyId,vehicleplatenumber) {
+      goVehicleDetail({id, companyId, plateNumber,  corpId, uniqueId, companyCode}) {
         this.$router.push({
           path:'/vehicleDetail-carOwner',
-          query: {repairbasicinfoId, companyId, vehicleplatenumber}
+          query: {repairbasicinfoId: id, companyId, vehicleplatenumber: plateNumber, corpId, uniqueId, companyCode}
         })
       },
       loadMore(){

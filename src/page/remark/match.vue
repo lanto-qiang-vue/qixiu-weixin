@@ -362,7 +362,7 @@
       clicktag(index){
         this.tags[index].checked= !this.tags[index].checked
       },
-      submit(){
+      submit1(){
         let self= this, tag= [];
         for (let i in this.tags){
           if(this.tags[i].checked) tag.push(this.tags[i].name)
@@ -397,24 +397,53 @@
           data: param
         }).then(res => {
           if(res.data.code=='0'){
-
             Toast('点评成功')
-            // setTimeout(function () {
-              // if(!this.$route.query.repairId){
-               // self.$router.replace({path: '/remarkDetail', query: { id: res.data.commentId }})
-            self.$router.replace({path: '/home'}) //去掉点评玩分享页面
-              // }else{
-              //   self.$router.replace({path: '/my'})
-              // }
-
-            // },500)
-
+            self.$router.replace({path: '/home'})
           } else if(res.data.code=='000004'){
             self.$router.go(-1)
             Toast('此车牌近期已有点评');
           }
         })
-      }
+      },
+	    submit(){
+		    if(!this.checkval()){
+			    this.$toast('请选择车牌号');
+			    return
+		    }
+		    let vehicleNum= this.area+ this.cardno.trim()
+		    let data={
+			    "attitude": this.serviceQuality,
+			    "keepAppointment": this.promise,
+			    "price": this.repairPrice,
+			    "quality": this.repairQuality,
+			    "speed": this.repairSpeed,
+
+			    level: this.please,
+			    openId: localStorage.getItem("OPENID"),
+			    vehicleNum: vehicleNum,
+			    tags: [],
+			    // userId: this.$store.state.user.userinfo.userId,
+			    companyId: this.corpId? parseInt(this.corpId) :null
+		    }
+		    for (let i in this.tags){
+			    if(this.tags[i].checked) data.tags.push(this.tags[i].name)
+		    }
+		    let uniqueId= this.$route.query.uniqueId
+		    if(uniqueId){
+			    data.repairUid= uniqueId
+		    }else{
+			    data.companyCode= this.$route.query.companyCode
+		    }
+		    this.axios.post('/review/shop/sh_qixiu', data ).then(res=>{
+			    if(res.data.code=='0'){
+				    Toast('点评成功')
+				    this.$router.replace('/home')
+			    } else if(res.data.code=='000004'){
+				    this.$router.go(-1)
+				    Toast('此车牌近期已有点评');
+			    }
+		    })
+	    }
     },
 		beforeRouteLeave (to, from, next) {
 			MessageBox.close()
